@@ -1,4 +1,4 @@
-module github.com/TokujouKaisenDonburi/calendar-back
+module github.com/TokujouKaisenDonburi/optical-backend
 
 go 1.24.4
 
