@@ -1,4 +1,4 @@
-# Calendar Backend
+# Optical Backend
 
 Goプロジェクトのバックエンドリポジトリです
 
