@@ -33,12 +33,11 @@ func NewSchedule(id uuid.UUID, name string, calendar Calendar, members []Member,
 		id:       id,
 		name:     name,
 		calendar: calendar,
-		members: members,
+		members:  members,
 		options:  options,
 	}, nil
 }
 
 func (s *Schedule) AssignEvent(event Event) error {
 	s.calendar = s.calendar.append(event)
-	return nil
 }
