@@ -16,12 +16,12 @@ const (
 type Schedule struct {
 	id       uuid.UUID
 	name     string
-	calender Calender
+	calendar Calendar
 	members  []Member
 	options  []option.Option
 }
 
-func NewSchedule(id uuid.UUID, name string, calender Calender, members []Member, options []option.Option) (*Schedule, error) {
+func NewSchedule(id uuid.UUID, name string, calendar Calendar, members []Member, options []option.Option) (*Schedule, error) {
 	if id == uuid.Nil {
 		return nil, errors.New("Schedule `id` is nil")
 	}
@@ -32,12 +32,13 @@ func NewSchedule(id uuid.UUID, name string, calender Calender, members []Member,
 	return &Schedule{
 		id:       id,
 		name:     name,
-		calender: calender,
+		calendar: calendar,
 		members: members,
 		options:  options,
 	}, nil
 }
 
 func (s *Schedule) AssignEvent(event Event) error {
-	s.calender = s.calender.append(event)
+	s.calendar = s.calendar.append(event)
+	return nil
 }
