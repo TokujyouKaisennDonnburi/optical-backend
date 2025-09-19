@@ -33,6 +33,19 @@ services:
       - .env
 
   # Redisのコンテナ定義
+  optical_redis:
+    image: redis:7.2
+    restart: always
+    container_name: optical_redis
+    ports:
+      - "127.0.0.1:6389:6379"
+    command: redis-server --save 60 1 --loglevel warning --requirepass $REDIS_PASSWORD
+    volumes:
+      - optical_redis_data:/data
+    env_file:
+      - .env
+
+  # Redisのコンテナ定義
   optical_redis_insight:
     image: redis/redisinsight:latest
     container_name: optical_redis_insight
