@@ -1,4 +1,4 @@
 development:
   dialect: postgresql
   dir: db/migrate
-  database: "optical_user:optical_pass_word@tcp(localhost:5433)/optical?parseTime=true"
+  datasource: "postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@localhost:5433/${POSTGRES_DB}?sslmode=disable"
