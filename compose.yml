@@ -17,19 +17,20 @@ services:
       - .env
 
 
-    # postgresqlの公式のGUIツール
-    optical_pgadmin:
-      image: dpage/pgadmin4:latest
-      container_name: optical_pgadmin
-      depends_on:
-        optical_postgres:
-          condition: service_started
-      ports:
-        - 127.0.0.1:8088:80
-      environment:
-        - PGA_HOST=optical_postgres
-      env_file:
-        - .env
+  # postgresqlの公式のGUIツール
+
+  optical_pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: optical_pgadmin
+    depends_on:
+      optical_postgres:
+        condition: service_started
+    ports:
+      - 127.0.0.1:8088:80
+    environment:
+      - PGA_HOST=optical_postgres
+    env_file:
+      - .env
 
   # Redisのコンテナ定義
   optical_redis_insight:
