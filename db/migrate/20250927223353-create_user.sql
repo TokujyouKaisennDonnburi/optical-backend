@@ -44,3 +44,4 @@ CREATE INDEX idx_users_email ON users(email);
 DROP TABLE IF EXISTS users; -- テーブルが存在する場合のみ削除する
 DROP FUNCTION IF EXISTS update_updated_at_column(); -- トリガー関数も削除
 DROP TRIGGER IF EXISTS update_users_updated_at ON users; -- トリガーも削除
+DROP INDEX IF EXISTS idx_users_email; -- インデックス削除
