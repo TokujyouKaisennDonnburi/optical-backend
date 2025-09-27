@@ -40,7 +40,7 @@ func NewEvent(id uuid.UUID, title, memo, color string, scheduledTime ScheduledTi
 		return nil, errors.New("Event `title` length is invalid")
 	}
 	// memo
-	memoLength := utf8.RuneCountInString(title)
+	memoLength := utf8.RuneCountInString(memo)
 	if memoLength > MAX_EVENT_MEMO_LENGTH {
 		return nil, errors.New("Event `memo` length is invalid")
 	}
