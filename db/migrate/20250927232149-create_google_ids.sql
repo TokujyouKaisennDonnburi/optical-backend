@@ -5,9 +5,10 @@
 CREATE TABLE google_ids(
     id UUID PRIMARY KEY,
     user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,   -- 外部キー制約とその削除動作
+    google_id VARCHAR(255) NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-)
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
 
 -- テーブルとカラムにコメント追加
 COMMENT ON TABLE google_ids IS 'Google認証連携テーブル';
