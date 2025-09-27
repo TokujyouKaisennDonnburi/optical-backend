@@ -4,7 +4,7 @@ CREATE TABLE schedule_options(
     schedule_id UUID REFERENCES schedules(id) ON DELETE CASCADE,    -- 外部キー制約とカスケード削除
     option_name VARCHAR(255) NOT NULL,
     PRIMARY KEY (schedule_id, option_name)  -- 複合主キー
-)
+);
 
 -- コメント
 COMMENT ON COLUMN schedule_options.schedule_id IS 'スケジュールID';
