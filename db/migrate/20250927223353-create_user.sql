@@ -1,4 +1,4 @@
--- user関連のスキーマを作成するマイグレーションファイル(postgres用)
+-- usersのスキーマを作成するマイグレーションファイル(postgres用)
 
 -- +migrate Up
 
@@ -35,7 +35,8 @@ CREATE TRIGGER update_users_updated_at
     EXECUTE FUNCTION update_updated_at_column();
 
 
-
+-- インデックスの作成(高速化のため)
+CREATE INDEX idx_users_email ON users(email);
 
 
 -- +migrate Down
