@@ -6,7 +6,7 @@ CREATE TABLE notice(
     title VARCHAR(255) NOT NULL,
     content TEXT,
     is_read BOOLEAN NOT NULL DEFAULT FALSE,  -- 読んだかどうかのフラグ
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 -- コメント
