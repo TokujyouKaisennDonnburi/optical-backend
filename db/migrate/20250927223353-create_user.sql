@@ -20,7 +20,7 @@ COMMENT ON COLUMN users.created_at IS '作成日時';
 COMMENT ON COLUMN users.updated_at IS '更新日時';
 
 -- updated_atを自動更新するトリガーを作成
-SELECT create_trigger_for_updated_at('users');
+SELECT create_updated_at_trigger('users');
 
 
 -- インデックスの作成(高速化のため)
