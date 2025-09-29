@@ -5,7 +5,7 @@ CREATE TABLE schedules(
     id UUID PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     deleted_at TIMESTAMP NULL   -- NULL許容
-)
+);
 
 -- コメント
 COMMENT ON COLUMN schedules.id IS 'スケジュールID';
