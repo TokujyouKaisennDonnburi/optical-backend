@@ -3,11 +3,14 @@ package profile
 import (
 	"errors"
 	"time"
+
+	"github.com/google/uuid"
+
 )
 
 type Profile struct {
-	ID        string
-	UserID    string
+	ID        uuid.UUID
+	UserID    uuid.UUID
 	PhotoURL  string
 	CreatedAt time.Time
 	UpdatedAt time.Time
@@ -18,14 +21,15 @@ var (
 )
 
 // NewProfile
-func NewProfile(userID string) (*Profile, error) {
+func NewProfile(userID uuid.UUID) *Profile {
 	now := time.Now()
 	return &Profile{
+		ID:        uuid.New(),
 		UserID:    userID,
 		PhotoURL:  "",
 		CreatedAt: now,
 		UpdatedAt: now,
-	}, nil
+	}
 }
 
 // update photo
