@@ -41,3 +41,6 @@ func (p *Profile) UpdatePhotoURL(photoURL string) error {
 	p.UpdatedAt = time.Now()
 	return nil
 }
+
+// validate photoURL
+// TODO #46
