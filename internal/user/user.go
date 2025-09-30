@@ -3,10 +3,18 @@ package user
 import (
 	"errors"
 	"time"
-	"unicode/uft8"
+	"strings"
+	"unicode/utf8"
 
 	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
+)
+
+const (
+	MinUserNameLength = 1
+	MaxUserNameLength = 50
+	MinEmailLength    = 3
+	MinPasswordLength = 8
 )
 
 type User struct {
@@ -18,13 +26,6 @@ type User struct {
 	UpdatedAt time.Time
 	DeletedAt time.Time
 }
-
-const (
-	MinUserNameLength = 1
-	MaxUserNameLength = 50
-	MinEmailLength    = 3
-	MinPasswordLength = 8
-)
 
 var (
 	ErrInvalidEmail    = errors.New("無効なメールアドレスです")
