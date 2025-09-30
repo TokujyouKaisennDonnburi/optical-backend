@@ -1,11 +1,11 @@
 -- +migrate Up
 CREATE TABLE event(
-    id UUID PRIMARY KEY,
-    schedule_id UUID REFERENCES schedules(id) ON DELETE CASCADE,
+    id UUID PRIMARY KEY ,
+    schedule_id UUID NOT NULL REFERENCES schedules(id) ON DELETE CASCADE,
     title VARCHAR(255) NOT NULL,
-    memo TEXT,
-    color VARCHAR(50),
-    all_day BOOLEAN,
+    memo TEXT NOT NULL,
+    color VARCHAR(50) NOT NULL,
+    all_day BOOLEAN NOT NULL,
     start_at TIMESTAMP NOT NULL,
     end_at TIMESTAMP NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,

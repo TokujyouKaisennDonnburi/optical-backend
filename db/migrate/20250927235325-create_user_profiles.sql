@@ -2,7 +2,7 @@
 
 CREATE TABLE user_profiles(
     user_id UUID PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,    -- usersテーブルのidを参照と削除動作
-    image_url TEXT
+    image_url TEXT NOT NULL
 );
 
 COMMENT ON TABLE user_profiles IS 'ユーザープロフィールテーブル';

@@ -2,7 +2,7 @@
 CREATE TABLE schedule_members(
     schedule_id UUID REFERENCES schedules(id) ON DELETE CASCADE,
     user_id UUID REFERENCES users(id) ON DELETE CASCADE,
-    joined_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,  -- NULL許容
+    joined_at TIMESTAMP,  -- NULL許容
     PRIMARY KEY (schedule_id, user_id)  -- 複合主キー
 );
 
