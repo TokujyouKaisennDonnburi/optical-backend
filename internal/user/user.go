@@ -3,7 +3,7 @@ package user
 import (
 	"errors"
 	"time"
-	"strings"
+	"unicode/uft8"
 
 	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
@@ -18,6 +18,13 @@ type User struct {
 	UpdatedAt time.Time
 	DeletedAt time.Time
 }
+
+const (
+	MinUserNameLength = 1
+	MaxUserNameLength = 50
+	MinEmailLength    = 3
+	MinPasswordLength = 8
+)
 
 var (
 	ErrInvalidEmail    = errors.New("無効なメールアドレスです")
@@ -117,7 +124,8 @@ func (u *User) VerifyPassword(password string) bool {
 
 // validate name
 func validateName(name string) error {
-	if len(name) < 1 || len(name) > 50 {
+	length := utf8.RuneCountInString(name)
+	if length < MinUserNameLength || length > MaxUserNameLength {
 		return ErrInvalidName
 	}
 	return nil
@@ -125,16 +133,18 @@ func validateName(name string) error {
 
 // validate email
 func validateEmail(email string) error {
-	if len(email) < 3 || !strings.Contains(email, "@") {
+	length := utf8.RuneCountInString(email)
+	if length < MinEmailLength || !strings.Contains(email, "@") {
 		return ErrInvalidEmail
 	}
 	return nil
 }
-// validate password
+
+// validate pass
 func validatePassword(password string) error {
-	if len(password) < 8 {
+	length := utf8.RuneCountInString(password)
+	if length < MinPasswordLength {
 		return ErrInvalidPassword
 	}
 	return nil
 }
-
