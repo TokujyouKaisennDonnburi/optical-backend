@@ -31,7 +31,7 @@ handler
             GetProfile() - プロフィール取得（GET /profiles/:profileId）
             UpdateProfile() - プロフィール編集（PATCH /profiles）
 
-repository
+gatway
 
     役割: データベース操作
     主要メソッド:
@@ -40,6 +40,10 @@ repository
         Update() - ユーザー更新（アイコンURL含む）
         Delete() - 論理削除
         SearchByNameOrEmail() - ユーザー検索
+
+repository
+
+    役割: インターフェースで抽象化
 
 service/command
 
