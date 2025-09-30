@@ -24,7 +24,7 @@ var (
 func NewProfile(userID uuid.UUID) *Profile {
 	now := time.Now()
 	return &Profile{
-		ID:        uuid.New(),
+		ID:        uuid.NewV7(),
 		UserID:    userID,
 		PhotoURL:  "",
 		CreatedAt: now,
