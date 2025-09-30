@@ -11,10 +11,10 @@ import (
 )
 
 const (
-	MinUserNameLength = 1
-	MaxUserNameLength = 50
-	MinEmailLength    = 3
-	MinPasswordLength = 8
+	MIN_USER_NAME_LENGTH = 1
+	MAX_USER_NAME_LENGTH = 50
+	MIN_EMAIL_LENGTH    = 3
+	MIN_PASSWORD_LENGTH = 8
 )
 
 type User struct {
@@ -126,7 +126,7 @@ func (u *User) VerifyPassword(password string) bool {
 // validate name
 func validateName(name string) error {
 	length := utf8.RuneCountInString(name)
-	if length < MinUserNameLength || length > MaxUserNameLength {
+	if length < MIN_USER_NAME_LENGTH || length > MAX_USER_NAME_LENGTH {
 		return ErrInvalidName
 	}
 	return nil
@@ -135,7 +135,7 @@ func validateName(name string) error {
 // validate email
 func validateEmail(email string) error {
 	length := utf8.RuneCountInString(email)
-	if length < MinEmailLength || !strings.Contains(email, "@") {
+	if length < MIN_EMAIL_LENGTH || !strings.Contains(email, "@") {
 		return ErrInvalidEmail
 	}
 	return nil
@@ -144,7 +144,7 @@ func validateEmail(email string) error {
 // validate pass
 func validatePassword(password string) error {
 	length := utf8.RuneCountInString(password)
-	if length < MinPasswordLength {
+	if length < MIN_PASSWORD_LENGTH {
 		return ErrInvalidPassword
 	}
 	return nil
