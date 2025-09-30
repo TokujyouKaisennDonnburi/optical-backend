@@ -5,11 +5,12 @@ import (
 	"time"
 	"strings"
 
+	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
 )
 
 type User struct {
-	ID        string
+	ID        uuid.UUID
 	Name      string
 	Email     string
 	Password  string
@@ -43,6 +44,7 @@ func NewUser(name, email, password string) (*User, error) {
 
 	now := time.Now()
 	return &User{
+		ID:		   uuid.New(),
 		Name:      name,
 		Email:     email,
 		Password:  hashedPassword,
