@@ -1,4 +1,3 @@
--- スケジュールにつけたオプションを管理するテーブル
 -- +migrate Up
 CREATE TABLE schedule_options(
     schedule_id UUID REFERENCES schedules(id) ON DELETE CASCADE,    -- 外部キー制約とカスケード削除
@@ -6,7 +5,6 @@ CREATE TABLE schedule_options(
     PRIMARY KEY (schedule_id, option_name)  -- 複合主キー
 );
 
--- コメント
 COMMENT ON COLUMN schedule_options.schedule_id IS 'スケジュールID';
 COMMENT ON COLUMN schedule_options.option_name IS 'オプション名';
 

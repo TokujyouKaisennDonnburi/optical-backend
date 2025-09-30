@@ -1,11 +1,9 @@
--- オプション
 -- +migrate Up
 CREATE TABLE options(
     id UUID PRIMARY KEY,
     name VARCHAR(255) NOT NULL
 );
 
--- コメント
 COMMENT ON COLUMN options.id IS 'オプションID';
 COMMENT ON COLUMN options.name IS 'オプション名';
 

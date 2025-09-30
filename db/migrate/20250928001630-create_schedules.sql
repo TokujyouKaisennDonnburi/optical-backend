@@ -1,5 +1,3 @@
--- スケジュールのマイグレーションファイル
-
 -- +migrate Up
 CREATE TABLE schedules(
     id UUID PRIMARY KEY,
@@ -7,7 +5,6 @@ CREATE TABLE schedules(
     deleted_at TIMESTAMP NULL   -- NULL許容
 );
 
--- コメント
 COMMENT ON COLUMN schedules.id IS 'スケジュールID';
 COMMENT ON COLUMN schedules.name IS 'スケジュール名';
 COMMENT ON COLUMN schedules.deleted_at IS '削除日時';

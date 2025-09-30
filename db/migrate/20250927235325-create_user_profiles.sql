@@ -1,5 +1,3 @@
--- user系 プロフィール
-
 -- +migrate Up
 
 CREATE TABLE user_profiles(
@@ -7,7 +5,6 @@ CREATE TABLE user_profiles(
     image_url TEXT
 );
 
--- テーブルとカラムにコメント追加
 COMMENT ON TABLE user_profiles IS 'ユーザープロフィールテーブル';
 COMMENT ON COLUMN user_profiles.user_id IS 'ユーザーID（主キー、外部キー）';
 COMMENT ON COLUMN user_profiles.image_url IS 'プロフィール画像のURL';

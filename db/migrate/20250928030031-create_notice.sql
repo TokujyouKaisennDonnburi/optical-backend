@@ -1,4 +1,3 @@
--- 通知を管理するテーブル
 -- +migrate Up
 CREATE TABLE notice(
     id UUID PRIMARY KEY,
@@ -9,7 +8,6 @@ CREATE TABLE notice(
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
--- コメント
 COMMENT ON COLUMN notice.id IS '通知ID';
 COMMENT ON COLUMN notice.event_id IS 'イベントID';
 COMMENT ON COLUMN notice.title IS '通知タイトル';

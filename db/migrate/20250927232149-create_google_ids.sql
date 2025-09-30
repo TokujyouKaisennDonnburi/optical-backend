@@ -1,5 +1,3 @@
--- user系　googleids
-
 -- +migrate Up
 
 CREATE TABLE google_ids(
@@ -10,19 +8,15 @@ CREATE TABLE google_ids(
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
--- テーブルとカラムにコメント追加
-COMMENT ON TABLE google_ids IS 'Google認証連携テーブル';
 COMMENT ON COLUMN google_ids.id IS 'グーグルID（主キー）';
 COMMENT ON COLUMN google_ids.user_id IS 'ユーザーID（外部キー）';
 COMMENT ON COLUMN google_ids.google_id IS 'GoogleアカウントのユニークID';
 COMMENT ON COLUMN google_ids.created_at IS '作成日時';
 COMMENT ON COLUMN google_ids.updated_at IS '更新日時';
 
--- updated_atを自動更新するトリガーを作成
 SELECT create_updated_at_trigger('google_ids');
 
 
--- インデックス作成
 CREATE UNIQUE INDEX idx_google_ids_user_id ON google_ids(user_id);
 CREATE INDEX idx_google_ids_google_id ON google_ids(google_id); -- 1ユーザーが複数のGoogleIDを持つ場合に備えてインデックスを作成
 

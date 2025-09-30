@@ -1,5 +1,3 @@
--- 予定のテーブル
-
 -- +migrate Up
 CREATE TABLE event(
     id UUID PRIMARY KEY,
@@ -15,7 +13,6 @@ CREATE TABLE event(
     deleted_at TIMESTAMP NULL   -- NULL許容
 );
 
--- コメント
 COMMENT ON COLUMN event.id IS 'イベントID';
 COMMENT ON COLUMN event.schedule_id IS 'スケジュールID';
 COMMENT ON COLUMN event.title IS 'タイトル';
@@ -28,7 +25,6 @@ COMMENT ON COLUMN event.created_at IS '作成日時';
 COMMENT ON COLUMN event.updated_at IS '更新日時';
 COMMENT ON COLUMN event.deleted_at IS '削除日時';
 
--- updated_atを自動更新するトリガーを作成
 SELECT create_updated_at_trigger('event');
 
 

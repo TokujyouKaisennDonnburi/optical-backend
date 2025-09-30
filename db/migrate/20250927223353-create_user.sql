@@ -1,5 +1,3 @@
--- usersのスキーマを作成するマイグレーションファイル(postgres用)
-
 -- +migrate Up
 
 CREATE TABLE users(
@@ -19,16 +17,13 @@ COMMENT ON COLUMN users.password_hash IS 'パスワードハッシュ';
 COMMENT ON COLUMN users.created_at IS '作成日時';
 COMMENT ON COLUMN users.updated_at IS '更新日時';
 
--- updated_atを自動更新するトリガーを作成
 SELECT create_updated_at_trigger('users');
 
 
--- インデックスの作成(高速化のため)
 CREATE INDEX idx_users_email ON users(email);
 
 
 -- +migrate Down
--- DROP TABLE users;
 DROP INDEX IF EXISTS idx_users_email; -- インデックス削除
 DROP TRIGGER IF EXISTS update_users_updated_at ON users; -- トリガーも削除
 DROP TABLE IF EXISTS users; -- テーブルが存在する場合のみ削除する
