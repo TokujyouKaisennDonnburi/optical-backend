@@ -15,7 +15,7 @@ type User struct {
 	Password  string
 	CreatedAt time.Time
 	UpdatedAt time.Time
-	DeletedAt *time.Time
+	DeletedAt time.Time
 }
 
 var (
@@ -48,6 +48,7 @@ func NewUser(name, email, password string) (*User, error) {
 		Password:  hashedPassword,
 		CreatedAt: now,
 		UpdatedAt: now,
+		DeletedAt: time.Time{},
 	}, nil
 }
 
@@ -88,13 +89,13 @@ func (u *User) UpdatePassword(newPassword string) error {
 // delete user
 func (u *User) Delete() {
 	now := time.Now()
-	u.DeletedAt = &now
+	u.DeletedAt = now
 	u.UpdatedAt = now
 }
 
-// deleted chek
+// deleted check
 func (u *User) IsDeleted() bool {
-	return u.DeletedAt != nil
+	return !u.DeletedAt.IsZero()
 }
 
 // hash pass
