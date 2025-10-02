@@ -4,7 +4,7 @@ import (
 	"errors"
 	"unicode/utf8"
 
-	"github.com/TokujouKaisenDonburi/calendar-back/internal/option"
+	"github.com/TokujouKaisenDonburi/optical-backend/internal/option"
 	"github.com/google/uuid"
 )
 
