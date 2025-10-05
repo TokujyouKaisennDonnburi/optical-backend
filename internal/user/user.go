@@ -51,8 +51,12 @@ func NewUser(name, email, password string) (*User, error) {
 	}
 
 	now := time.Now()
+	id, err := uuid.NewV7()
+	if err != nil {
+		return nil, err
+	}
 	return &User{
-		ID:		   uuid.NewV7(),
+		ID:		   id,
 		Name:      name,
 		Email:     email,
 		Password:  hashedPassword,

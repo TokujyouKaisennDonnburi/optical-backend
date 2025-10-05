@@ -21,15 +21,19 @@ var (
 )
 
 // NewProfile
-func NewProfile(userID uuid.UUID) *Profile {
+func NewProfile(userID uuid.UUID) (*Profile, error) {
 	now := time.Now()
+	id, err := uuid.NewV7()
+	if err != nil {
+		return nil, err
+	}
 	return &Profile{
-		ID:        uuid.NewV7(),
+		ID:        id,
 		UserID:    userID,
 		PhotoURL:  "",
 		CreatedAt: now,
 		UpdatedAt: now,
-	}
+	}, nil
 }
 
 // update photo
