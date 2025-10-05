@@ -16,17 +16,17 @@ const (
 )
 
 type Event struct {
-	id            uuid.UUID
-	title         string
-	memo          string
-	color         string
-	scheduledTime ScheduledTime
+	ID            uuid.UUID
+	Title         string
+	Memo          string
+	Color         string
+	ScheduledTime ScheduledTime
 }
 
 type ScheduledTime struct {
-	allDay    bool
-	startTime time.Time
-	endTime   time.Time
+	AllDay    bool
+	StartTime time.Time
+	EndTime   time.Time
 }
 
 func NewEvent(id uuid.UUID, title, memo, color string, scheduledTime ScheduledTime) (*Event, error) {
@@ -58,18 +58,18 @@ func NewEvent(id uuid.UUID, title, memo, color string, scheduledTime ScheduledTi
 		return nil, errors.New("Event `scheduledTime` is zero")
 	}
 	return &Event{
-		id:            id,
-		title:         title,
-		color:         color,
-		memo:          memo,
-		scheduledTime: scheduledTime,
+		ID:            id,
+		Title:         title,
+		Color:         color,
+		Memo:          memo,
+		ScheduledTime: scheduledTime,
 	}, nil
 }
 
 func NewScheduledTime(allDay bool, startTime, endTime time.Time) (*ScheduledTime, error) {
 	if allDay {
 		return &ScheduledTime{
-			allDay: true,
+			AllDay: true,
 		}, nil
 	}
 	if startTime.IsZero() {
@@ -79,9 +79,9 @@ func NewScheduledTime(allDay bool, startTime, endTime time.Time) (*ScheduledTime
 		return nil, errors.New("ScheduledTime `endTime` is zero")
 	}
 	return &ScheduledTime{
-		allDay:    false,
-		startTime: startTime,
-		endTime:   endTime,
+		AllDay:    false,
+		StartTime: startTime,
+		EndTime:   endTime,
 	}, nil
 }
 

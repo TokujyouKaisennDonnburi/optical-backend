@@ -9,9 +9,9 @@ import (
 
 // スケジュールに参加するユーザー
 type Member struct {
-	id       uuid.UUID
-	name     string
-	joinedAt time.Time
+	ID       uuid.UUID
+	Name     string
+	JoinedAt time.Time
 }
 
 func NewMember(id uuid.UUID, name string, joinedAt time.Time) (*Member, error) {
@@ -22,8 +22,8 @@ func NewMember(id uuid.UUID, name string, joinedAt time.Time) (*Member, error) {
 		return nil, errors.New("Member `name` is nil")
 	}
 	return &Member{
-		id:       id,
-		name:     name,
-		joinedAt: joinedAt,
+		ID:       id,
+		Name:     name,
+		JoinedAt: joinedAt,
 	}, nil
 }
