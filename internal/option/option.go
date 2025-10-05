@@ -7,19 +7,20 @@ import (
 )
 
 type Option struct {
-	id   uuid.UUID
-	name string
+	Id   uuid.UUID
+	Name string
 }
 
-func NewOption(id uuid.UUID, name string) (*Option, error) {
-	if id == uuid.Nil {
-		return nil, errors.New("Option `id` is nil")
+func NewOption(name string) (*Option, error) {
+	id, err := uuid.NewV7()
+	if err != nil {
+		return nil, err
 	}
 	if name == "" {
-		return nil, errors.New("Option `name` is nil")
+		return nil, errors.New("Option `Name` is nil")
 	}
 	return &Option{
-		id:   id,
-		name: name,
+		Id:   id,
+		Name: name,
 	}, nil
 }
