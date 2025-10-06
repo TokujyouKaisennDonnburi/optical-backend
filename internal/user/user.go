@@ -18,7 +18,7 @@ const (
 )
 
 type User struct {
-	ID        uuid.UUID
+	Id        uuid.UUID
 	Name      string
 	Email     string
 	Password  string
@@ -56,7 +56,7 @@ func NewUser(name, email, password string) (*User, error) {
 		return nil, err
 	}
 	return &User{
-		ID:		   id,
+		Id:		   id,
 		Name:      name,
 		Email:     email,
 		Password:  hashedPassword,

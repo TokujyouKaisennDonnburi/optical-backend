@@ -9,8 +9,8 @@ import (
 )
 
 type Profile struct {
-	ID        uuid.UUID
-	UserID    uuid.UUID
+	Id        uuid.UUID
+	UserId    uuid.UUID
 	PhotoURL  string
 	CreatedAt time.Time
 	UpdatedAt time.Time
@@ -21,15 +21,15 @@ var (
 )
 
 // NewProfile
-func NewProfile(userID uuid.UUID) (*Profile, error) {
+func NewProfile(userId uuid.UUID) (*Profile, error) {
 	now := time.Now()
 	id, err := uuid.NewV7()
 	if err != nil {
 		return nil, err
 	}
 	return &Profile{
-		ID:        id,
-		UserID:    userID,
+		Id:        id,
+		UserId:    userId,
 		PhotoURL:  "",
 		CreatedAt: now,
 		UpdatedAt: now,
