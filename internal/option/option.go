@@ -17,7 +17,7 @@ func NewOption(name string) (*Option, error) {
 		return nil, err
 	}
 	if name == "" {
-		return nil, errors.New("Option `Name` is nil")
+		return nil, errors.New("Option `Name` is empty")
 	}
 	return &Option{
 		Id:   id,
