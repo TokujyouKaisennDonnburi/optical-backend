@@ -24,5 +24,4 @@ CREATE INDEX idx_users_email ON users(email);
 
 -- +migrate Down
 DROP INDEX IF EXISTS idx_users_email; -- インデックス削除
-DROP TRIGGER IF EXISTS update_users_updated_at ON users; -- トリガーも削除
 DROP TABLE IF EXISTS users; -- テーブルが存在する場合のみ削除する

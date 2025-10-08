@@ -22,5 +22,4 @@ CREATE INDEX idx_google_ids_google_id ON google_ids(google_id); -- 1ユーザー
 -- +migrate Down
 DROP INDEX IF EXISTS idx_google_ids_user_id; -- インデックス削除
 DROP INDEX IF EXISTS idx_google_ids_google_id; -- インデックス削除
-DROP TRIGGER IF EXISTS update_google_ids_updated_at ON google_ids; -- トリガーも削除
 DROP TABLE IF EXISTS google_ids; -- テーブルが存在する場合のみ削除する

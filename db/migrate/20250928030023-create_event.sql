@@ -28,5 +28,4 @@ COMMENT ON COLUMN event.deleted_at IS '削除日時';
 
 
 -- +migrate Down
-DROP TRIGGER IF EXISTS update_event_updated_at ON event; -- トリガーも削除
 DROP TABLE IF EXISTS event; -- テーブルが存在する場合のみ削除する
