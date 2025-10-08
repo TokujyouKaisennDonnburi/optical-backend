@@ -3,7 +3,9 @@
 
 # Load environment variables from .env file
 if [ -f .env ]; then
-    export $(grep -v '^#' .env | grep -v '^$' | xargs)
+    set -a
+    source .env
+    set +a
 fi
 
 sql-migrate up
