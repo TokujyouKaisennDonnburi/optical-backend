@@ -17,7 +17,6 @@ COMMENT ON COLUMN users.password_hash IS 'パスワードハッシュ';
 COMMENT ON COLUMN users.created_at IS '作成日時';
 COMMENT ON COLUMN users.updated_at IS '更新日時';
 
-SELECT create_updated_at_trigger('users');
 
 
 CREATE INDEX idx_users_email ON users(email);

@@ -25,7 +25,6 @@ COMMENT ON COLUMN event.created_at IS '作成日時';
 COMMENT ON COLUMN event.updated_at IS '更新日時';
 COMMENT ON COLUMN event.deleted_at IS '削除日時';
 
-SELECT create_updated_at_trigger('event');
 
 
 -- +migrate Down

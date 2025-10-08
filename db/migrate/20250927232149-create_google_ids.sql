@@ -14,7 +14,6 @@ COMMENT ON COLUMN google_ids.google_id IS 'GoogleアカウントのユニークI
 COMMENT ON COLUMN google_ids.created_at IS '作成日時';
 COMMENT ON COLUMN google_ids.updated_at IS '更新日時';
 
-SELECT create_updated_at_trigger('google_ids');
 
 
 CREATE UNIQUE INDEX idx_google_ids_user_id ON google_ids(user_id);
