@@ -18,7 +18,8 @@ type Profile struct {
 }
 
 var (
-	ErrEmptyPhotoURL   = errors.New("写真URLが空です")
+	ErrEmptyPhotoURL   = errors.New("photoURL is empty")
+	ErrInvalidPhotoURL = errors.New("photoURL validate error")
 )
 
 // NewProfile
