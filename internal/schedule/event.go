@@ -68,9 +68,9 @@ func NewEvent(id uuid.UUID, title, memo, color string, scheduledTime ScheduledTi
 }
 
 func NewScheduledTime(allDay bool, startTime, endTime time.Time) (*ScheduledTime, error) {
-	if AllDay {
+	if allDay {
 		return &ScheduledTime{
-			allDay: true,
+			AllDay: true,
 		}, nil
 	}
 	if startTime.IsZero() {
