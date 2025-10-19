@@ -29,7 +29,7 @@ type ScheduledTime struct {
 	EndTime   time.Time
 }
 
-func NewEvent(id uuid.UUID, title, memo, color string, scheduledTime ScheduledTime) (*Event, error) {
+func NewEvent(title, memo, color string, scheduledTime ScheduledTime) (*Event, error) {
 	// id
 	id, err := uuid.NewV7()
 	if err != nil {
