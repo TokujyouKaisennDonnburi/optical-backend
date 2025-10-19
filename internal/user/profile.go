@@ -3,6 +3,7 @@ package user
 import (
 	"errors"
 	"time"
+	"net/url"
 
 	"github.com/google/uuid"
 
@@ -38,8 +39,8 @@ func NewProfile(userId uuid.UUID) (*Profile, error) {
 
 // update photo
 func (p *Profile) UpdatePhotoURL(photoURL string) error {
-	if photoURL == "" {
-		return ErrEmptyPhotoURL
+	if err := validatePhotoURL(photoURL); err != nil {
+		return err
 	}
 	p.PhotoURL = photoURL
 	p.UpdatedAt = time.Now()
@@ -47,4 +48,13 @@ func (p *Profile) UpdatePhotoURL(photoURL string) error {
 }
 
 // validate photoURL
-// TODO #46
+func validatePhotoURL(photoURL string) error {
+	if photoURL == "" {
+		return ErrEmptyPhotoURL
+	}
+	_, err := url.Parse(photoURL)
+	if err != nil {
+		return ErrInvalidPhotoURL
+	}
+	return nil
+}
