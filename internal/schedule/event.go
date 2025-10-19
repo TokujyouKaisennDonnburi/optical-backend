@@ -17,7 +17,7 @@ const (
 
 type Event struct {
 	Id            uuid.UUID
-	title         string
+	Title         string
 	Memo          string
 	Color         string
 	ScheduledTime ScheduledTime
