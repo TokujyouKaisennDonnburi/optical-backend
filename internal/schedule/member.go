@@ -9,21 +9,22 @@ import (
 
 // スケジュールに参加するユーザー
 type Member struct {
-	Id       uuid.UUID
+	UserId   uuid.UUID
 	Name     string
 	JoinedAt time.Time
 }
 
-func NewMember(id uuid.UUID, name string, joinedAt time.Time) (*Member, error) {
-	if id == uuid.Nil {
+func NewMember(userId uuid.UUID, name string, joinedAt time.Time) (*Member, error) {
+	if userId == uuid.Nil {
 		return nil, errors.New("Member `id` is nil")
 	}
 	if name == "" {
 		return nil, errors.New("Member `name` is nil")
 	}
 	return &Member{
-		Id:       id,
+		UserId:   id,
 		Name:     name,
 		JoinedAt: joinedAt,
 	}, nil
 }
+
