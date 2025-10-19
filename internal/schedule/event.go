@@ -31,7 +31,8 @@ type ScheduledTime struct {
 
 func NewEvent(id uuid.UUID, title, memo, color string, scheduledTime ScheduledTime) (*Event, error) {
 	// id
-	if id == uuid.Nil {
+	id, err := uuid.NewV7()
+	if err != nil {
 		return nil, errors.New("Event `id` is nil")
 	}
 	// title
