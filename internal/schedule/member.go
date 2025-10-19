@@ -22,7 +22,7 @@ func NewMember(userId uuid.UUID, name string, joinedAt time.Time) (*Member, erro
 		return nil, errors.New("Member `name` is nil")
 	}
 	return &Member{
-		UserId:   id,
+		UserId:   userId,
 		Name:     name,
 		JoinedAt: joinedAt,
 	}, nil
