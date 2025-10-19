@@ -14,11 +14,11 @@ const (
 )
 
 type Schedule struct {
-	id       uuid.UUID
-	name     string
-	calendar Calendar
-	members  []Member
-	options  []option.Option
+	Id       uuid.UUID
+	Name     string
+	Calendar Calendar
+	Members  []Member
+	Options  []option.Option
 }
 
 func NewSchedule(id uuid.UUID, name string, calendar Calendar, members []Member, options []option.Option) (*Schedule, error) {
@@ -30,15 +30,15 @@ func NewSchedule(id uuid.UUID, name string, calendar Calendar, members []Member,
 		return nil, errors.New("Schedule `name` is invalid")
 	}
 	return &Schedule{
-		id:       id,
-		name:     name,
-		calendar: calendar,
-		members:  members,
-		options:  options,
+		Id:       id,
+		Name:     name,
+		Calendar: calendar,
+		Members:  members,
+		Options:  options,
 	}, nil
 }
 
 func (s *Schedule) AssignEvent(event Event) error {
-	s.calendar = s.calendar.append(event)
+	s.Calendar = s.Calendar.append(event)
 	return nil
 }
