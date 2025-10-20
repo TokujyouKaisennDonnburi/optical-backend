@@ -50,7 +50,7 @@ func NewEvent(title, memo, color string, scheduledTime ScheduledTime) (*Event, e
 	if colorLen != 6 {
 		return nil, errors.New("Color length is invalid")
 	}
-	_, err := hex.DecodeString(color)
+	_, err = hex.DecodeString(color)
 	if err != nil {
 		return nil, errors.New("Color format is invalid")
 	}
