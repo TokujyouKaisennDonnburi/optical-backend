@@ -21,9 +21,10 @@ type Schedule struct {
 	Options  []option.Option
 }
 
-func NewSchedule(id uuid.UUID, name string, calendar Calendar, members []Member, options []option.Option) (*Schedule, error) {
-	if id == uuid.Nil {
-		return nil, errors.New("Schedule `id` is nil")
+func NewSchedule(name string, members []Member, options []option.Option) (*Schedule, error) {
+	id, err := uuid.NewV7()
+	if err != nil {
+		return nil, err
 	}
 	nameLength := utf8.RuneCountInString(name)
 	if nameLength < MIN_SCHEDULE_NAME_LEN || nameLength > MAX_SCHEDULE_NAME_LEN {
@@ -32,7 +33,7 @@ func NewSchedule(id uuid.UUID, name string, calendar Calendar, members []Member,
 	return &Schedule{
 		Id:       id,
 		Name:     name,
-		Calendar: calendar,
+		Calendar: Calendar{},
 		Members:  members,
 		Options:  options,
 	}, nil
