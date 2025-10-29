@@ -20,10 +20,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UserCreateResponse'
-        '400':
-          description: Invalid request
-        '500':
-          description: Internal server error
   /login:
     post:
       summary: Login a user
@@ -58,6 +54,26 @@ paths:
                 $ref: '#/components/schemas/UserResponse'
         '500':
           description: Internal server error
+  /schedules:
+    post:
+      summary: Create a new schedule
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ScheduleCreateRequest'
+      responses:
+        '200':
+          description: Schedule created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ScheduleCreateResponse'
+        '400':
+          description: Invalid request
+        '500':
+          description: Internal server error
 components:
   schemas:
     UserCreateRequest:
@@ -80,10 +96,6 @@ components:
         id:
           type: string
     UserResponse:
-      type: object
-      properties:
-        id:
-          type: string
         name:
           type: string
         email:
@@ -113,3 +125,29 @@ components:
           type: string
         refreshToken:
           type: string
+    ScheduleCreateRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The name of the schedule
+        optionIds:
+          type: array
+          items:
+            type: string
+          description: List of option IDs
+      required:
+        - name
+        - optionIds
+    ScheduleCreateResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The ID of the created schedule
+        name:
+          type: string
+          description: The name of the created schedule
+      required:
+        - id
+        - name
