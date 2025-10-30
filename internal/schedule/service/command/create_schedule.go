@@ -28,6 +28,19 @@ type ScheduleCreateOutput struct {
 	Name string
 }
 
+func NewCreateSchedule(scheduleRepository scheduleRepo.ScheduleRepository, optionRepository optionRepo.OptionRepository) *CreateSchedule {
+	if scheduleRepository == nil {
+		panic("scheduleRepository is nil")
+	}
+	if optionRepository == nil {
+		panic("optionRepository is nil")
+	}
+	return &CreateSchedule{
+		scheduleRepository: scheduleRepository,
+		optionRepository: optionRepository,
+	}
+}
+
 // スケジュールを新規作成する
 func (s *CreateSchedule) CreateSchedule(ctx context.Context, args ScheduleCreateArgs) (*ScheduleCreateOutput, error) {
 	// オプション一覧取得
