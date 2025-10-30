@@ -56,6 +56,24 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UserResponse'
+  /schedules:
+    post:
+      summary: Create a new schedule
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ScheduleCreateRequest'
+      responses:
+        '200':
+          description: Schedule created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ScheduleCreateResponse'
+        '400':
+          description: Invalid request
         '500':
           description: Internal server error
 components:
@@ -112,4 +130,21 @@ components:
         accessToken:
           type: string
         refreshToken:
+          type: string
+    ScheduleCreateRequest:
+      type: object
+      required:
+        - name
+        - optionIds
+      properties:
+        name:
+          type: string
+        optionIds:
+          type: array
+          items:
+            type: string
+    ScheduleCreateResponse:
+      type: object
+      properties:
+        id:
           type: string
