@@ -16,11 +16,9 @@ import (
 	_ "github.com/lib/pq"
 )
 
-func init() {
-	godotenv.Load()
-}
-
 func main() {
+	_ = godotenv.Load()
+
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
 
