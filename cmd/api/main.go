@@ -6,17 +6,21 @@ import (
 	"net/http"
 	"os"
 
+	optionGateway "github.com/TokujouKaisenDonburi/optical-backend/internal/option/gateway"
+	scheduleGateway "github.com/TokujouKaisenDonburi/optical-backend/internal/schedule/gateway"
+	scheduleHandler "github.com/TokujouKaisenDonburi/optical-backend/internal/schedule/handler"
+	scheduleCommand "github.com/TokujouKaisenDonburi/optical-backend/internal/schedule/service/command"
 	userGateway "github.com/TokujouKaisenDonburi/optical-backend/internal/user/gateway"
 	userHandler "github.com/TokujouKaisenDonburi/optical-backend/internal/user/handler"
 	userCommand "github.com/TokujouKaisenDonburi/optical-backend/internal/user/service/command"
 	userQuery "github.com/TokujouKaisenDonburi/optical-backend/internal/user/service/query"
-	"github.com/jmoiron/sqlx"
-	"github.com/redis/go-redis/v9"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+	"github.com/jmoiron/sqlx"
 	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
+	"github.com/redis/go-redis/v9"
 )
 
 func main() {
@@ -33,6 +37,10 @@ func main() {
 	userQuery := userQuery.NewUserQuery(userRepository)
 	userCommand := userCommand.NewUserCommand(userRepository, tokenRepository)
 	userHandler := userHandler.NewUserHttpHandler(userQuery, userCommand)
+	optionRepository := optionGateway.NewOptionPsqlRepository(db)
+	scheduleRepository := scheduleGateway.NewSchedulePsqlRepository(db)
+	scheduleCreateCommand := scheduleCommand.NewScheduleCommand(scheduleRepository, optionRepository)
+	scheduleHandler := scheduleHandler.NewScheduleHttpHandler(scheduleCreateCommand)
 
 	// Unprotected Routes
 	r.Group(func(r chi.Router) {
@@ -45,8 +53,13 @@ func main() {
 	r.Group(func(r chi.Router) {
 		r.Use(jwtMiddleware.JWTAuthorization)
 
+		// Users
 		r.Get("/users/@me", userHandler.GetMe)
+
+		// Schedules
+		r.Post("/schedules", scheduleHandler.Create)
 	})
+
 
 	// Start Serving
 	http.ListenAndServe(":8000", r)
