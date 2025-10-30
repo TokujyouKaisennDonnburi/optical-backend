@@ -6,14 +6,6 @@
 go install github.com/rubenv/sql-migrate/...@latest
 ```
 
-## マイグレーション
-
-※  Windowsの場合は`migrate.bat`を実行する
-
-```bash
-./migrate.sh
-```
-
 ## 環境変数の設定
 
 ```bash
@@ -24,3 +16,12 @@ cp .env.example .env
 ```bash
 docker compose up -d
 ```
+
+## マイグレーション
+
+※  Windowsの場合は`migrate.bat`を実行する
+
+```bash
+./migrate.sh
+```
+
