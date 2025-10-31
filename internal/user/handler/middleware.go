@@ -10,6 +10,7 @@ import (
 	"github.com/TokujouKaisenDonburi/optical-backend/pkg/apperr"
 	"github.com/go-chi/render"
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/google/uuid"
 )
 
 const (
@@ -34,6 +35,7 @@ func (m *UserAuthMiddleware) JWTAuthorization(next http.Handler) http.Handler {
 			}
 			return
 		}
+		authorizationHeader = strings.TrimPrefix(authorizationHeader, "Bearer ")
 		// トークンデコード
 		claims := jwt.MapClaims{}
 		_, err := jwt.ParseWithClaims(authorizationHeader, claims, func(t *jwt.Token) (any, error) {
@@ -58,6 +60,16 @@ func (m *UserAuthMiddleware) JWTAuthorization(next http.Handler) http.Handler {
 		ctx := context.WithValue(r.Context(), USER_ID_CONTEXT_KEY, userId)
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
+}
+
+func GetUserIdFromContext(r *http.Request) (uuid.UUID, error) {
+	// IDを取得
+ 	uid := r.Context().Value(USER_ID_CONTEXT_KEY)
+	uidStr, ok := uid.(string)
+	if !ok {
+		return uuid.Nil, errors.New("invalid jwt context")
+	}
+	return uuid.Parse(uidStr)
 }
 
 // JWTの暗号化鍵

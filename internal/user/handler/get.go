@@ -7,7 +7,6 @@ import (
 	"github.com/TokujouKaisenDonburi/optical-backend/internal/user/service/query"
 	"github.com/TokujouKaisenDonburi/optical-backend/pkg/apperr"
 	"github.com/go-chi/render"
-	"github.com/google/uuid"
 )
 
 type UserResponse struct {
@@ -20,8 +19,8 @@ type UserResponse struct {
 
 // 自身のユーザー情報を取得する
 func (h *UserHttpHandler) GetMe(w http.ResponseWriter, r *http.Request) {
-	// IDを取得
-	userId, err := uuid.Parse(r.Context().Value("id").(string))
+	// ユーザーIDを取得
+	userId, err := GetUserIdFromContext(r)
 	if err != nil {
 		_ = render.Render(w, r, apperr.ErrInternalServerError(err))
 		return
