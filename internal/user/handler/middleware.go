@@ -12,6 +12,10 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
+const (
+	USER_ID_CONTEXT_KEY = "userId"
+)
+
 type UserAuthMiddleware struct {}
 
 func NewUserAuthMiddleware() *UserAuthMiddleware {
@@ -51,7 +55,7 @@ func (m *UserAuthMiddleware) JWTAuthorization(next http.Handler) http.Handler {
 			}
 		}
 		// コンテキストに含めてエンドポイントに渡す
-		ctx := context.WithValue(r.Context(), "userId", userId)
+		ctx := context.WithValue(r.Context(), USER_ID_CONTEXT_KEY, userId)
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }
