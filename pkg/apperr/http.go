@@ -23,6 +23,13 @@ func ErrInvalidRequest(err error) render.Renderer {
 	}
 }
 
+func ErrUnauthorized(err error) render.Renderer {
+	return &Response{
+		StatusCode: http.StatusUnauthorized,
+		Message: err.Error(),
+	}
+}
+
 func ErrInternalServerError(err error) render.Renderer {
 	return &Response{
 		StatusCode: http.StatusInternalServerError,
