@@ -24,6 +24,18 @@ paths:
           description: Invalid request
         '500':
           description: Internal server error
+  /users/@me:
+    get:
+      summary: Get current user information
+      responses:
+        '200':
+          description: User information retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        '500':
+          description: Internal server error
 components:
   schemas:
     UserCreateRequest:
@@ -45,3 +57,19 @@ components:
       properties:
         id:
           type: string
+    UserResponse:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        email:
+          type: string
+          format: email
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
