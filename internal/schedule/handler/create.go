@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/TokujouKaisenDonburi/optical-backend/internal/schedule/service/command"
+	"github.com/TokujouKaisenDonburi/optical-backend/internal/user/handler"
 	"github.com/TokujouKaisenDonburi/optical-backend/pkg/apperr"
 	"github.com/go-chi/render"
 	"github.com/google/uuid"
@@ -22,7 +23,7 @@ type ScheduleCreateResponse struct {
 }
 
 func (h *ScheduleHttpHandler) Create(w http.ResponseWriter, r *http.Request) {
-	userId, err := uuid.Parse(r.Context().Value("id").(string))
+	userId, err := handler.GetUserIdFromContext(r)
 	if err != nil {
 		_ = render.Render(w, r, apperr.ErrInternalServerError(err))
 		return
