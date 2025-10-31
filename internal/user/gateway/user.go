@@ -74,3 +74,27 @@ func (r *UserPsqlRepository) FindByEmail(ctx context.Context, email string) (*us
 		DeletedAt: userModel.DeletedAt,
 	}, nil
 }
+
+func (r *UserPsqlRepository) FindById(ctx context.Context, id uuid.UUID) (*user.User, error) {
+	query := `
+		SELECT 
+			id, name, email, password_hash, created_at, updated_at, deleted_at
+		FROM users
+		WHERE 
+			id = ?
+	`
+	userModel := UserModel{}
+	err := r.db.Get(&userModel, query, id)
+	if err != nil {
+		return nil, err
+	}
+	return &user.User{
+		Id: userModel.Id,
+		Name: userModel.Name,
+		Email: userModel.Email,
+		Password: userModel.Password,
+		CreatedAt: userModel.CreatedAt,
+		UpdatedAt: userModel.UpdatedAt,
+		DeletedAt: userModel.DeletedAt,
+	}, nil
+}
