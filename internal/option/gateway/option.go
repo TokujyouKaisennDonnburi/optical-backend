@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/TokujouKaisenDonburi/optical-backend/internal/option"
+	"github.com/TokujouKaisenDonburi/optical-backend/pkg/db"
 	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
 )
@@ -25,8 +26,20 @@ type OptionModel struct {
 	id   uuid.UUID
 	name string
 }
-
 func (r *OptionPsqlRepository) FindByIds(ctx context.Context, ids []uuid.UUID) ([]option.Option, error) {
+	var err error
+	var options []option.Option
+	err = db.RunInTx(r.db, func(tx *sqlx.Tx) error {
+		options, err = FindOptionsByIdsInTx(ctx, tx, ids)
+		return err
+	})
+	return options, err
+}
+
+func FindOptionsByIdsInTx(ctx context.Context, tx *sqlx.Tx, ids []uuid.UUID) ([]option.Option, error) {
+	if len(ids) == 0 {
+		return []option.Option{}, nil
+	}
 	query := `
 		SELECT id, name
 			FROM options
@@ -34,7 +47,11 @@ func (r *OptionPsqlRepository) FindByIds(ctx context.Context, ids []uuid.UUID) (
 			id in (?)
 	`
 	optionModels := []OptionModel{}
-	err := r.db.SelectContext(ctx, optionModels, query, ids)
+	query, args, err := sqlx.In(query, ids)
+	if err != nil {
+		return nil, err
+	}
+	err = tx.SelectContext(ctx, optionModels, query, args...)
 	if err != nil {
 		return nil, err
 	}
