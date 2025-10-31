@@ -38,6 +38,7 @@ func main() {
 	r.Group(func(r chi.Router) {
 		// Users
 		r.Post("/register", userHandler.Create)
+		r.Post("/login", userHandler.Login)
 	})
 
 	// Protected Routes
