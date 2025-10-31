@@ -14,7 +14,7 @@ type Member struct {
 	JoinedAt time.Time
 }
 
-func NewMember(userId uuid.UUID, name string, joinedAt time.Time) (*Member, error) {
+func NewMember(userId uuid.UUID, name string) (*Member, error) {
 	if userId == uuid.Nil {
 		return nil, errors.New("Member `id` is nil")
 	}
@@ -24,7 +24,7 @@ func NewMember(userId uuid.UUID, name string, joinedAt time.Time) (*Member, erro
 	return &Member{
 		UserId:   userId,
 		Name:     name,
-		JoinedAt: joinedAt,
+		JoinedAt: time.Time{},
 	}, nil
 }
 
