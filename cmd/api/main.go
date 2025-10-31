@@ -24,6 +24,7 @@ func main() {
 
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
+	jwtMiddleware := userHandler.NewUserAuthMiddleware()
 
 	db := getPostgresDB()
 	redisClient := GetRedisClient()
@@ -33,9 +34,18 @@ func main() {
 	userCommand := userCommand.NewUserCommand(userRepository, tokenRepository)
 	userHandler := userHandler.NewUserHttpHandler(userQuery, userCommand)
 
-	// Users
-	r.Post("/register", userHandler.Create)
-	r.Get("/users/@me", userHandler.GetMe)
+	// Unprotected Routes
+	r.Group(func(r chi.Router) {
+		// Users
+		r.Post("/register", userHandler.Create)
+	})
+
+	// Protected Routes
+	r.Group(func(r chi.Router) {
+		r.Use(jwtMiddleware.JWTAuthorization)
+
+		r.Get("/users/@me", userHandler.GetMe)
+	})
 
 	// Start Serving
 	http.ListenAndServe(":8000", r)
