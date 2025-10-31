@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"os"
@@ -8,7 +9,9 @@ import (
 	userGateway "github.com/TokujouKaisenDonburi/optical-backend/internal/user/gateway"
 	userHandler "github.com/TokujouKaisenDonburi/optical-backend/internal/user/handler"
 	userCommand "github.com/TokujouKaisenDonburi/optical-backend/internal/user/service/command"
+	userQuery "github.com/TokujouKaisenDonburi/optical-backend/internal/user/service/query"
 	"github.com/jmoiron/sqlx"
+	"github.com/redis/go-redis/v9"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
@@ -23,12 +26,16 @@ func main() {
 	r.Use(middleware.Logger)
 
 	db := getPostgresDB()
+	redisClient := GetRedisClient()
 	userRepository := userGateway.NewUserPsqlRepository(db)
-	userCommand := userCommand.NewUserCommand(userRepository)
-	userHandler := userHandler.NewUserHttpHandler(userCommand)
+	tokenRepository := userGateway.NewTokenRedisRepository(redisClient)
+	userQuery := userQuery.NewUserQuery(userRepository)
+	userCommand := userCommand.NewUserCommand(userRepository, tokenRepository)
+	userHandler := userHandler.NewUserHttpHandler(userQuery, userCommand)
 
 	// Users
 	r.Post("/register", userHandler.Create)
+	r.Get("/users/@me", userHandler.GetMe)
 
 	// Start Serving
 	http.ListenAndServe(":8000", r)
@@ -66,4 +73,25 @@ func getPostgresDB() *sqlx.DB {
 		panic(err.Error())
 	}
 	return db
+}
+
+func GetRedisClient() *redis.Client {
+	endpoint, ok := os.LookupEnv("REDIS_ADDRESS")
+	if !ok {
+		panic("'REDIS_ADDRESS' is not set")
+	}
+	password, ok := os.LookupEnv("REDIS_PASSWORD")
+	if !ok {
+		panic("'REDIS_PASSWORD' is not set")
+	}
+	client := redis.NewClient(&redis.Options{
+		Addr:     endpoint,
+		Password: password,
+		DB:       0,
+	})
+	_, err := client.Ping(context.Background()).Result()
+	if err != nil {
+		panic("redis connection failed")
+	}
+	return client
 }
