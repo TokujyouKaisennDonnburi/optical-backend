@@ -22,6 +22,14 @@ func main() {
 		panic(err.Error())
 	}
 	fmt.Printf("Applied %d migrations.\n", n)
+
+	records, err := migrate.GetMigrationRecords(database.DB, "postgres")
+	if err != nil {
+		panic(err.Error())
+	}
+	for _, record := range records {
+		fmt.Printf("Id: %s\n", record.Id)
+	}
 }
 
 // PostgresのDBに接続する
