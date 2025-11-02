@@ -18,4 +18,4 @@ jobs:
       - name: Preview Pages
         uses: rajyan/preview-pages@v1
         with:
-          source-dir: docs
+          source-dir: swagger
