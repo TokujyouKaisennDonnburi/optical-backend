@@ -35,12 +35,12 @@ func (r *SchedulePsqlRepository) Create(
 ) error {
 	return db.RunInTx(r.db, func(tx *sqlx.Tx) error {
 		// オプション取得
-		options, err := optionGateway.FindOptionsByIdsInTx(ctx, tx, optionIds)
+		options, err := optionGateway.FindOptionsByIds(ctx, tx, optionIds)
 		if err != nil {
 			return err
 		}
 		// ユーザー取得
-		user, err := userGateway.FindUserByIdInTx(ctx, tx, userId)
+		user, err := userGateway.FindUserById(ctx, tx, userId)
 		if err != nil {
 			return err
 		}

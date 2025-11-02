@@ -82,13 +82,13 @@ func (r *UserPsqlRepository) FindById(ctx context.Context, id uuid.UUID) (*user.
 	var err error
 	var user *user.User
 	err = db.RunInTx(r.db, func(tx *sqlx.Tx) error {
-		user, err = FindUserByIdInTx(ctx, tx, id)
+		user, err = FindUserById(ctx, tx, id)
 		return err
 	})
 	return user, err
 }
 
-func FindUserByIdInTx(ctx context.Context, tx *sqlx.Tx, id uuid.UUID) (*user.User, error) {
+func FindUserById(ctx context.Context, tx *sqlx.Tx, id uuid.UUID) (*user.User, error) {
 	query := `
 		SELECT 
 			id, name, email, password_hash, created_at, updated_at, deleted_at

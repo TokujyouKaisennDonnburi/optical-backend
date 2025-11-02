@@ -30,13 +30,13 @@ func (r *OptionPsqlRepository) FindByIds(ctx context.Context, ids []uuid.UUID) (
 	var err error
 	var options []option.Option
 	err = db.RunInTx(r.db, func(tx *sqlx.Tx) error {
-		options, err = FindOptionsByIdsInTx(ctx, tx, ids)
+		options, err = FindOptionsByIds(ctx, tx, ids)
 		return err
 	})
 	return options, err
 }
 
-func FindOptionsByIdsInTx(ctx context.Context, tx *sqlx.Tx, ids []uuid.UUID) ([]option.Option, error) {
+func FindOptionsByIds(ctx context.Context, tx *sqlx.Tx, ids []uuid.UUID) ([]option.Option, error) {
 	if len(ids) == 0 {
 		return []option.Option{}, nil
 	}
