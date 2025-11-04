@@ -21,7 +21,7 @@ type User struct {
 	Id        uuid.UUID
 	Name      string
 	Email     string
-	Password  string
+	Password  []byte
 	CreatedAt time.Time
 	UpdatedAt time.Time
 	DeletedAt time.Time
@@ -113,12 +113,12 @@ func (u *User) IsDeleted() bool {
 }
 
 // hash pass
-func hashPassword(password string) (string, error) {
+func hashPassword(password string) ([]byte, error) {
 	hashedBytes, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
-	return string(hashedBytes), nil
+	return hashedBytes, nil
 }
 
 // verify pass
