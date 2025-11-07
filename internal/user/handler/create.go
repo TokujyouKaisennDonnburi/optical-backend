@@ -42,7 +42,7 @@ func (h *UserHttpHandler) Create(w http.ResponseWriter, r *http.Request) {
 		_ = render.Render(w, r, apperr.ErrInternalServerError(err))
 		return
 	}
-	// レスポンス作成
+	// レスポンス書き込み
 	render.JSON(w, r, UserCreateResponse{
 		Id: output.Id.String(),
 	})
