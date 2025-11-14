@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/TokujouKaisenDonburi/optical-backend/internal/user"
+	"github.com/TokujouKaisenDonburi/optical-backend/pkg/db"
 	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
 )
@@ -78,6 +79,16 @@ func (r *UserPsqlRepository) FindByEmail(ctx context.Context, email string) (*us
 }
 
 func (r *UserPsqlRepository) FindById(ctx context.Context, id uuid.UUID) (*user.User, error) {
+	var err error
+	var user *user.User
+	err = db.RunInTx(r.db, func(tx *sqlx.Tx) error {
+		user, err = FindUserById(ctx, tx, id)
+		return err
+	})
+	return user, err
+}
+
+func FindUserById(ctx context.Context, tx *sqlx.Tx, id uuid.UUID) (*user.User, error) {
 	query := `
 		SELECT 
 			id, name, email, password_hash, created_at, updated_at, deleted_at
@@ -86,7 +97,7 @@ func (r *UserPsqlRepository) FindById(ctx context.Context, id uuid.UUID) (*user.
 			id = $1
 	`
 	userModel := UserModel{}
-	err := r.db.Get(&userModel, query, id)
+	err := tx.Get(&userModel, query, id)
 	if err != nil {
 		return nil, err
 	}
