@@ -1,4 +1,4 @@
-package schedule
+package calendar
 
 import (
 	"errors"
@@ -9,37 +9,37 @@ import (
 )
 
 const (
-	MIN_SCHEDULE_NAME_LEN = 1
-	MAX_SCHEDULE_NAME_LEN = 32
+	MIN_CALENDAR_NAME_LEN = 1
+	MAX_CALENDAR_NAME_LEN = 32
 )
 
-type Schedule struct {
+type Calendar struct {
 	Id       uuid.UUID
 	Name     string
-	Calendar Calendar
+	Schedules Schedules
 	Members  []Member
 	Options  []option.Option
 }
 
-func NewSchedule(name string, members []Member, options []option.Option) (*Schedule, error) {
+func NewCalendar(name string, members []Member, options []option.Option) (*Calendar, error) {
 	id, err := uuid.NewV7()
 	if err != nil {
 		return nil, err
 	}
 	nameLength := utf8.RuneCountInString(name)
-	if nameLength < MIN_SCHEDULE_NAME_LEN || nameLength > MAX_SCHEDULE_NAME_LEN {
+	if nameLength < MIN_CALENDAR_NAME_LEN || nameLength > MAX_CALENDAR_NAME_LEN {
 		return nil, errors.New("Schedule `name` is invalid")
 	}
-	return &Schedule{
+	return &Calendar{
 		Id:       id,
 		Name:     name,
-		Calendar: Calendar{},
+		Schedules: Schedules{},
 		Members:  members,
 		Options:  options,
 	}, nil
 }
 
-func (s *Schedule) AssignEvent(event Event) error {
-	s.Calendar = s.Calendar.append(event)
+func (s *Calendar) AssignEvent(event Event) error {
+	s.Schedules = s.Schedules.append(event)
 	return nil
 }
