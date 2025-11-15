@@ -1,12 +1,12 @@
 -- +migrate Up
-CREATE TABLE schedule_options(
-    schedule_id UUID REFERENCES schedules(id) ON DELETE CASCADE,    -- 外部キー制約とカスケード削除
+CREATE TABLE calendar_options(
+    calendar_id UUID REFERENCES calendars(id) ON DELETE CASCADE,    -- 外部キー制約とカスケード削除
     option_id UUID REFERENCES options(id) ON DELETE CASCADE,
-    PRIMARY KEY (schedule_id, option_name)  -- 複合主キー
+    PRIMARY KEY (calendar_id, option_name)  -- 複合主キー
 );
 
-COMMENT ON COLUMN schedule_options.schedule_id IS 'スケジュールID';
-COMMENT ON COLUMN schedule_options.option_id IS 'オプション名';
+COMMENT ON COLUMN calendar_options.calendar_id IS 'カレンダーID';
+COMMENT ON COLUMN calendar_options.option_id IS 'オプション名';
 
 -- +migrate Down
-DROP TABLE IF EXISTS schedule_options; -- テーブルが存在する場合のみ削除する
+DROP TABLE IF EXISTS calendar_options; -- テーブルが存在する場合のみ削除する

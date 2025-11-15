@@ -1,7 +1,7 @@
 -- +migrate Up
 CREATE TABLE event(
     id UUID PRIMARY KEY ,
-    schedule_id UUID NOT NULL REFERENCES schedules(id) ON DELETE CASCADE,
+    calendar_id UUID NOT NULL REFERENCES calendars(id) ON DELETE CASCADE,
     title VARCHAR(255) NOT NULL,
     memo TEXT NOT NULL,
     color VARCHAR(50) NOT NULL,
@@ -14,7 +14,7 @@ CREATE TABLE event(
 );
 
 COMMENT ON COLUMN event.id IS 'イベントID';
-COMMENT ON COLUMN event.schedule_id IS 'スケジュールID';
+COMMENT ON COLUMN event.calendar_id IS 'カレンダーID';
 COMMENT ON COLUMN event.title IS 'タイトル';
 COMMENT ON COLUMN event.memo IS 'メモ';
 COMMENT ON COLUMN event.color IS 'カラー';
