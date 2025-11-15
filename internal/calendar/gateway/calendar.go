@@ -5,7 +5,7 @@ import (
 
 	"github.com/TokujouKaisenDonburi/optical-backend/internal/option"
 	optionGateway "github.com/TokujouKaisenDonburi/optical-backend/internal/option/gateway"
-	"github.com/TokujouKaisenDonburi/optical-backend/internal/schedule"
+	"github.com/TokujouKaisenDonburi/optical-backend/internal/calendar"
 	"github.com/TokujouKaisenDonburi/optical-backend/internal/user"
 	userGateway "github.com/TokujouKaisenDonburi/optical-backend/internal/user/gateway"
 	"github.com/TokujouKaisenDonburi/optical-backend/pkg/db"
@@ -13,25 +13,25 @@ import (
 	"github.com/jmoiron/sqlx"
 )
 
-type SchedulePsqlRepository struct {
+type CalendarPsqlRepository struct {
 	db *sqlx.DB
 }
 
-func NewSchedulePsqlRepository(db *sqlx.DB) *SchedulePsqlRepository {
+func NewCalendarPsqlRepository(db *sqlx.DB) *CalendarPsqlRepository {
 	if db == nil {
 		panic("db is nil")
 	}
-	return &SchedulePsqlRepository{
+	return &CalendarPsqlRepository{
 		db: db,
 	}
 }
 
 // スケジュールを新規作成する
-func (r *SchedulePsqlRepository) Create(
+func (r *CalendarPsqlRepository) Create(
 	ctx context.Context,
 	userId uuid.UUID,
 	optionIds []uuid.UUID,
-	createFn func(user *user.User, options []option.Option) (*schedule.Schedule, error),
+	createFn func(user *user.User, options []option.Option) (*calendar.Calendar, error),
 ) error {
 	return db.RunInTx(r.db, func(tx *sqlx.Tx) error {
 		// オプション取得
@@ -45,53 +45,53 @@ func (r *SchedulePsqlRepository) Create(
 			return err
 		}
 		// スケジュール作成関数を実行
-		schedule, err := createFn(user, options)
+		calendar, err := createFn(user, options)
 		if err != nil {
 			return err
 		}
 		// スケジュール作成
 		query := `
-			INSERT INTO schedules(id, name)
+			INSERT INTO calendars(id, name)
 			VALUES (:id, :name)
 		`
 		_, err = tx.NamedExecContext(ctx, query, map[string]any{
-			"id":   schedule.Id,
-			"name": schedule.Name,
+			"id":   calendar.Id,
+			"name": calendar.Name,
 		})
 		if err != nil {
 			return err
 		}
 		// メンバー作成
 		query = `
-			INSERT INTO schedule_members(schedule_id, user_id, joined_at)
-			VALUES (:scheduleId, :userId, :joinedAt)
+			INSERT INTO calendar_members(calendar_id, user_id, joined_at)
+			VALUES (:calendarId, :userId, :joinedAt)
 		`
-		scheduleMemberMaps := []map[string]any{}
-		for _, member := range schedule.Members {
-			scheduleMemberMaps = append(scheduleMemberMaps, map[string]any{
-				"scheduleId": schedule.Id,
+		calendarMemberMaps := []map[string]any{}
+		for _, member := range calendar.Members {
+			calendarMemberMaps = append(calendarMemberMaps, map[string]any{
+				"calendarId": calendar.Id,
 				"userId":     member.UserId,
 				"joinedAt":   member.JoinedAt,
 			})
 		}
-		_, err = tx.NamedExecContext(ctx, query, scheduleMemberMaps)
+		_, err = tx.NamedExecContext(ctx, query, calendarMemberMaps)
 		if err != nil {
 			return err
 		}
 		// オプション設定
 		if len(options) > 0 {
 			query = `
-				INSERT INTO schedule_options(schedule_id, option_id)
-				VALUES (:scheduleId, :optionId)
+				INSERT INTO calendar_options(calendar_id, option_id)
+				VALUES (:calendarId, :optionId)
 			`
-			scheduleOptionMaps := []map[string]any{}
-			for _, option := range schedule.Options {
-				scheduleMemberMaps = append(scheduleMemberMaps, map[string]any{
-					"scheduleId": schedule.Id,
+			calendarOptionMaps := []map[string]any{}
+			for _, option := range calendar.Options {
+				calendarMemberMaps = append(calendarMemberMaps, map[string]any{
+					"calendarId": calendar.Id,
 					"optionId":   option.Id,
 				})
 			}
-			_, err = tx.NamedExecContext(ctx, query, scheduleOptionMaps)
+			_, err = tx.NamedExecContext(ctx, query, calendarOptionMaps)
 			if err != nil {
 				return err
 			}

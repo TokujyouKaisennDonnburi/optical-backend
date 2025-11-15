@@ -1,4 +1,4 @@
-package schedule
+package calendar
 
 import (
 	"encoding/hex"
