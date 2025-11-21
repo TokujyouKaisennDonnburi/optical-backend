@@ -9,3 +9,4 @@ if [ -f .env ]; then
 fi
 
 sql-migrate up
+sql-migrate status
