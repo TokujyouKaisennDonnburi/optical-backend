@@ -1,18 +1,18 @@
 package handler
 
-import "github.com/TokujouKaisenDonburi/optical-backend/internal/schedule/service/command"
+import "github.com/TokujouKaisenDonburi/optical-backend/internal/calendar/service/command"
 
-type ScheduleHttpHandler struct {
-	scheduleCommand *command.ScheduleCommand
+type CalendarHttpHandler struct {
+	calendarCommand *command.ScheduleCommand
 }
 
-func NewScheduleHttpHandler(
-	createCommandService *command.ScheduleCommand,
-) *ScheduleHttpHandler {
-	if createCommandService == nil {
+func NewCalendarHttpHandler(
+	calendarCommand *command.ScheduleCommand,
+) *CalendarHttpHandler {
+	if calendarCommand == nil {
 		panic("CreateSchedule is nil")
 	}
-	return &ScheduleHttpHandler{
-		scheduleCommand: createCommandService,
+	return &CalendarHttpHandler{
+		calendarCommand: calendarCommand,
 	}
 }
