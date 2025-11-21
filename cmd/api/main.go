@@ -6,10 +6,10 @@ import (
 	"net/http"
 	"os"
 
+	calendarGateway "github.com/TokujouKaisenDonburi/optical-backend/internal/calendar/gateway"
+	calendarHandler "github.com/TokujouKaisenDonburi/optical-backend/internal/calendar/handler"
+	calendarCommand "github.com/TokujouKaisenDonburi/optical-backend/internal/calendar/service/command"
 	optionGateway "github.com/TokujouKaisenDonburi/optical-backend/internal/option/gateway"
-	scheduleGateway "github.com/TokujouKaisenDonburi/optical-backend/internal/schedule/gateway"
-	scheduleHandler "github.com/TokujouKaisenDonburi/optical-backend/internal/schedule/handler"
-	scheduleCommand "github.com/TokujouKaisenDonburi/optical-backend/internal/schedule/service/command"
 	userGateway "github.com/TokujouKaisenDonburi/optical-backend/internal/user/gateway"
 	userHandler "github.com/TokujouKaisenDonburi/optical-backend/internal/user/handler"
 	userCommand "github.com/TokujouKaisenDonburi/optical-backend/internal/user/service/command"
@@ -38,9 +38,9 @@ func main() {
 	userCommand := userCommand.NewUserCommand(userRepository, tokenRepository)
 	userHandler := userHandler.NewUserHttpHandler(userQuery, userCommand)
 	optionRepository := optionGateway.NewOptionPsqlRepository(db)
-	scheduleRepository := scheduleGateway.NewSchedulePsqlRepository(db)
-	scheduleCreateCommand := scheduleCommand.NewScheduleCommand(scheduleRepository, optionRepository)
-	scheduleHandler := scheduleHandler.NewScheduleHttpHandler(scheduleCreateCommand)
+	calendarRepository := calendarGateway.NewCalendarPsqlRepository(db)
+	calendarCreateCommand := calendarCommand.NewCalendarCommand(calendarRepository, optionRepository)
+	caledarHandler := calendarHandler.NewCalendarHttpHandler(calendarCreateCommand)
 
 	// Unprotected Routes
 	r.Group(func(r chi.Router) {
@@ -56,10 +56,9 @@ func main() {
 		// Users
 		r.Get("/users/@me", userHandler.GetMe)
 
-		// Schedules
-		r.Post("/schedules", scheduleHandler.Create)
+		// Calendars
+		r.Post("/calendar", caledarHandler.Create)
 	})
-
 
 	// Start Serving
 	http.ListenAndServe(":8000", r)
