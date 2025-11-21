@@ -57,7 +57,7 @@ func main() {
 		r.Get("/users/@me", userHandler.GetMe)
 
 		// Calendars
-		r.Post("/calendar", caledarHandler.Create)
+		r.Post("/calendars", caledarHandler.Create)
 	})
 
 	// Start Serving
