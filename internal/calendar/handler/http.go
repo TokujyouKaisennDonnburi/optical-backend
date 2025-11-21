@@ -3,11 +3,11 @@ package handler
 import "github.com/TokujouKaisenDonburi/optical-backend/internal/calendar/service/command"
 
 type CalendarHttpHandler struct {
-	calendarCommand *command.ScheduleCommand
+	calendarCommand *command.CalendarCommand
 }
 
 func NewCalendarHttpHandler(
-	calendarCommand *command.ScheduleCommand,
+	calendarCommand *command.CalendarCommand,
 ) *CalendarHttpHandler {
 	if calendarCommand == nil {
 		panic("CreateSchedule is nil")

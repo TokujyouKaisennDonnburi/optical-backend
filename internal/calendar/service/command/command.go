@@ -2,23 +2,23 @@ package command
 
 import (
 	optionRepo "github.com/TokujouKaisenDonburi/optical-backend/internal/option/repository"
-	scheduleRepo "github.com/TokujouKaisenDonburi/optical-backend/internal/schedule/repository"
+	calendarRepo "github.com/TokujouKaisenDonburi/optical-backend/internal/calendar/repository"
 )
 
-type ScheduleCommand struct {
-	scheduleRepository scheduleRepo.ScheduleRepository
+type CalendarCommand struct {
+	calendarRepository calendarRepo.CalendarRepository
 	optionRepository   optionRepo.OptionRepository
 }
 
-func NewScheduleCommand(scheduleRepository scheduleRepo.ScheduleRepository, optionRepository optionRepo.OptionRepository) *ScheduleCommand {
-	if scheduleRepository == nil {
+func NewCalendarCommand(calendarRepository calendarRepo.CalendarRepository, optionRepository optionRepo.OptionRepository) *CalendarCommand {
+	if calendarRepository == nil {
 		panic("scheduleRepository is nil")
 	}
 	if optionRepository == nil {
 		panic("optionRepository is nil")
 	}
-	return &ScheduleCommand{
-		scheduleRepository: scheduleRepository,
+	return &CalendarCommand{
+		calendarRepository: calendarRepository,
 		optionRepository: optionRepository,
 	}
 }
