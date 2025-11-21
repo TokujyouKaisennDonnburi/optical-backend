@@ -2,7 +2,7 @@
 CREATE TABLE calendar_options(
     calendar_id UUID REFERENCES calendars(id) ON DELETE CASCADE,    -- 外部キー制約とカスケード削除
     option_id UUID REFERENCES options(id) ON DELETE CASCADE,
-    PRIMARY KEY (calendar_id, option_name)  -- 複合主キー
+    PRIMARY KEY (calendar_id, option_id)  -- 複合主キー
 );
 
 COMMENT ON COLUMN calendar_options.calendar_id IS 'カレンダーID';
