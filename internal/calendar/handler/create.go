@@ -5,30 +5,30 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/TokujouKaisenDonburi/optical-backend/internal/schedule/service/command"
+	"github.com/TokujouKaisenDonburi/optical-backend/internal/calendar/service/command"
 	"github.com/TokujouKaisenDonburi/optical-backend/internal/user/handler"
 	"github.com/TokujouKaisenDonburi/optical-backend/pkg/apperr"
 	"github.com/go-chi/render"
 	"github.com/google/uuid"
 )
 
-type ScheduleCreateRequest struct {
+type CalendarCreateRequest struct {
 	Name      string   `json:"name"`
 	OptionIds []string `json:"optionIds"`
 }
 
-type ScheduleCreateResponse struct {
+type CalendarCreateResponse struct {
 	Id   string `json:"id"`
 	Name string `json:"name"`
 }
 
-func (h *ScheduleHttpHandler) Create(w http.ResponseWriter, r *http.Request) {
+func (h *CalendarHttpHandler) Create(w http.ResponseWriter, r *http.Request) {
 	userId, err := handler.GetUserIdFromContext(r)
 	if err != nil {
 		_ = render.Render(w, r, apperr.ErrInternalServerError(err))
 		return
 	}
-	var request ScheduleCreateRequest
+	var request CalendarCreateRequest
 	// リクエストJSONをバインド
 	err = json.NewDecoder(r.Body).Decode(&request)
 	if err != nil {
@@ -51,9 +51,9 @@ func (h *ScheduleHttpHandler) Create(w http.ResponseWriter, r *http.Request) {
 		optionIds = append(optionIds, optionId)
 	}
 	// スケジュールを作成
-	output, err := h.scheduleCommand.CreateSchedule(context.Background(), command.ScheduleCreateArgs{
+	output, err := h.calendarCommand.CreateSchedule(context.Background(), command.CalendarCreateArgs{
 		UserId:       userId,
-		ScheduleName: request.Name,
+		CalendarName: request.Name,
 		OptionIds:    optionIds,
 	})
 	if err != nil {
@@ -61,7 +61,7 @@ func (h *ScheduleHttpHandler) Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// レスポンスに変換
-	render.JSON(w, r, ScheduleCreateResponse{
+	render.JSON(w, r, CalendarCreateResponse{
 		Id:   output.Id.String(),
 		Name: output.Name,
 	})
