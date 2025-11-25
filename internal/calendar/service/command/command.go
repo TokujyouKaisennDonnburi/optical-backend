@@ -10,6 +10,10 @@ type CalendarCommand struct {
 	optionRepository   optionRepo.OptionRepository
 }
 
+type EventCommand struct {
+	eventRepository calendarRepo.EventRepository
+}
+
 func NewCalendarCommand(calendarRepository calendarRepo.CalendarRepository, optionRepository optionRepo.OptionRepository) *CalendarCommand {
 	if calendarRepository == nil {
 		panic("calendarRepository is nil")
@@ -23,3 +27,12 @@ func NewCalendarCommand(calendarRepository calendarRepo.CalendarRepository, opti
 	}
 }
 
+
+func NewEventCommand(eventRepository calendarRepo.EventRepository) *EventCommand {
+	if eventRepository == nil {
+		panic("eventRepository is nil")
+	}
+	return &EventCommand{
+		eventRepository: eventRepository,
+	}
+}

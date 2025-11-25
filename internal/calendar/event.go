@@ -17,6 +17,7 @@ const (
 
 type Event struct {
 	Id            uuid.UUID
+	CalendarId    uuid.UUID
 	Title         string
 	Memo          string
 	Color         string
@@ -30,11 +31,13 @@ type ScheduledTime struct {
 	EndTime   time.Time
 }
 
-func NewEvent(title, memo, color, location string, scheduledTime ScheduledTime) (*Event, error) {
-	// id
+func NewEvent(calendarId uuid.UUID, title, memo, color, location string, scheduledTime ScheduledTime) (*Event, error) {
 	id, err := uuid.NewV7()
 	if err != nil {
 		return nil, errors.New("Event `id` is nil")
+	}
+	if calendarId == uuid.Nil {
+		return nil, errors.New("Evnet `calendarId` is nil")
 	}
 	// title
 	titleLength := utf8.RuneCountInString(title)
@@ -61,6 +64,7 @@ func NewEvent(title, memo, color, location string, scheduledTime ScheduledTime) 
 	}
 	return &Event{
 		Id:            id,
+		CalendarId:    calendarId,
 		Title:         title,
 		Color:         color,
 		Memo:          memo,
