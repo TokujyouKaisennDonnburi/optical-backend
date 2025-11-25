@@ -51,7 +51,7 @@ func (h *CalendarHttpHandler) Create(w http.ResponseWriter, r *http.Request) {
 		}
 		optionIds = append(optionIds, optionId)
 	}
-	// スケジュールを作成
+	// カレンダーを作成
 	output, err := h.calendarCommand.CreateCalendar(context.Background(), command.CalendarCreateArgs{
 		UserId:        userId,
 		CalendarName:  request.Name,
