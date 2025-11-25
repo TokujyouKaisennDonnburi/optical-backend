@@ -55,7 +55,7 @@ func NewRefreshToken(user *User) (*RefreshToken, error) {
 	claims := jwt.MapClaims{
 		"sub": user.Id.String(),
 		"tid": tokenId.String(),
-		"exp": exp,
+		"exp": exp.Unix(),
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	signedStr, err := token.SignedString(getJwtSecretKey())
