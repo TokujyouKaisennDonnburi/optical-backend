@@ -135,9 +135,12 @@ components:
       type: object
       required:
         - name
+        - color
         - optionIds
       properties:
         name:
+          type: string
+        color:
           type: string
         optionIds:
           type: array
