@@ -12,7 +12,7 @@ type CalendarCommand struct {
 
 func NewCalendarCommand(calendarRepository calendarRepo.CalendarRepository, optionRepository optionRepo.OptionRepository) *CalendarCommand {
 	if calendarRepository == nil {
-		panic("scheduleRepository is nil")
+		panic("calendarRepository is nil")
 	}
 	if optionRepository == nil {
 		panic("optionRepository is nil")
