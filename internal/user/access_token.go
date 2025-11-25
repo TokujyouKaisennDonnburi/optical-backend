@@ -1,6 +1,7 @@
 package user
 
 import (
+	"errors"
 	"os"
 	"time"
 
@@ -19,10 +20,10 @@ type AccessToken struct {
 	ExpiresIn time.Time
 }
 
-func NewAccessToken(user *User) (*AccessToken, error) {
+func NewAccessToken(userId uuid.UUID) (*AccessToken, error) {
 	exp := time.Now().Add(time.Second * time.Duration(ACCESS_TOKEN_EXPIRE))
 	claims := jwt.MapClaims{
-		"sub": user.Id.String(),
+		"sub": userId.String(),
 		"exp": exp.Unix(),
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
@@ -31,13 +32,13 @@ func NewAccessToken(user *User) (*AccessToken, error) {
 		return nil, err
 	}
 	return &AccessToken{
-		UserId:    user.Id,
+		UserId:    userId,
 		Token:     signedStr,
 		ExpiresIn: exp,
 	}, nil
 }
 
-func (at* AccessToken) IsExpired() bool {
+func (at *AccessToken) IsExpired() bool {
 	return at.ExpiresIn.Before(time.Now())
 }
 
@@ -69,8 +70,49 @@ func NewRefreshToken(user *User) (*RefreshToken, error) {
 	}, nil
 }
 
-func (rt* RefreshToken) IsExpired() bool {
+func (rt *RefreshToken) IsExpired() bool {
 	return rt.ExpiresIn.Before(time.Now())
+}
+
+// トークンをデコードして情報を取得する
+func DecodeRefreshToken(refreshToken string) (*RefreshToken, error) {
+	claims := jwt.MapClaims{}
+	_, err := jwt.ParseWithClaims(refreshToken, claims, func(t *jwt.Token) (any, error) {
+		return []byte(getJwtSecretKey()), nil
+	})
+	if err != nil {
+		return nil, err
+	}
+	sub, err := claims.GetSubject()
+	if err != nil {
+		return nil, err
+	}
+	userId, err := uuid.Parse(sub)
+	if err != nil {
+		return nil, err
+	}
+	tid, ok := claims["tid"]
+	if !ok {
+		return nil, errors.New("tid does not exist.")
+	}
+	tidStr, ok := tid.(string)
+	if !ok {
+		return nil, errors.New("invalid tid.")
+	}
+	tidUuid, err := uuid.Parse(tidStr)
+	if err != nil {
+		return nil, err
+	}
+	exp, err := claims.GetExpirationTime()
+	if err != nil {
+		return nil, err
+	}
+	return &RefreshToken{
+		Id: tidUuid,
+		UserId: userId,
+		Token: refreshToken,
+		ExpiresIn: exp.Time,
+	}, nil
 }
 
 // JWTの暗号化鍵
