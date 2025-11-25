@@ -32,11 +32,11 @@ func (r *TokenRedisRepository) AddToWhitelist(refreshToken *user.RefreshToken) e
 }
 
 func (r *TokenRedisRepository) IsWhitelisted(tokenId uuid.UUID) error {
-	exists, err := r.client.Exists(context.Background(), tokenId.String()).Result()
+	exists, err := r.client.SIsMember(context.Background(), REDIS_TOKEN_WHITELIST_NAME, tokenId.String()).Result()
 	if err != nil {
 		return err
 	}
-	if exists != 1 {
+	if !exists {
 		return errors.New(tokenId.String() + " is not in whitelist")
 	}
 	return nil
