@@ -20,6 +20,7 @@ type Event struct {
 	Title         string
 	Memo          string
 	Color         string
+	Location      string
 	ScheduledTime ScheduledTime
 }
 
@@ -29,7 +30,7 @@ type ScheduledTime struct {
 	EndTime   time.Time
 }
 
-func NewEvent(title, memo, color string, scheduledTime ScheduledTime) (*Event, error) {
+func NewEvent(title, memo, color, location string, scheduledTime ScheduledTime) (*Event, error) {
 	// id
 	id, err := uuid.NewV7()
 	if err != nil {
@@ -63,6 +64,7 @@ func NewEvent(title, memo, color string, scheduledTime ScheduledTime) (*Event, e
 		Title:         title,
 		Color:         color,
 		Memo:          memo,
+		Location:      location,
 		ScheduledTime: scheduledTime,
 	}, nil
 }

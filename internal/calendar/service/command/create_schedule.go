@@ -4,8 +4,8 @@ import (
 	"context"
 	"errors"
 
-	"github.com/TokujouKaisenDonburi/optical-backend/internal/option"
 	"github.com/TokujouKaisenDonburi/optical-backend/internal/calendar"
+	"github.com/TokujouKaisenDonburi/optical-backend/internal/option"
 	"github.com/TokujouKaisenDonburi/optical-backend/internal/user"
 	"github.com/google/uuid"
 )
