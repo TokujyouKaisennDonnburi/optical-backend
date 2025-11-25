@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+	"errors"
 	"time"
 
 	"github.com/TokujouKaisenDonburi/optical-backend/internal/user"
@@ -22,6 +23,9 @@ func (u UserCommand) Refresh(ctx context.Context, input TokenRefreshInput) (*Tok
 	refreshToken, err := user.DecodeRefreshToken(input.RefreshToken)
 	if err != nil {
 		return nil, err
+	}
+	if refreshToken.IsExpired() {
+		return nil, errors.New("RefreshToken is expired")
 	}
 	// 有効なリフレッシュトークンか確認
 	err = u.tokenRepository.IsWhitelisted(refreshToken.Id)
