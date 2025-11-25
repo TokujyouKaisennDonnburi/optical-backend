@@ -23,7 +23,7 @@ type CalendarCreateResponse struct {
 	Name string `json:"name"`
 }
 
-func (h *CalendarHttpHandler) Create(w http.ResponseWriter, r *http.Request) {
+func (h *CalendarHttpHandler) CreateCalendar(w http.ResponseWriter, r *http.Request) {
 	userId, err := handler.GetUserIdFromContext(r)
 	if err != nil {
 		_ = render.Render(w, r, apperr.ErrInternalServerError(err))
