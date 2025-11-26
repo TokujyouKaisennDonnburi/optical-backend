@@ -17,7 +17,6 @@ type Calendar struct {
 	Id        uuid.UUID
 	Name      string
 	Color     string
-	Schedules Schedules
 	Members   []Member
 	Options   []option.Option
 }
@@ -38,13 +37,7 @@ func NewCalendar(name, color string, members []Member, options []option.Option) 
 		Id:        id,
 		Name:      name,
 		Color:     color,
-		Schedules: Schedules{},
 		Members:   members,
 		Options:   options,
 	}, nil
-}
-
-func (s *Calendar) AssignEvent(event Event) error {
-	s.Schedules = s.Schedules.append(event)
-	return nil
 }
