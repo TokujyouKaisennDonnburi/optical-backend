@@ -3,12 +3,11 @@ package gateway
 import (
 	"context"
 
-	"github.com/TokujouKaisenDonburi/optical-backend/internal/option"
-	optionGateway "github.com/TokujouKaisenDonburi/optical-backend/internal/option/gateway"
 	"github.com/TokujouKaisenDonburi/optical-backend/internal/calendar"
+	"github.com/TokujouKaisenDonburi/optical-backend/internal/option"
 	"github.com/TokujouKaisenDonburi/optical-backend/internal/user"
-	userGateway "github.com/TokujouKaisenDonburi/optical-backend/internal/user/gateway"
 	"github.com/TokujouKaisenDonburi/optical-backend/pkg/db"
+	"github.com/TokujouKaisenDonburi/optical-backend/pkg/psql"
 	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
 )
@@ -35,12 +34,12 @@ func (r *CalendarPsqlRepository) Create(
 ) error {
 	return db.RunInTx(r.db, func(tx *sqlx.Tx) error {
 		// オプション取得
-		options, err := optionGateway.FindOptionsByIds(ctx, tx, optionIds)
+		options, err := psql.FindOptionsByIds(ctx, tx, optionIds)
 		if err != nil {
 			return err
 		}
 		// ユーザー取得
-		user, err := userGateway.FindUserById(ctx, tx, userId)
+		user, err := psql.FindUserById(ctx, tx, userId)
 		if err != nil {
 			return err
 		}
