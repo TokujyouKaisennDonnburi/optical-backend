@@ -2,9 +2,9 @@ package gateway
 
 import (
 	"context"
-	"errors"
 
 	"github.com/TokujouKaisenDonburi/optical-backend/internal/user"
+	"github.com/TokujouKaisenDonburi/optical-backend/pkg/apperr"
 	"github.com/google/uuid"
 	"github.com/redis/go-redis/v9"
 )
@@ -37,7 +37,7 @@ func (r *TokenRedisRepository) IsWhitelisted(tokenId uuid.UUID) error {
 		return err
 	}
 	if !exists {
-		return errors.New(tokenId.String() + " is not in whitelist")
+		return apperr.ValidationError(tokenId.String() + " is not in whitelist")
 	}
 	return nil
 }

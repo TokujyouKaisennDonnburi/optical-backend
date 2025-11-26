@@ -36,10 +36,7 @@ func (h UserHttpHandler) Refresh(w http.ResponseWriter, r *http.Request) {
 		RefreshToken: request.RefreshToken,
 	})
 	if err != nil {
-		err = render.Render(w, r, apperr.ErrUnauthorized(err))
-		if err != nil {
-			_ = render.Render(w, r, apperr.ErrInternalServerError(err))
-		}
+		apperr.HandleAppError(w, r, err)
 		return
 	}
 	// レスポンスを返す
