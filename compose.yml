@@ -34,6 +34,19 @@ services:
     env_file:
       - .env
 
+  optical_minio:
+    image: quay.io/minio/minio
+    container_name: optical_minio
+    command: server /data --console-address ":9001"
+    ports:
+      - 127.0.0.1:9000:9000
+      - 127.0.0.1:9001:9001
+    volumes:
+      - optical_minio_data:/data
+    env_file:
+      - .env
+
 volumes:
   optical_postgres_data:
   optical_redis_data:
+  optical_minio_data:
