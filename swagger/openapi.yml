@@ -79,6 +79,17 @@ paths:
               schema:
                 $ref: '#/components/schemas/UserResponse'
   /calendars:
+    get:
+      summary: Get list of calendars
+      responses:
+        '200':
+          description: Calendar list retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CalendarListResponse'
+        '500':
+          description: Internal server error
     post:
       summary: Create a new calendar
       requestBody:
@@ -225,6 +236,22 @@ components:
       type: object
       properties:
         id:
+          type: string
+    CalendarListResponse:
+      type: object
+      properties:
+        calendars:
+          type: array
+          items:
+            $ref: '#/components/schemas/CalendarResponse'
+    CalendarResponse:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        color:
           type: string
     EventCreateRequest:
       type: object
