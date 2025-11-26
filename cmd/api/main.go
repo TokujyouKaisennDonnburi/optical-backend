@@ -49,6 +49,7 @@ func main() {
 		// Users
 		r.Post("/register", userHandler.Create)
 		r.Post("/login", userHandler.Login)
+		r.Post("/refresh", userHandler.Refresh)
 	})
 
 	// Protected Routes
