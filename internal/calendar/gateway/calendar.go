@@ -112,13 +112,10 @@ func (r *CalendarPsqlRepository) Create(
 // ユーザーが所属するカレンダー一覧を取得する
 func (r *CalendarPsqlRepository) FindByUserId(ctx context.Context, userId uuid.UUID) ([]calendar.Calendar, error) {
 	query := `
-		SELECT c.id, c.name, COALESCE(co.color, '000000') as color
+		SELECT c.id, c.name, c.color
 		FROM calendars c
 		INNER JOIN calendar_members cm ON c.id = cm.calendar_id
-		LEFT JOIN calendar_options cop ON c.id = cop.calendar_id
-		LEFT JOIN options co ON cop.option_id = co.id AND co.type = 'color'
 		WHERE cm.user_id = $1
-		GROUP BY c.id, c.name, co.color
 		ORDER BY c.id
 	`
 	var rows []struct {
