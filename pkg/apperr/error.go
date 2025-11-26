@@ -31,7 +31,14 @@ func InternalServerError(message string) error {
 
 func ValidationError(message string) error {
 	return &AppError{
-		StatusCode: http.StatusInternalServerError,
+		StatusCode: http.StatusBadRequest,
+		Message:    message,
+	}
+}
+
+func UnauthorizedError(message string) error {
+	return &AppError{
+		StatusCode: http.StatusUnauthorized,
 		Message:    message,
 	}
 }
