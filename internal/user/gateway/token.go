@@ -37,7 +37,7 @@ func (r *TokenRedisRepository) IsWhitelisted(tokenId uuid.UUID) error {
 		return err
 	}
 	if !exists {
-		return apperr.ValidationError(tokenId.String() + " is not in whitelist")
+		return apperr.UnauthorizedError(tokenId.String() + " is not in whitelist")
 	}
 	return nil
 }
