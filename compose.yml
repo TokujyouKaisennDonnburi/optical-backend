@@ -1,38 +1,14 @@
 services:
-  # PostgreSQLのコンテナ定義
   optical_postgres:
     image: postgres:latest
-    # コンテナの名前
     container_name: optical_postgres
-
-    # posetgresのデフォルトのポート5432をホストの5433にマッピング
     ports:
       - 127.0.0.1:5433:5432
-
-    # データをコンテナ終了後も保持するための「永続化領域」 を定義する
     volumes:
       - optical_postgres_data:/var/lib/postgresql
-
     env_file:
       - .env
 
-
-  # postgresqlの公式のGUIツール
-
-  optical_pgadmin:
-    image: dpage/pgadmin4:latest
-    container_name: optical_pgadmin
-    depends_on:
-      optical_postgres:
-        condition: service_started
-    ports:
-      - 127.0.0.1:8088:80
-    environment:
-      - PGA_HOST=optical_postgres
-    env_file:
-      - .env
-
-  # Redisのコンテナ定義
   optical_redis:
     image: redis:7.2
     restart: always
@@ -45,7 +21,6 @@ services:
     env_file:
       - .env
 
-  # Redisのコンテナ定義
   optical_redis_insight:
     image: redis/redisinsight:latest
     container_name: optical_redis_insight
@@ -59,7 +34,6 @@ services:
     env_file:
       - .env
 
-# 永続化領域の定義
 volumes:
   optical_postgres_data:
   optical_redis_data:
