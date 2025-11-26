@@ -1,7 +1,7 @@
 -- +migrate Up
 CREATE TABLE notice(
     id UUID PRIMARY KEY,
-    event_id UUID NOT NULL REFERENCES event(id) ON DELETE CASCADE, -- イベントIDへの外部キー
+    event_id UUID NOT NULL REFERENCES events(id) ON DELETE CASCADE, -- イベントIDへの外部キー
     title VARCHAR(255) NOT NULL,
     content TEXT NOT NULL,
     is_read BOOLEAN NOT NULL DEFAULT FALSE,  -- 読んだかどうかのフラグ
