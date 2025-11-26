@@ -2,12 +2,10 @@ package gateway
 
 import (
 	"context"
-	"database/sql"
-	"errors"
-	"time"
 
 	"github.com/TokujouKaisenDonburi/optical-backend/internal/user"
 	"github.com/TokujouKaisenDonburi/optical-backend/pkg/db"
+	"github.com/TokujouKaisenDonburi/optical-backend/pkg/psql"
 	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
 )
@@ -23,16 +21,6 @@ func NewUserPsqlRepository(db *sqlx.DB) *UserPsqlRepository {
 	return &UserPsqlRepository{
 		db: db,
 	}
-}
-
-type UserModel struct {
-	Id        uuid.UUID    `db:"id"`
-	Name      string       `db:"name"`
-	Email     string       `db:"email"`
-	Password  []byte       `db:"password_hash"`
-	CreatedAt time.Time    `db:"created_at"`
-	UpdatedAt time.Time    `db:"updated_at"`
-	DeletedAt sql.NullTime `db:"deleted_at"`
 }
 
 func (r *UserPsqlRepository) Create(ctx context.Context, user *user.User) error {
@@ -55,59 +43,21 @@ func (r *UserPsqlRepository) Create(ctx context.Context, user *user.User) error 
 }
 
 func (r *UserPsqlRepository) FindByEmail(ctx context.Context, email string) (*user.User, error) {
-	query := `
-		SELECT 
-			id, name, email, password_hash, created_at, updated_at, deleted_at
-		FROM users
-		WHERE 
-			users.email = $1
-	`
-	userModel := UserModel{}
-	err := r.db.Get(&userModel, query, email)
-	if err != nil {
-		return nil, errors.New(err.Error() + ", email:" + email)
-	}
-	return &user.User{
-		Id:        userModel.Id,
-		Name:      userModel.Name,
-		Email:     userModel.Email,
-		Password:  userModel.Password,
-		CreatedAt: userModel.CreatedAt,
-		UpdatedAt: userModel.UpdatedAt,
-		DeletedAt: userModel.DeletedAt.Time,
-	}, nil
+	var err error
+	var user *user.User
+	err = db.RunInTx(r.db, func(tx *sqlx.Tx) error {
+		user, err = psql.FindUserByEmail(ctx, tx, email)
+		return err
+	})
+	return user, err
 }
 
 func (r *UserPsqlRepository) FindById(ctx context.Context, id uuid.UUID) (*user.User, error) {
 	var err error
 	var user *user.User
 	err = db.RunInTx(r.db, func(tx *sqlx.Tx) error {
-		user, err = FindUserById(ctx, tx, id)
+		user, err = psql.FindUserById(ctx, tx, id)
 		return err
 	})
 	return user, err
-}
-
-func FindUserById(ctx context.Context, tx *sqlx.Tx, id uuid.UUID) (*user.User, error) {
-	query := `
-		SELECT 
-			id, name, email, password_hash, created_at, updated_at, deleted_at
-		FROM users
-		WHERE 
-			id = $1
-	`
-	userModel := UserModel{}
-	err := tx.Get(&userModel, query, id)
-	if err != nil {
-		return nil, err
-	}
-	return &user.User{
-		Id:        userModel.Id,
-		Name:      userModel.Name,
-		Email:     userModel.Email,
-		Password:  userModel.Password,
-		CreatedAt: userModel.CreatedAt,
-		UpdatedAt: userModel.UpdatedAt,
-		DeletedAt: userModel.DeletedAt.Time,
-	}, nil
 }
