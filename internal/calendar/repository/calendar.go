@@ -16,4 +16,5 @@ type CalendarRepository interface {
 		optionIds []uuid.UUID,
 		createFn func(*user.User, *calendar.Image, []option.Option) (*calendar.Calendar, error),
 	) error
+	FindByUserId(ctx context.Context, userId uuid.UUID) ([]calendar.Calendar, error)
 }

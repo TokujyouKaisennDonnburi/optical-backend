@@ -108,3 +108,36 @@ func (r *CalendarPsqlRepository) Create(
 		return nil
 	})
 }
+
+// ユーザーが所属するカレンダー一覧を取得する
+func (r *CalendarPsqlRepository) FindByUserId(ctx context.Context, userId uuid.UUID) ([]calendar.Calendar, error) {
+	query := `
+		SELECT c.id, c.name, COALESCE(co.color, '000000') as color
+		FROM calendars c
+		INNER JOIN calendar_members cm ON c.id = cm.calendar_id
+		LEFT JOIN calendar_options cop ON c.id = cop.calendar_id
+		LEFT JOIN options co ON cop.option_id = co.id AND co.type = 'color'
+		WHERE cm.user_id = $1
+		GROUP BY c.id, c.name, co.color
+		ORDER BY c.id
+	`
+	var rows []struct {
+		Id    uuid.UUID `db:"id"`
+		Name  string    `db:"name"`
+		Color string    `db:"color"`
+	}
+	err := r.db.SelectContext(ctx, &rows, query, userId)
+	if err != nil {
+		return nil, err
+	}
+
+	calendars := make([]calendar.Calendar, len(rows))
+	for i, row := range rows {
+		calendars[i] = calendar.Calendar{
+			Id:    row.Id,
+			Name:  row.Name,
+			Color: row.Color,
+		}
+	}
+	return calendars, nil
+}
