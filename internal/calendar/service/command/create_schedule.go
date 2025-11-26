@@ -15,6 +15,7 @@ type CalendarCreateArgs struct {
 	UserName      string
 	CalendarName  string
 	CalendarColor string
+	ImageId       uuid.UUID
 	OptionIds     []uuid.UUID
 }
 
@@ -27,7 +28,7 @@ type CalendarCreateOutput struct {
 func (s *CalendarCommand) CreateCalendar(ctx context.Context, args CalendarCreateArgs) (*CalendarCreateOutput, error) {
 	var newCalendar *calendar.Calendar
 	// カレンダーをリポジトリで作成
-	err := s.calendarRepository.Create(ctx, args.UserId, args.OptionIds, func(user *user.User, options []option.Option) (*calendar.Calendar, error) {
+	err := s.calendarRepository.Create(ctx, args.UserId, args.ImageId, args.OptionIds, func(user *user.User, image *calendar.Image, options []option.Option) (*calendar.Calendar, error) {
 		// オプションIDが全て正しいか確認
 		if len(options) != len(args.OptionIds) {
 			return nil, errors.New("invalid option ids")
@@ -38,7 +39,7 @@ func (s *CalendarCommand) CreateCalendar(ctx context.Context, args CalendarCreat
 			return nil, err
 		}
 		// カレンダーを作成
-		newCalendar, err = calendar.NewCalendar(args.CalendarName, args.CalendarColor, []calendar.Member{*member}, options)
+		newCalendar, err = calendar.NewCalendar(args.CalendarName, args.CalendarColor, *image, []calendar.Member{*member}, options)
 		if err != nil {
 			return nil, err
 		}

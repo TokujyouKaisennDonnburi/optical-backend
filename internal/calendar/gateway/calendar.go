@@ -28,9 +28,9 @@ func NewCalendarPsqlRepository(db *sqlx.DB) *CalendarPsqlRepository {
 // スケジュールを新規作成する
 func (r *CalendarPsqlRepository) Create(
 	ctx context.Context,
-	userId uuid.UUID,
+	userId, imageId uuid.UUID,
 	optionIds []uuid.UUID,
-	createFn func(user *user.User, options []option.Option) (*calendar.Calendar, error),
+	createFn func(user *user.User, image *calendar.Image, options []option.Option) (*calendar.Calendar, error),
 ) error {
 	return db.RunInTx(r.db, func(tx *sqlx.Tx) error {
 		// オプション取得
@@ -43,19 +43,27 @@ func (r *CalendarPsqlRepository) Create(
 		if err != nil {
 			return err
 		}
+		image, err := psql.FindImageById(ctx, tx, imageId)
+		if err != nil {
+			return err
+		}
 		// スケジュール作成関数を実行
-		calendar, err := createFn(user, options)
+		calendar, err := createFn(user, image, options)
 		if err != nil {
 			return err
 		}
 		// スケジュール作成
 		query := `
-			INSERT INTO calendars(id, name)
-			VALUES (:id, :name)
+			INSERT INTO calendars(id, name, image_id)
+			VALUES (:id, :name, :imageId)
 		`
 		_, err = tx.NamedExecContext(ctx, query, map[string]any{
 			"id":   calendar.Id,
 			"name": calendar.Name,
+			"imageId": uuid.NullUUID{
+				UUID:  image.Id,
+				Valid: image.Valid,
+			},
 		})
 		if err != nil {
 			return err
