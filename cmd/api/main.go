@@ -38,9 +38,11 @@ func main() {
 	userCommand := userCommand.NewUserCommand(userRepository, tokenRepository)
 	userHandler := userHandler.NewUserHttpHandler(userQuery, userCommand)
 	optionRepository := optionGateway.NewOptionPsqlRepository(db)
+	eventRepository := calendarGateway.NewEventPsqlRepository(db)
 	calendarRepository := calendarGateway.NewCalendarPsqlRepository(db)
-	calendarCreateCommand := calendarCommand.NewCalendarCommand(calendarRepository, optionRepository)
-	caledarHandler := calendarHandler.NewCalendarHttpHandler(calendarCreateCommand)
+	eventCommand := calendarCommand.NewEventCommand(eventRepository)
+	calendarCommand := calendarCommand.NewCalendarCommand(calendarRepository, optionRepository)
+	caledarHandler := calendarHandler.NewCalendarHttpHandler(eventCommand, calendarCommand)
 
 	// Unprotected Routes
 	r.Group(func(r chi.Router) {
@@ -57,7 +59,10 @@ func main() {
 		r.Get("/users/@me", userHandler.GetMe)
 
 		// Calendars
-		r.Post("/calendars", caledarHandler.Create)
+		r.Post("/calendars", caledarHandler.CreateCalendar)
+
+		// Events
+		r.Post("/calendars/{calendarId}/events", caledarHandler.CreateEvent)
 	})
 
 	// Start Serving
