@@ -43,6 +43,7 @@ func (r *CalendarPsqlRepository) Create(
 		if err != nil {
 			return err
 		}
+		// 画像を取得
 		image, err := psql.FindImageById(ctx, tx, imageId)
 		if err != nil {
 			return err
@@ -54,12 +55,13 @@ func (r *CalendarPsqlRepository) Create(
 		}
 		// スケジュール作成
 		query := `
-			INSERT INTO calendars(id, name, image_id)
-			VALUES (:id, :name, :imageId)
+			INSERT INTO calendars(id, name, color, image_id)
+			VALUES (:id, :name, :color, :imageId)
 		`
 		_, err = tx.NamedExecContext(ctx, query, map[string]any{
-			"id":   calendar.Id,
-			"name": calendar.Name,
+			"id":    calendar.Id,
+			"name":  calendar.Name,
+			"color": calendar.Color,
 			"imageId": uuid.NullUUID{
 				UUID:  image.Id,
 				Valid: image.Valid,

@@ -9,7 +9,7 @@ import (
 func HandleAppError(w http.ResponseWriter, r *http.Request, err error) {
 	apperr, ok := err.(*AppError)
 	if !ok {
-		ErrInternalServerError(err)
+		_ = render.Render(w, r, ErrInternalServerError(err))
 		return
 	}
 	err = render.Render(w, r, apperr)
