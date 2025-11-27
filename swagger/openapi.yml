@@ -214,6 +214,9 @@ components:
           type: string
         color:
           type: string
+        imageId:
+          type: string
+          format: uuid
         optionIds:
           type: array
           items:
