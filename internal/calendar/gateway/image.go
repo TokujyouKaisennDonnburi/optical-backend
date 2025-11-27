@@ -40,7 +40,7 @@ func (r *ImagePsqlAndMinioRepository) Upload(ctx context.Context, file multipart
 	if err != nil {
 		return "", err
 	}
-	return header.Filename, nil
+	return r.bucketName+"/"+filePath+header.Filename, nil
 }
 
 func (r *ImagePsqlAndMinioRepository) Save(ctx context.Context, image *calendar.Image) error {
