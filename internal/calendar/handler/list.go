@@ -32,12 +32,12 @@ func (h *CalendarHttpHandler) GetCalendars(w http.ResponseWriter, r *http.Reques
 		UserId: userId,
 	})
 	if err != nil {
-		_ = render.Render(w, r, apperr.ErrInternalServerError(err))
+		apperr.HandleAppError(w,r,err)
 		return
 	}
 	// レスポンスに変換
-	calendars := make([]CalendarResponse, len(output.Calendars))
-	for i, cal := range output.Calendars {
+	calendars := make([]CalendarResponse, len(output))
+	for i, cal := range output {
 		calendars[i] = CalendarResponse{
 			Id:    cal.Id.String(),
 			Name:  cal.Name,
