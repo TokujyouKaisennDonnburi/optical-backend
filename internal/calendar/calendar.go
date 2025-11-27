@@ -14,14 +14,15 @@ const (
 )
 
 type Calendar struct {
-	Id        uuid.UUID
-	Name      string
-	Color     string
-	Members   []Member
-	Options   []option.Option
+	Id      uuid.UUID
+	Name    string
+	Color   string
+	Image   Image
+	Members []Member
+	Options []option.Option
 }
 
-func NewCalendar(name, color string, members []Member, options []option.Option) (*Calendar, error) {
+func NewCalendar(name, color string, image Image, members []Member, options []option.Option) (*Calendar, error) {
 	id, err := uuid.NewV7()
 	if err != nil {
 		return nil, err
@@ -34,10 +35,11 @@ func NewCalendar(name, color string, members []Member, options []option.Option) 
 		return nil, errors.New("Calendar `color` is invalid")
 	}
 	return &Calendar{
-		Id:        id,
-		Name:      name,
-		Color:     color,
-		Members:   members,
-		Options:   options,
+		Id:      id,
+		Name:    name,
+		Color:   color,
+		Image:   image,
+		Members: members,
+		Options: options,
 	}, nil
 }

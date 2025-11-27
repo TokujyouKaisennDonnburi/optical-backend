@@ -12,8 +12,8 @@ import (
 type CalendarRepository interface {
 	Create(
 		ctx context.Context,
-		userId uuid.UUID,
+		userId, imageId uuid.UUID,
 		optionIds []uuid.UUID,
-		createFn func(*user.User, []option.Option) (*calendar.Calendar, error),
+		createFn func(*user.User, *calendar.Image, []option.Option) (*calendar.Calendar, error),
 	) error
 }
