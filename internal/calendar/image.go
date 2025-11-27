@@ -13,22 +13,27 @@ type Image struct {
 }
 
 func NewImage(imageUrl string) (*Image, error) {
-	if imageUrl == "" {
-		return &Image{
-			Valid: false,
-		}, nil
-	}
+	image := &Image{}
+	// id生成
 	id, err := uuid.NewV7()
 	if err != nil {
 		return nil, err
 	}
-	_, err = url.Parse(imageUrl)
+	// id設定
+	image.Id = id
+	// URL設定
+	image.SetUrl(imageUrl)
+	return image, nil
+}
+
+// URLを設定する
+func (img *Image) SetUrl(imageUrl string) {
+	_, err := url.Parse(imageUrl)
 	if err != nil {
-		return nil, err
+		img.Url = ""
+		img.Valid = false
+	} else {
+		img.Url = imageUrl
+		img.Valid = true
 	}
-	return &Image{
-		Id:    id,
-		Url:   imageUrl,
-		Valid: true,
-	}, nil
 }
