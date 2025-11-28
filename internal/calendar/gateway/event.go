@@ -53,3 +53,9 @@ func (r *EventPsqlRepository) Create(
 		return err
 	})
 }
+
+// 一覧取得
+func (r *EventPsqlRepository) ListEventsByCalendarId(
+	ctx context.Context,
+	calendarId uuid.UUID,
+) ([]query., error)

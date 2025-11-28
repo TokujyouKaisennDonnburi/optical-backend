@@ -10,7 +10,13 @@ import (
 type EventRepository interface {
 	Create(
 		ctx context.Context,
-		calendarId uuid.UUID, 
+		calendarId uuid.UUID,
 		createFn func(*calendar.Calendar) (*calendar.Event, error),
 	) error
+
+	// 一覧取得
+	ListEventsByCalendarId(
+		ctx context.Context,
+		calendarId uuid.UUID,
+	) ([]*calendar.Event, error)
 }
