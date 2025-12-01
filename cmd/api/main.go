@@ -14,6 +14,8 @@ import (
 	userHandler "github.com/TokujouKaisenDonburi/optical-backend/internal/user/handler"
 	userCommand "github.com/TokujouKaisenDonburi/optical-backend/internal/user/service/command"
 	userQuery "github.com/TokujouKaisenDonburi/optical-backend/internal/user/service/query"
+	"github.com/minio/minio-go/v7"
+	"github.com/minio/minio-go/v7/pkg/credentials"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
@@ -32,6 +34,11 @@ func main() {
 
 	db := getPostgresDB()
 	redisClient := GetRedisClient()
+	minioClient := GetMinIOClient()
+
+	// Migration
+	MigrateMinio(minioClient)
+
 	userRepository := userGateway.NewUserPsqlRepository(db)
 	tokenRepository := userGateway.NewTokenRedisRepository(redisClient)
 	userQuery := userQuery.NewUserQuery(userRepository)
@@ -40,8 +47,9 @@ func main() {
 	optionRepository := optionGateway.NewOptionPsqlRepository(db)
 	eventRepository := calendarGateway.NewEventPsqlRepository(db)
 	calendarRepository := calendarGateway.NewCalendarPsqlRepository(db)
+	imageRepository := calendarGateway.NewImagePsqlAndMinioRepository(db, minioClient, getBucketName())
 	eventCommand := calendarCommand.NewEventCommand(eventRepository)
-	calendarCommand := calendarCommand.NewCalendarCommand(calendarRepository, optionRepository)
+	calendarCommand := calendarCommand.NewCalendarCommand(calendarRepository, optionRepository, imageRepository)
 	caledarHandler := calendarHandler.NewCalendarHttpHandler(eventCommand, calendarCommand)
 
 	// Unprotected Routes
@@ -61,6 +69,7 @@ func main() {
 
 		// Calendars
 		r.Post("/calendars", caledarHandler.CreateCalendar)
+		r.Post("/calendars/images", caledarHandler.UploadImage)
 
 		// Events
 		r.Post("/calendars/{calendarId}/events", caledarHandler.CreateEvent)
@@ -68,6 +77,22 @@ func main() {
 
 	// Start Serving
 	http.ListenAndServe(":8000", r)
+}
+
+func MigrateMinio(client *minio.Client) {
+	exists, err := client.BucketExists(context.Background(), getBucketName())
+	if err != nil {
+		panic(err)
+	}
+	if exists {
+		return
+	}
+	err = client.MakeBucket(context.Background(), getBucketName(), minio.MakeBucketOptions{
+		Region: getMinioRegion(),
+	})
+	if err != nil {
+		panic(err)
+	}
 }
 
 // PostgresのDBに接続する
@@ -102,6 +127,49 @@ func getPostgresDB() *sqlx.DB {
 		panic(err.Error())
 	}
 	return db
+}
+
+func GetMinIOClient() *minio.Client {
+	endpoint, ok := os.LookupEnv("MINIO_ENDPOINT")
+	if !ok {
+		panic("'MINIO_ENDPOINT' is not set'")
+	}
+	accessKeyId, ok := os.LookupEnv("MINIO_ACCESS_KEY_ID")
+	if !ok {
+		panic("'MINIO_ACCESS_KEY_ID' is not set'")
+	}
+	secretAccessKey, ok := os.LookupEnv("MINIO_SECRET_ACCESS_KEY")
+	if !ok {
+		panic("'MINIO_SECRET_ACCESS_KEY' is not set")
+	}
+	useSsl, ok := os.LookupEnv("MINIO_USE_SSL")
+	if !ok {
+		panic("'MINIO_USE_SSL' is not set")
+	}
+	client, err := minio.New(endpoint, &minio.Options{
+		Creds:  credentials.NewStaticV4(accessKeyId, secretAccessKey, ""),
+		Secure: useSsl == "1",
+	})
+	if err != nil {
+		panic(err.Error())
+	}
+	return client
+}
+
+func getBucketName() string {
+	bucketName, ok := os.LookupEnv("MINIO_IMAGE_BUCKET_NAME")
+	if !ok {
+		panic("'MINIO_IMAGE_BUCKET_NAME' is not set")
+	}
+	return bucketName
+}
+
+func getMinioRegion() string {
+	bucketName, ok := os.LookupEnv("MINIO_REGION")
+	if !ok {
+		panic("'MINIO_REGION' is not set")
+	}
+	return bucketName
 }
 
 func GetRedisClient() *redis.Client {

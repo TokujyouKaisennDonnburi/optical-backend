@@ -1,32 +1,40 @@
 package command
 
 import (
-	optionRepo "github.com/TokujouKaisenDonburi/optical-backend/internal/option/repository"
 	calendarRepo "github.com/TokujouKaisenDonburi/optical-backend/internal/calendar/repository"
+	optionRepo "github.com/TokujouKaisenDonburi/optical-backend/internal/option/repository"
 )
 
 type CalendarCommand struct {
 	calendarRepository calendarRepo.CalendarRepository
 	optionRepository   optionRepo.OptionRepository
+	imageRepository    calendarRepo.ImageRepository
 }
 
 type EventCommand struct {
 	eventRepository calendarRepo.EventRepository
 }
 
-func NewCalendarCommand(calendarRepository calendarRepo.CalendarRepository, optionRepository optionRepo.OptionRepository) *CalendarCommand {
+func NewCalendarCommand(
+	calendarRepository calendarRepo.CalendarRepository,
+	optionRepository optionRepo.OptionRepository,
+	imageRepository calendarRepo.ImageRepository,
+) *CalendarCommand {
 	if calendarRepository == nil {
 		panic("calendarRepository is nil")
 	}
 	if optionRepository == nil {
 		panic("optionRepository is nil")
 	}
+	if imageRepository == nil {
+		panic("imageRepository is nil")
+	}
 	return &CalendarCommand{
 		calendarRepository: calendarRepository,
-		optionRepository: optionRepository,
+		optionRepository:   optionRepository,
+		imageRepository:    imageRepository,
 	}
 }
-
 
 func NewEventCommand(eventRepository calendarRepo.EventRepository) *EventCommand {
 	if eventRepository == nil {

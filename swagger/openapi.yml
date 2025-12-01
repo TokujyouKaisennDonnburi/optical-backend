@@ -124,6 +124,30 @@ paths:
           description: Invalid request
         '500':
           description: Internal server error
+  /calendars/images:
+    post:
+      summary: Upload an image
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                image:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: Image uploaded successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ImageUploadResponse'
+        '400':
+          description: Invalid request
+        '500':
+          description: Internal server error
 components:
   schemas:
     UserCreateRequest:
@@ -190,6 +214,9 @@ components:
           type: string
         color:
           type: string
+        imageId:
+          type: string
+          format: uuid
         optionIds:
           type: array
           items:
@@ -246,3 +273,9 @@ components:
         expiresIn:
           type: string
           format: date-time
+    ImageUploadResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid

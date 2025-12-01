@@ -15,6 +15,7 @@ import (
 type CalendarCreateRequest struct {
 	Name      string   `json:"name"`
 	Color     string   `json:"color"`
+	ImageId   string   `json:"imageId"`
 	OptionIds []string `json:"optionIds"`
 }
 
@@ -51,9 +52,20 @@ func (h *CalendarHttpHandler) CreateCalendar(w http.ResponseWriter, r *http.Requ
 		}
 		optionIds = append(optionIds, optionId)
 	}
+	var imageId uuid.UUID
+	if request.ImageId != "" {
+		imageId, err = uuid.Parse(request.ImageId)
+		if err != nil {
+			err = render.Render(w, r, apperr.ErrInvalidRequest(err))
+			if err != nil {
+				_ = render.Render(w, r, apperr.ErrInternalServerError(err))
+			}
+		}
+	}
 	// カレンダーを作成
 	output, err := h.calendarCommand.CreateCalendar(context.Background(), command.CalendarCreateArgs{
 		UserId:        userId,
+		ImageId:       imageId,
 		CalendarName:  request.Name,
 		CalendarColor: request.Color,
 		OptionIds:     optionIds,
