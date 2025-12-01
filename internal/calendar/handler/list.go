@@ -44,7 +44,5 @@ func (h *CalendarHttpHandler) GetCalendars(w http.ResponseWriter, r *http.Reques
 			Color: cal.Color,
 		}
 	}
-	render.JSON(w, r, CalendarListResponse{
-		Calendars: calendars,
-	})
+	render.JSON(w, r, calendars)
 }
