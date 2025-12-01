@@ -52,13 +52,15 @@ func (h *CalendarHttpHandler) CreateCalendar(w http.ResponseWriter, r *http.Requ
 		}
 		optionIds = append(optionIds, optionId)
 	}
-	imageId, err := uuid.Parse(request.ImageId)
-	if err != nil {
-		err = render.Render(w, r, apperr.ErrInvalidRequest(err))
+	var imageId uuid.UUID
+	if request.ImageId != "" {
+		imageId, err = uuid.Parse(request.ImageId)
 		if err != nil {
-			_ = render.Render(w, r, apperr.ErrInternalServerError(err))
+			err = render.Render(w, r, apperr.ErrInvalidRequest(err))
+			if err != nil {
+				_ = render.Render(w, r, apperr.ErrInternalServerError(err))
+			}
 		}
-		return
 	}
 	// カレンダーを作成
 	output, err := h.calendarCommand.CreateCalendar(context.Background(), command.CalendarCreateArgs{
