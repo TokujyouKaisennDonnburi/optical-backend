@@ -22,6 +22,7 @@ func (h *CalendarHttpHandler) UploadImage(w http.ResponseWriter, r *http.Request
 		}
 		return
 	}
+	defer file.Close()
 	output, err := h.calendarCommand.SaveImage(r.Context(), command.SaveImageCommandInput{
 		File:   file,
 		Header: header,
