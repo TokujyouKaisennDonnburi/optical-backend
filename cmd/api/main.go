@@ -140,7 +140,7 @@ func GetMinIOClient() *minio.Client {
 	}
 	secretAccessKey, ok := os.LookupEnv("MINIO_SECRET_ACCESS_KEY")
 	if !ok {
-		panic("'MINIO_SECRET_ACCESS_KEY' is not set'")
+		panic("'MINIO_SECRET_ACCESS_KEY' is not set")
 	}
 	useSsl, ok := os.LookupEnv("MINIO_USE_SSL")
 	if !ok {
