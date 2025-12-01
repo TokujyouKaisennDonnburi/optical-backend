@@ -29,7 +29,7 @@ func NewImage(imageUrl string) (*Image, error) {
 // URLを設定する
 func (img *Image) SetUrl(imageUrl string) {
 	_, err := url.Parse(imageUrl)
-	if err != nil {
+	if imageUrl == "" || err != nil {
 		img.Url = ""
 		img.Valid = false
 	} else {
