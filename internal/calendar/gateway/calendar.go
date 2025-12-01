@@ -111,6 +111,12 @@ func (r *CalendarPsqlRepository) Create(
 	})
 }
 
+type CalendarListQueryModel struct{
+	Id uuid.UUID `db:"id"`
+	Name  string `db:"name"`
+	Color string `db:"color"`
+}
+
 // ユーザーが所属するカレンダー一覧を取得する
 func (r *CalendarPsqlRepository) FindByUserId(ctx context.Context, userId uuid.UUID) ([]output.CalendarQueryOutput, error) {
 	query := `
@@ -126,7 +132,7 @@ func (r *CalendarPsqlRepository) FindByUserId(ctx context.Context, userId uuid.U
 		return nil, err
 	}
 
-	calendars := make([]calendar.Calendar, len(rows))
+	calendars := make([]output.CalendarQueryOutput, len(rows))
 	for i, row := range rows {
 		calendars[i] = output.CalendarQueryOutput{
 			Id:    row.Id,
