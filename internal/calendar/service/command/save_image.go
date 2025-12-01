@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"mime/multipart"
+	"strings"
 
 	"github.com/google/uuid"
 
@@ -12,6 +13,7 @@ import (
 
 const (
 	MAX_IMAGE_SIZE = 20_000_000 // 20MB
+	VALID_IMAGE_EXT = "png,jpg,jpeg"
 )
 
 type SaveImageCommandInput struct {
@@ -27,6 +29,16 @@ type SaveImageCommandOutput struct {
 func (c *CalendarCommand) SaveImage(ctx context.Context, input SaveImageCommandInput) (*SaveImageCommandOutput, error) {
 	if input.Header.Size > MAX_IMAGE_SIZE {
 		return nil, errors.New("Image size is invalid")
+	}
+	found := false
+	for ext := range strings.SplitSeq(VALID_IMAGE_EXT, ","){
+		if strings.HasSuffix(input.Header.Filename, ext) {
+			found = true
+			break
+		}
+	}
+	if !found {
+		return nil, errors.New("Image extension is invalid")
 	}
 	// 画像情報を作成
 	image, err := calendar.NewImage("")
