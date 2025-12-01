@@ -122,8 +122,6 @@ func (r *CalendarPsqlRepository) FindByUserId(ctx context.Context, userId uuid.U
 	query := `
 		SELECT c.id, c.name, c.color
 		FROM calendars c
-		INNER JOIN calendar_members cm ON c.id = cm.calendar_id
-		WHERE cm.user_id = $1
 		ORDER BY c.id
 	`
 	var rows []CalendarListQueryModel
