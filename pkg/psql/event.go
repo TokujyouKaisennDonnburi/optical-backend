@@ -21,16 +21,21 @@ type EventModel struct {
 	EndAt      time.Time `db:"end_at"`
 }
 
-func FindEventById(ctx context.Context, tx *sqlx.Tx, id uuid.UUID) (*calendar.Event, error) {
+func FindEventByUserIdAndId(ctx context.Context, tx *sqlx.Tx, userId, eventId uuid.UUID) (*calendar.Event, error) {
 	query := `
-		SELECT id, calendar_id, title, memo, color, location, all_day, start_at, end_at
-			FROM events
+		SELECT 
+			id, calendar_id, title, memo, color, location, all_day, start_at, end_at
+		FROM events
+		JOIN calendar_members
+			ON calendar_members.calendar_id = events.calendar_id
 		WHERE 
-			id = $1 AND 
+			id = $2 AND 
+			calendar_members.user_id = $1 AND
+			calendar_members.joined_at IS NOT NULL AND
 			deleted_at IS NULL
 	`
 	var eventModel EventModel
-	err := tx.GetContext(ctx, &eventModel, query, id)
+	err := tx.GetContext(ctx, &eventModel, query, userId, eventId)
 	if err != nil {
 		return nil, err
 	}

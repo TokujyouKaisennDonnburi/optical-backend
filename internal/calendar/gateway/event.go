@@ -77,11 +77,11 @@ func (r *EventPsqlRepository) Create(
 
 func (r *EventPsqlRepository) Update(
 	ctx context.Context,
-	eventId uuid.UUID,
+	userId, eventId uuid.UUID,
 	updateFn func(event *calendar.Event) (*calendar.Event, error),
 ) error {
 	return db.RunInTx(r.db, func(tx *sqlx.Tx) error {
-		event, err := psql.FindEventById(ctx, tx, eventId)
+		event, err := psql.FindEventByUserIdAndId(ctx, tx, userId, eventId)
 		if err != nil {
 			return err
 		}
