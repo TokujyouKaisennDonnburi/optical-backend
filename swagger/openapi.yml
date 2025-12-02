@@ -137,6 +137,33 @@ paths:
           description: Invalid request
         '500':
           description: Internal server error
+  /calendars/{calendarId}/events/{eventId}:
+    patch:
+      summary: Update an event
+      parameters:
+        - name: calendarId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: eventId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EventUpdateRequest'
+      responses:
+        '204':
+          description: Event updated successfully
+        '400':
+          description: Invalid request
+        '500':
+          description: Internal server error
   /calendars/images:
     post:
       summary: Upload an image
@@ -316,3 +343,30 @@ components:
         id:
           type: string
           format: uuid
+    EventUpdateRequest:
+      type: object
+      required:
+        - title
+        - memo
+        - color
+        - location
+        - startTime
+        - endTime
+        - isAllDay
+      properties:
+        title:
+          type: string
+        memo:
+          type: string
+        color:
+          type: string
+        location:
+          type: string
+        startTime:
+          type: string
+          format: date-time
+        endTime:
+          type: string
+          format: date-time
+        isAllDay:
+          type: boolean
