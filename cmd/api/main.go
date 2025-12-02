@@ -76,6 +76,7 @@ func main() {
 
 		// Events
 		r.Post("/calendars/{calendarId}/events", caledarHandler.CreateEvent)
+		r.Patch("/calendars/{calendarId}/events/{eventId}", caledarHandler.UpdateEvent)
 	})
 
 	// Start Serving
