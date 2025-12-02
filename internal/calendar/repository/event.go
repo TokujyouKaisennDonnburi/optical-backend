@@ -15,7 +15,7 @@ type EventRepository interface {
 	) error
 	Update(
 		ctx context.Context,
-		eventId uuid.UUID,
+		userId, eventId uuid.UUID,
 		updateFn func(*calendar.Event) (*calendar.Event, error),
 	) error
 }
