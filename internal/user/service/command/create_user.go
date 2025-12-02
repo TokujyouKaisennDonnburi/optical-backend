@@ -14,19 +14,38 @@ type UserCreateInput struct {
 }
 
 type UserCreateOutput struct {
-	Id uuid.UUID
+	Id           uuid.UUID
+	AccessToken  string
+	RefreshToken string
 }
 
 func (c *UserCommand) CreateUser(ctx context.Context, input UserCreateInput) (*UserCreateOutput, error) {
-	user, err := user.NewUser(input.Name, input.Email, input.Password)
+	newUser, err := user.NewUser(input.Name, input.Email, input.Password)
 	if err != nil {
 		return nil, err
 	}
-	err = c.userRepository.Create(ctx, user)
+	err = c.userRepository.Create(ctx, newUser)
+	if err != nil {
+		return nil, err
+	}
+	// アクセストークン発行
+	accessToken, err := user.NewAccessToken(newUser.Id)
+	if err != nil {
+		return nil, err
+	}
+	// リフレッシュトークン発行
+	refreshToken, err := user.NewRefreshToken(newUser)
+	if err != nil {
+		return nil, err
+	}
+	// リフレッシュトークンを保存
+	err = c.tokenRepository.AddToWhitelist(refreshToken)
 	if err != nil {
 		return nil, err
 	}
 	return &UserCreateOutput{
-		Id: user.Id,
+		Id:           newUser.Id,
+		AccessToken:  accessToken.Token,
+		RefreshToken: refreshToken.Token,
 	}, nil
 }
