@@ -9,6 +9,7 @@ import (
 )
 
 type EventUpdateInput struct {
+	UserId    uuid.UUID
 	EventId   uuid.UUID
 	Title     string
 	Memo      string
@@ -26,7 +27,7 @@ func (c *EventCommand) UpdateEvent(ctx context.Context, input EventUpdateInput) 
 	if err != nil {
 		return err
 	}
-	err = c.eventRepository.Update(ctx, input.EventId, func(event *calendar.Event) (*calendar.Event, error) {
+	err = c.eventRepository.Update(ctx, input.UserId, input.EventId, func(event *calendar.Event) (*calendar.Event, error) {
 		err = event.SetTitle(input.Title)
 		if err != nil {
 			return nil, err
