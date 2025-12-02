@@ -167,3 +167,31 @@ func (r *CalendarPsqlRepository) FindByUserId(ctx context.Context, userId uuid.U
 	}
 	return calendars, nil
 }
+
+type CalendarQueryModel struct {
+	Id      uuid.UUID  `db:"id"`
+	Name    string     `db:"name"`
+	Color   string     `db:"color"`
+	Image   calendar.Image    `db:"image"`
+	Members []calendar.Member `db:"member"`
+	Options []option.Option   `db:"option"`
+}
+
+func (r *CalendarPsqlRepository) FindById(ctx context.Context, id uuid.UUID) (*CalendarQueryModel, error) {
+	query := `
+        SELECT c.id, c.name, c.color, i.image, m.members, o.options
+        FROM calendars c
+		LEFT JOIN calendar_image i ON i.calendar_id = c.id
+		CROSS JOIN LATERAL 
+		INNER JOIN calendar_options o ON o.calendar_id = c.id
+		INNER JOIN calendar_members m ON m.calendar_id = c.id
+        WHERE c.id = $1
+		ORDER BY c.id
+    `
+	model := CalendarQueryModel{}
+	err := r.db.GetContext(ctx, &model, query, id)
+	if err != nil {
+		return nil, err
+	}
+	return &model, err
+}
