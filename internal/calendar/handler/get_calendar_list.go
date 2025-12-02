@@ -9,11 +9,8 @@ import (
 	"github.com/go-chi/render"
 )
 
-type CalendarListResponse struct {
-	Calendars []CalendarResponse `json:"calendars"`
-}
 
-type CalendarResponse struct {
+type CalendarListResponse struct {
 	Id    string `json:"id"`
 	Name  string `json:"name"`
 	Color string `json:"color"`
@@ -36,9 +33,9 @@ func (h *CalendarHttpHandler) GetCalendars(w http.ResponseWriter, r *http.Reques
 		return
 	}
 	// レスポンスに変換
-	calendars := make([]CalendarResponse, len(output))
+	calendars := make([]CalendarListResponse, len(output))
 	for i, cal := range output {
-		calendars[i] = CalendarResponse{
+		calendars[i] = CalendarListResponse{
 			Id:    cal.Id.String(),
 			Name:  cal.Name,
 			Color: cal.Color,
