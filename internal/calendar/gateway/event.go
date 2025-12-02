@@ -55,6 +55,20 @@ func (r *EventPsqlRepository) Create(
 	})
 }
 
+// 専用モデル
+// gateway層専用のモデル
+type EventListQueryModel struct {
+	Id         uuid.UUID `db:"id"`
+	CalendarId uuid.UUID `db:"calendar_id"`
+	Title      string    `db:"title"`
+	Memo       string    `db:"memo"`
+	Color      string    `db:"color"`
+	AllDay     bool      `db:"all_day"`
+	StartAt    string    `db:"start_at"`
+	EndAt      string    `db:"end_at"`
+	CreatedAt  string    `db:"created_at"`
+}
+
 // 特定のカレンダーに対応するイベント一覧取得
 func (r *EventPsqlRepository) ListEventsByCalendarId(
 	ctx context.Context,
@@ -67,10 +81,29 @@ func (r *EventPsqlRepository) ListEventsByCalendarId(
 			AND e.deleted_at IS NULL -- 論理削除されていないもののみ取得
 		ORDER BY e.start_at ASC
 	`
-	events := []output.EventQueryOutput{}
-	err := r.db.SelectContext(ctx, &events, query, calendarId)
+
+	// クエリ実行
+	var rows []EventListQueryModel
+	err := r.db.SelectContext(ctx, &rows, query, calendarId)
 	if err != nil {
 		return nil, err
 	}
+
+	// 出力形式に変換
+	events := make([]output.EventQueryOutput, len(rows))
+	for i, row := range rows {
+		events[i] = output.EventQueryOutput{
+			Id:         row.Id,
+			CalendarId: row.CalendarId,
+			Title:      row.Title,
+			Memo:       row.Memo,
+			Color:      row.Color,
+			AllDay:     row.AllDay,
+			StartAt:    row.StartAt,
+			EndAt:      row.EndAt,
+			CreatedAt:  row.CreatedAt,
+		}
+	}
+
 	return events, nil
 }
