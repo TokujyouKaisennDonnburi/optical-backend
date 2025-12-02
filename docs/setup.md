@@ -6,6 +6,12 @@
 go install github.com/rubenv/sql-migrate/...@latest
 ```
 
+## airのインストール
+
+```bash
+go install github.com/air-verse/air@latest
+```
+
 ## MinioMCのインストール
 
 ```bash
