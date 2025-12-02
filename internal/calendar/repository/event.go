@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/TokujouKaisenDonburi/optical-backend/internal/calendar"
+	"github.com/TokujouKaisenDonburi/optical-backend/internal/calendar/service/query/output"
 	"github.com/google/uuid"
 )
 
@@ -18,5 +19,5 @@ type EventRepository interface {
 	ListEventsByCalendarId(
 		ctx context.Context,
 		calendarId uuid.UUID,
-	) ([]*calendar.Event, error)
+	) ([]output.EventQueryOutput, error)
 }
