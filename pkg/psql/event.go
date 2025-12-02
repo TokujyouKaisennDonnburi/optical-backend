@@ -1,0 +1,50 @@
+package psql
+
+import (
+	"context"
+	"time"
+
+	"github.com/TokujouKaisenDonburi/optical-backend/internal/calendar"
+	"github.com/google/uuid"
+	"github.com/jmoiron/sqlx"
+)
+
+type EventModel struct {
+	Id         uuid.UUID `db:"id"`
+	CalendarId uuid.UUID `db:"calendarId"`
+	Title      string    `db:"title"`
+	Memo       string    `db:"memo"`
+	Color      string    `db:"color"`
+	Location   string    `db:"location"`
+	IsAllDay   bool      `db:"all_day"`
+	StartAt    time.Time `db:"start_at"`
+	EndAt      time.Time `db:"end_at"`
+}
+
+func FindEventById(ctx context.Context, tx *sqlx.Tx, id uuid.UUID) (*calendar.Event, error) {
+	query := `
+		SELECT id, calendar_id, title, memo, color, location, all_day, start_at, end_at
+			FROM events
+		WHERE 
+			id = $1 AND 
+			deleted_at IS NULL
+	`
+	var eventModel EventModel
+	err := tx.GetContext(ctx, &eventModel, query, id)
+	if err != nil {
+		return nil, err
+	}
+	return &calendar.Event{
+		Id:         eventModel.Id,
+		CalendarId: eventModel.CalendarId,
+		Title:      eventModel.Title,
+		Memo:       eventModel.Memo,
+		Color:      eventModel.Color,
+		Location:   eventModel.Location,
+		ScheduledTime: calendar.ScheduledTime{
+			AllDay:    eventModel.IsAllDay,
+			StartTime: eventModel.StartAt,
+			EndTime:   eventModel.EndAt,
+		},
+	}, nil
+}
