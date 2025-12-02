@@ -14,3 +14,4 @@ func NewCalendarQuery(calendarRepository repository.CalendarRepository) *Calenda
 		calendarRepository: calendarRepository,
 	}
 }
+
