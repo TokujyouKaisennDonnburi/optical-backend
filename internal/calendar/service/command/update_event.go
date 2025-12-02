@@ -19,6 +19,7 @@ type EventUpdateInput struct {
 	IsAllDay  bool
 }
 
+// 予定を更新する
 func (c *EventCommand) UpdateEvent(ctx context.Context, input EventUpdateInput) error {
 	// 予定時間を作成
 	scheduledTime, err := calendar.NewScheduledTime(input.IsAllDay, input.StartTime, input.EndTime)
