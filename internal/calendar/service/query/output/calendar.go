@@ -5,7 +5,7 @@ import (
 )
 
 type CalendarQueryOutput struct {
-	Id    uuid.UUID `json:"id"`
-	Name  string    `json:"name"`
-	Color string    `json:"color"`
+	Id    uuid.UUID
+	Name  string
+	Color string
 }
