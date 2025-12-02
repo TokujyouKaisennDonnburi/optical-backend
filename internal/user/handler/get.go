@@ -6,6 +6,7 @@ import (
 
 	"github.com/TokujouKaisenDonburi/optical-backend/internal/user/service/query"
 	"github.com/TokujouKaisenDonburi/optical-backend/pkg/apperr"
+	"github.com/TokujouKaisenDonburi/optical-backend/pkg/auth"
 	"github.com/go-chi/render"
 )
 
@@ -20,7 +21,7 @@ type UserResponse struct {
 // 自身のユーザー情報を取得する
 func (h *UserHttpHandler) GetMe(w http.ResponseWriter, r *http.Request) {
 	// ユーザーIDを取得
-	userId, err := GetUserIdFromContext(r)
+	userId, err := auth.GetUserIdFromContext(r)
 	if err != nil {
 		_ = render.Render(w, r, apperr.ErrInternalServerError(err))
 		return
