@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/TokujouKaisenDonburi/optical-backend/internal/calendar"
+	"github.com/TokujouKaisenDonburi/optical-backend/internal/calendar/service/query/output"
 	"github.com/TokujouKaisenDonburi/optical-backend/pkg/db"
 	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
@@ -54,8 +55,22 @@ func (r *EventPsqlRepository) Create(
 	})
 }
 
-// 一覧取得
+// 特定のカレンダーに対応するイベント一覧取得
 func (r *EventPsqlRepository) ListEventsByCalendarId(
 	ctx context.Context,
 	calendarId uuid.UUID,
-) ([]query., error)
+) ([]output.EventQueryOutput, error) {
+	query := `
+		SELECT e.id, e.calendar_id, e.title, e.memo, e.color, e.all_day, e.start_at, e.end_at, e.created_at
+		FROM events e
+		WHERE e.calendar_id = $1
+			AND e.deleted_at IS NULL -- 論理削除されていないもののみ取得
+		ORDER BY e.start_at ASC
+	`
+	events := []output.EventQueryOutput{}
+	err := r.db.SelectContext(ctx, &events, query, calendarId)
+	if err != nil {
+		return nil, err
+	}
+	return events, nil
+}
