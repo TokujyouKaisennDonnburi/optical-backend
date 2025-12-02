@@ -10,9 +10,11 @@ import (
 )
 
 const (
-	MIN_EVENT_TITLE_LENGTH = 1
-	MAX_EVENT_TITLE_LENGTH = 32
-	MAX_EVENT_MEMO_LENGTH  = 255
+	MIN_EVENT_TITLE_LENGTH    = 1
+	MAX_EVENT_TITLE_LENGTH    = 32
+	MIN_EVENT_LOCATION_LENGTH = 1
+	MAX_EVENT_LOCATION_LENGTH = 32
+	MAX_EVENT_MEMO_LENGTH     = 255
 )
 
 type Event struct {
@@ -39,38 +41,79 @@ func NewEvent(calendarId uuid.UUID, title, memo, color, location string, schedul
 	if calendarId == uuid.Nil {
 		return nil, errors.New("Evnet `calendarId` is nil")
 	}
-	// title
+	event := Event{
+		Id:         id,
+		CalendarId: calendarId,
+	}
+	err = event.SetTitle(title)
+	if err != nil {
+		return nil, err
+	}
+	err = event.SetColor(color)
+	if err != nil {
+		return nil, err
+	}
+	err = event.SetMemo(memo)
+	if err != nil {
+		return nil, err
+	}
+	err = event.SetLocation(location)
+	if err != nil {
+		return nil, err
+	}
+	err = event.SetScheduledTime(scheduledTime)
+	if err != nil {
+		return nil, err
+	}
+	return &event, nil
+}
+
+func (e *Event) SetTitle(title string) error {
 	titleLength := utf8.RuneCountInString(title)
 	if titleLength < MIN_EVENT_TITLE_LENGTH || titleLength > MAX_EVENT_TITLE_LENGTH {
-		return nil, errors.New("Event `title` length is invalid")
+		return errors.New("Event `title` length is invalid")
 	}
-	// memo
-	memoLength := utf8.RuneCountInString(memo)
-	if memoLength > MAX_EVENT_MEMO_LENGTH {
-		return nil, errors.New("Event `memo` length is invalid")
-	}
-	// color
+	e.Title = title
+	return nil
+}
+
+func (e *Event) SetColor(color string) error {
 	colorLen := utf8.RuneCountInString(color)
 	if colorLen != 6 {
-		return nil, errors.New("Color length is invalid")
+		return errors.New("Color length is invalid")
 	}
-	_, err = hex.DecodeString(color)
+	_, err := hex.DecodeString(color)
 	if err != nil {
-		return nil, errors.New("Color format is invalid")
+		return errors.New("Color format is invalid")
 	}
-	// scheduledTime
+	e.Color = color
+	return nil
+}
+
+func (e *Event) SetMemo(memo string) error {
+	memoLength := utf8.RuneCountInString(memo)
+	if memoLength > MAX_EVENT_MEMO_LENGTH {
+		return errors.New("Event `memo` length is invalid")
+	}
+	e.Memo = memo
+	return nil
+}
+
+func (e *Event) SetLocation(location string) error {
+	locationLength := utf8.RuneCountInString(location)
+	if locationLength < MIN_EVENT_LOCATION_LENGTH || locationLength > MAX_EVENT_LOCATION_LENGTH {
+		return errors.New("Event `location` length is invalid")
+	}
+	e.Location = location
+	return nil
+}
+
+func (e *Event) SetScheduledTime(scheduledTime ScheduledTime) error {
 	if scheduledTime.IsZero() {
-		return nil, errors.New("Event `scheduledTime` is zero")
+		return errors.New("Event `scheduledTime` is zero")
 	}
-	return &Event{
-		Id:            id,
-		CalendarId:    calendarId,
-		Title:         title,
-		Color:         color,
-		Memo:          memo,
-		Location:      location,
-		ScheduledTime: scheduledTime,
-	}, nil
+	e.ScheduledTime = scheduledTime
+	return nil
 }
 
 func NewScheduledTime(allDay bool, startTime, endTime time.Time) (*ScheduledTime, error) {
