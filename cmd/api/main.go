@@ -90,6 +90,7 @@ func main() {
 
 		// Events
 		r.Post("/calendars/{calendarId}/events", calendarHandler.CreateEvent)
+		r.Patch("/calendars/{calendarId}/events/{eventId}", calendarHandler.UpdateEvent)
 		r.Get("/calendars/{calendarId}/events", calendarHandler.ListGetEvents)
 		r.Get("/events/todays", calendarHandler.GetToday)
 		r.Get("/events/months", calendarHandler.GetByMonth)
