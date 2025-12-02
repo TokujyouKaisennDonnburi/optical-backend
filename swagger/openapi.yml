@@ -192,6 +192,32 @@ paths:
           description: Forbidden - Calendar does not belong to user
         '500':
           description: Internal server error
+  /calendars/{calendarId}/events/{eventId}:
+    patch:
+      summary: Update an event
+      tags: 
+        - calendars
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: eventId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EventUpdateRequest'
+      responses:
+        '204':
+          description: Event updated successfully
+        '400':
+          description: Invalid request
+        '500':
+          description: Internal server error
   /calendars/images:
     post:
       summary: Upload an image
@@ -556,16 +582,29 @@ components:
           type: string
         title:
           type: string
+    EventUpdateRequest:
+      type: object
+      required:
+        - title
+        - memo
+        - color
+        - location
+        - startTime
+        - endTime
+        - isAllDay
+      properties:
+        title:
+          type: string
+        memo:
+          type: string
         color:
           type: string
         location:
           type: string
-        memo:
-          type: string
-        startAt:
+        startTime:
           type: string
           format: date-time
-        endAt:
+        endTime:
           type: string
           format: date-time
         isAllDay:
@@ -626,4 +665,3 @@ components:
           example:
             - optical-user1@example.com
             - optical-user2@example.com
-
