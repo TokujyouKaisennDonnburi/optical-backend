@@ -9,6 +9,7 @@ import (
 	calendarGateway "github.com/TokujouKaisenDonburi/optical-backend/internal/calendar/gateway"
 	calendarHandler "github.com/TokujouKaisenDonburi/optical-backend/internal/calendar/handler"
 	calendarCommand "github.com/TokujouKaisenDonburi/optical-backend/internal/calendar/service/command"
+	calendarQuery "github.com/TokujouKaisenDonburi/optical-backend/internal/calendar/service/query"
 	optionGateway "github.com/TokujouKaisenDonburi/optical-backend/internal/option/gateway"
 	userGateway "github.com/TokujouKaisenDonburi/optical-backend/internal/user/gateway"
 	userHandler "github.com/TokujouKaisenDonburi/optical-backend/internal/user/handler"
@@ -50,7 +51,8 @@ func main() {
 	imageRepository := calendarGateway.NewImagePsqlAndMinioRepository(db, minioClient, getBucketName())
 	eventCommand := calendarCommand.NewEventCommand(eventRepository)
 	calendarCommand := calendarCommand.NewCalendarCommand(calendarRepository, optionRepository, imageRepository)
-	caledarHandler := calendarHandler.NewCalendarHttpHandler(eventCommand, calendarCommand)
+	calendarQuery := calendarQuery.NewCalendarQuery(calendarRepository)
+	caledarHandler := calendarHandler.NewCalendarHttpHandler(eventCommand, calendarCommand, calendarQuery)
 
 	// Unprotected Routes
 	r.Group(func(r chi.Router) {
@@ -70,6 +72,7 @@ func main() {
 		// Calendars
 		r.Post("/calendars", caledarHandler.CreateCalendar)
 		r.Post("/calendars/images", caledarHandler.UploadImage)
+		r.Get("/calendars", caledarHandler.GetCalendars)
 
 		// Events
 		r.Post("/calendars/{calendarId}/events", caledarHandler.CreateEvent)

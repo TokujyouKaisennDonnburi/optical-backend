@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/TokujouKaisenDonburi/optical-backend/internal/calendar"
+	"github.com/TokujouKaisenDonburi/optical-backend/internal/calendar/service/query/output"
 	"github.com/TokujouKaisenDonburi/optical-backend/internal/option"
 	"github.com/TokujouKaisenDonburi/optical-backend/internal/user"
 	"github.com/TokujouKaisenDonburi/optical-backend/pkg/db"
@@ -11,6 +12,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
 )
+
 
 type CalendarPsqlRepository struct {
 	db *sqlx.DB
@@ -95,7 +97,7 @@ func (r *CalendarPsqlRepository) Create(
 			`
 			calendarOptionMaps := []map[string]any{}
 			for _, option := range calendar.Options {
-				calendarMemberMaps = append(calendarMemberMaps, map[string]any{
+				calendarOptionMaps = append(calendarOptionMaps, map[string]any{
 					"calendarId": calendar.Id,
 					"optionId":   option.Id,
 				})
@@ -107,4 +109,37 @@ func (r *CalendarPsqlRepository) Create(
 		}
 		return nil
 	})
+}
+
+type CalendarListQueryModel struct{
+	Id uuid.UUID `db:"id"`
+	Name  string `db:"name"`
+	Color string `db:"color"`
+}
+
+// ユーザーが所属するカレンダー一覧を取得する
+func (r *CalendarPsqlRepository) FindByUserId(ctx context.Context, userId uuid.UUID) ([]output.CalendarQueryOutput, error) {
+	query := `
+		SELECT c.id, c.name, c.color
+		FROM calendars c
+		INNER JOIN calendar_members m ON c.id = m.calendar_id
+		WHERE m.user_id = $1
+		AND c.deleted_at IS NULL
+		ORDER BY c.id
+	`
+	var rows []CalendarListQueryModel
+	err := r.db.SelectContext(ctx, &rows, query, userId)
+	if err != nil {
+		return nil, err
+	}
+
+	calendars := make([]output.CalendarQueryOutput, len(rows))
+	for i, row := range rows {
+		calendars[i] = output.CalendarQueryOutput{
+			Id:    row.Id,
+			Name:  row.Name,
+			Color: row.Color,
+		}
+	}
+	return calendars, nil
 }
