@@ -76,6 +76,7 @@ func (r *EventPsqlRepository) Update(
 		if err != nil {
 			return err
 		}
+		IsLocationExists := event.Location != ""
 		event, err = updateFn(event)
 		if err != nil {
 			return err
@@ -96,11 +97,34 @@ func (r *EventPsqlRepository) Update(
 			"title":    event.Title,
 			"memo":     event.Memo,
 			"color":    event.Color,
-			"location": event.Location,
 			"allDay":   event.ScheduledTime.AllDay,
 			"startAt":  event.ScheduledTime.StartTime,
 			"endAt":    event.ScheduledTime.EndTime,
 		})
-		return err
+		if err != nil {
+			return err
+		}
+		if event.Location == "" {
+			return nil
+		}
+		if IsLocationExists {
+			query = `
+				UPDATE event_locations
+				SET location = :location
+				WHERE event_id = $1
+			`
+			_, err := tx.ExecContext(ctx, query, event.Id)
+			return err
+		} else {
+			query = `
+				INSERT INTO event_location(event_id, location)
+				VALUES(:eventId, :loation)
+			`
+			_, err := tx.NamedExecContext(ctx, query, map[string]any{
+				"eventId": event.Id,
+				"location": event.Location,
+			})
+			return err
+		}
 	})
 }
