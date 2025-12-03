@@ -28,4 +28,6 @@ func NewMember(userId uuid.UUID, name string) (*Member, error) {
 	}, nil
 }
 
-
+func (m *Member) SetAsJoined() {
+	m.JoinedAt = time.Now()
+}
