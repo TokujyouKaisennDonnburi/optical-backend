@@ -107,3 +107,29 @@ func (r *EventPsqlRepository) ListEventsByCalendarId(
 
 	return events, nil
 }
+
+// カレンダーが指定されたユーザーに属しているかチェック
+func (r *EventPsqlRepository) ExistsCalendarByUserIdAndCalendarId(
+	ctx context.Context,
+	userId uuid.UUID,
+	calendarId uuid.UUID,
+) (bool, error) {
+	query := `
+		SELECT EXISTS(
+			SELECT 1
+			FROM calendar_members cm
+			JOIN calendars c ON cm.calendar_id = c.id
+			WHERE cm.user_id = $1
+				AND cm.calendar_id = $2
+				AND c.deleted_at IS NULL
+		)
+	`
+
+	var exists bool
+	err := r.db.GetContext(ctx, &exists, query, userId, calendarId)
+	if err != nil {
+		return false, err
+	}
+
+	return exists, nil
+}

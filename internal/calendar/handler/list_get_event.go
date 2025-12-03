@@ -35,6 +35,11 @@ func (h *CalendarHttpHandler) ListGetEvents(w http.ResponseWriter, r *http.Reque
 		UserID:     userId,
 	})
 	if err != nil {
+		// 権限エラーの場合は403を返す
+		if err == query.ErrCalendarNotBelongToUser {
+			_ = render.Render(w, r, apperr.ErrForbidden(err))
+			return
+		}
 		_ = render.Render(w, r, apperr.ErrInternalServerError(err))
 		return
 	}

@@ -20,4 +20,11 @@ type EventRepository interface {
 		ctx context.Context,
 		calendarId uuid.UUID,
 	) ([]output.EventQueryOutput, error)
+
+	// カレンダーが指定されたユーザーに属しているかチェック
+	ExistsCalendarByUserIdAndCalendarId(
+		ctx context.Context,
+		userId uuid.UUID,
+		calendarId uuid.UUID,
+	) (bool, error)
 }

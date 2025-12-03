@@ -36,3 +36,10 @@ func ErrInternalServerError(err error) render.Renderer {
 		Message: err.Error(),
 	}
 }
+
+func ErrForbidden(err error) render.Renderer {
+	return &Response{
+		StatusCode: http.StatusForbidden,
+		Message: err.Error(),
+	}
+}
