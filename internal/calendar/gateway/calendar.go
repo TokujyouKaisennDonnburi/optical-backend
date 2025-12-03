@@ -180,17 +180,16 @@ type CalendarQueryModel struct {
 // calendarの単体取得
 func (r *CalendarPsqlRepository) FindById(ctx context.Context, id uuid.UUID) (*calendar.Calendar, error) {
 	query := `
-        SELECT c.id, c.name, c.color, i.image, m.members, o.options
+        SELECT c.id, c.name, c.color, i.id AS image_id, i.url, m.user_id, o.option_id
         FROM calendars c
-		LEFT JOIN calendar_image i ON i.calendar_id = c.id
-		CROSS JOIN LATERAL
+		LEFT JOIN calendar_images i ON i.id = c.image_id
 		INNER JOIN calendar_options o ON o.calendar_id = c.id
 		INNER JOIN calendar_members m ON m.calendar_id = c.id
         WHERE c.id = $1
 		ORDER BY c.id
     `
 	model := CalendarQueryModel{}
-	err := r.db.GetContext(ctx, &model, query, id)
+	err := r.db.SelectContext(ctx, &model, query, id)
 	if err != nil {
 		return nil, err
 	}
