@@ -1,0 +1,52 @@
+package handler
+
+import (
+	"encoding/json"
+	"net/http"
+	"time"
+
+	"github.com/TokujouKaisenDonburi/optical-backend/internal/calendar/service/command"
+	"github.com/TokujouKaisenDonburi/optical-backend/internal/user/handler"
+	"github.com/TokujouKaisenDonburi/optical-backend/pkg/apperr"
+	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/render"
+	"github.com/google/uuid"
+)
+
+type MemberCreateRequest struct {
+	UserId     uuid.UUID `JSON:"userId"`
+	CalendarId uuid.UUID `JSON:"calendarId"`
+	Email      string    `JSON:"email"`
+}
+
+type MemberCreateResponse struct {
+	UserId 		uuid.UUID
+	Name		string
+	JoinedAt 	time.Time
+}
+
+func (h *CalendarHttpHandler) CreateMembers(w http.ResponseWriter, r *http.Request) {
+	userId, err := handler.GetUserIdFromContext(r)
+	if err != nil {
+		_ =render.Render(w,r,apperr.ErrInternalServerError(err))
+		return
+	}
+	calendarId, err := uuid.Parse(chi.URLParam(r,"calendarId"))
+	var request MemberCreateRequest
+	err = json.NewDecoder(r.Body).Decode(&request)
+	if err != nil {
+		_ = render.Render(w,r,apperr.ErrInvalidRequest(err))
+		return
+	}
+	output, err := h.calendarCommand.CreateMember(r.Context(), command.MemberCreateInput{
+		UserId:     userId,
+		CalendarId: calendarId,
+		Email: 		request.Email,
+	})
+	render.JSON(w, r, MemberCreateResponse{
+		UserId:   output.UserId,
+		Name:     output.Name,
+		JoinedAt: output.JoinedAt,
+
+	})
+}
