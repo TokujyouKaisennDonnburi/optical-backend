@@ -36,7 +36,7 @@ func (r *EventPsqlRepository) Create(
 			return err
 		}
 		query := `
-			INSERT INTO events(id, calendar_id, title, memo, location, color, all_day, start_at, end_at, created_at, updated_at)
+			INSERT INTO events(id, calendar_id, title, memo, color, all_day, start_at, end_at, created_at, updated_at)
 			VALUES(:id, :calendarId, :title, :memo, :color, :allDay, :startAt, :endAt, :createdAt, :updatedAt)
 		`
 		_, err = tx.NamedExecContext(ctx, query, map[string]any{
@@ -45,7 +45,6 @@ func (r *EventPsqlRepository) Create(
 			"title":      event.Title,
 			"memo":       event.Memo,
 			"color":      event.Color,
-			"location":   event.Location,
 			"allDay":     event.ScheduledTime.AllDay,
 			"startAt":    event.ScheduledTime.StartTime,
 			"endAt":      event.ScheduledTime.EndTime,
@@ -55,23 +54,15 @@ func (r *EventPsqlRepository) Create(
 		if err != nil {
 			return err
 		}
-
-		// locationが空でない場合はevent_locationsテーブルにも保存
-		if event.Location != "" {
-			locationQuery := `
-				INSERT INTO event_locations(event_id, location)
-				VALUES(:eventId, :location)
-			`
-			_, err = tx.NamedExecContext(ctx, locationQuery, map[string]any{
-				"eventId":  event.Id,
-				"location": event.Location,
-			})
-			if err != nil {
-				return err
-			}
-		}
-
-		return nil
+		query = `
+			INSERT INTO event_locations(event_id, location)
+			VALUES(:eventId, :location)
+		`
+		_, err = tx.NamedExecContext(ctx, query, map[string]any{
+			"eventId":  event.Id,
+			"location": event.Location,
+		})
+		return err
 	})
 }
 
@@ -90,11 +81,11 @@ func (r *EventPsqlRepository) Update(
 			return err
 		}
 		query := `
-			UPDATE event SET
+			UPDATE events SET
 				title = :title,
 				memo = :memo,
 				color = :color,
-				allDay = :allDay,
+				all_day = :allDay,
 				start_at = :startAt,
 				end_at = :endAt
 			WHERE 
