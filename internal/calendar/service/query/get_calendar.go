@@ -36,7 +36,7 @@ func (q *CalendarQuery) GetCalendar(ctx context.Context, input GetCalendarInput)
 			break
 		}
 	}
-	if isMember == false {
+	if !isMember {
 		return nil, errors.New("user is not in members")
 	}
 	return &CalendarQueryOutput{
