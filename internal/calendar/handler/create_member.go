@@ -26,13 +26,20 @@ type MemberCreateResponse struct {
 }
 
 func (h *CalendarHttpHandler) CreateMembers(w http.ResponseWriter, r *http.Request) {
+	// UserId
 	userId, err := handler.GetUserIdFromContext(r)
 	if err != nil {
 		_ =render.Render(w,r,apperr.ErrInternalServerError(err))
 		return
 	}
+	// CalendarId
 	calendarId, err := uuid.Parse(chi.URLParam(r,"calendarId"))
+	if err != nil {
+		_ =render.Render(w,r,apperr.ErrInternalServerError(err))
+		return
+	}
 	var request MemberCreateRequest
+	// Email
 	err = json.NewDecoder(r.Body).Decode(&request)
 	if err != nil {
 		_ = render.Render(w,r,apperr.ErrInvalidRequest(err))
@@ -43,6 +50,10 @@ func (h *CalendarHttpHandler) CreateMembers(w http.ResponseWriter, r *http.Reque
 		CalendarId: calendarId,
 		Email: 		request.Email,
 	})
+	if err != nil {
+		_ = render.Render(w,r,apperr.ErrInternalServerError(err))
+		return
+	}
 	render.JSON(w, r, MemberCreateResponse{
 		UserId:   output.UserId,
 		Name:     output.Name,
