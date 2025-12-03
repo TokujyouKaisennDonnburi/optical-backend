@@ -37,7 +37,7 @@ func (h *CalendarHttpHandler) GetCalendar(w http.ResponseWriter, r *http.Request
 		return
 	}
 	// input
-	output, err := h.calendarQuery.GetCalendar(r.Context(), query.CalendarQueryInput{
+	output, err := h.calendarQuery.GetCalendar(r.Context(), query.GetCalendarInput{
 		UserId:     userId,
 		CalendarId: calendarId,
 	})

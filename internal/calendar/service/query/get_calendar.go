@@ -9,7 +9,7 @@ import (
 	"github.com/TokujouKaisenDonburi/optical-backend/internal/option"
 )
 
-type CalendarQueryInput struct {
+type GetCalendarInput struct {
 	CalendarId uuid.UUID
 	UserId     uuid.UUID
 }
@@ -24,7 +24,7 @@ type CalendarQueryOutput struct {
 }
 
 // カレンダー情報を取得
-func (q *CalendarQuery) GetCalendar(ctx context.Context, input CalendarQueryInput)(*CalendarQueryOutput, error) {
+func (q *CalendarQuery) GetCalendar(ctx context.Context, input GetCalendarInput)(*CalendarQueryOutput, error) {
 	calendar, err := q.calendarRepository.FindById(ctx, input.CalendarId)
 	if err != nil {
 		return nil, err
