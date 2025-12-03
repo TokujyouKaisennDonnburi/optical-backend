@@ -102,6 +102,30 @@ paths:
           description: Invalid request
         '500':
           description: Internal server error
+    get:
+      summary: Get events from a calendar
+      parameters:
+        - name: calendarId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Events retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/EventQueryOutput'
+        '400':
+          description: Invalid request
+        '403':
+          description: Forbidden - Calendar does not belong to user
+        '500':
+          description: Internal server error
 components:
   schemas:
     UserCreateRequest:
@@ -209,3 +233,29 @@ components:
       properties:
         id:
           type: string
+    EventQueryOutput:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        calendarId:
+          type: string
+          format: uuid
+        title:
+          type: string
+        memo:
+          type: string
+        color:
+          type: string
+        allDay:
+          type: boolean
+        startAt:
+          type: string
+          format: date-time
+        endAt:
+          type: string
+          format: date-time
+        createdAt:
+          type: string
+          format: date-time
