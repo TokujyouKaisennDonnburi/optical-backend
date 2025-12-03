@@ -9,9 +9,9 @@ type MemberCreateInput struct {
 	Email string 
 }
 
-func (c *CalendarCommand) CreateMember (ctx context.Context, in CalendarMemberInput) (calendar.Member) {
+func (c *CalendarCommand) CreateMember (ctx context.Context, input MemberCreateInput) (*calendar.Member, error) {
 	var newMember *calendar.Member
-	calendar , err := c.memberRepository.Create(MemberCreateInput.Email)
+	_, err := c.memberRepository.Create(input.Email)
 	if err != nil {
 		return nil, err 
 	}
