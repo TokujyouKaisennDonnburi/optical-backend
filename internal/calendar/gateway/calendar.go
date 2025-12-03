@@ -177,12 +177,13 @@ type CalendarQueryModel struct {
 	Options []option.Option   `db:"option"`
 }
 
-func (r *CalendarPsqlRepository) FindById(ctx context.Context, id uuid.UUID) (*CalendarQueryModel, error) {
+// calendarの単体取得
+func (r *CalendarPsqlRepository) FindById(ctx context.Context, id uuid.UUID) (*calendar.Calendar, error) {
 	query := `
         SELECT c.id, c.name, c.color, i.image, m.members, o.options
         FROM calendars c
 		LEFT JOIN calendar_image i ON i.calendar_id = c.id
-		CROSS JOIN LATERAL 
+		CROSS JOIN LATERAL
 		INNER JOIN calendar_options o ON o.calendar_id = c.id
 		INNER JOIN calendar_members m ON m.calendar_id = c.id
         WHERE c.id = $1
@@ -193,5 +194,13 @@ func (r *CalendarPsqlRepository) FindById(ctx context.Context, id uuid.UUID) (*C
 	if err != nil {
 		return nil, err
 	}
-	return &model, err
+	return &calendar.Calendar{
+		Id:      model.Id,
+		Name:    model.Name,
+		Color:   model.Color,
+		Image:   model.Image,
+		Members: model.Members,
+		Options: model.Options,
+	},nil
 }
+
