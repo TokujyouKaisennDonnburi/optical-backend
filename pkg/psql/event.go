@@ -38,7 +38,6 @@ func FindEventByUserIdAndId(ctx context.Context, tx *sqlx.Tx, userId, eventId uu
 			deleted_at IS NULL
 	`
 	var eventModel EventModel
-	fmt.Println(userId.String() + "," + eventId.String())
 	err := tx.GetContext(ctx, &eventModel, query, userId, eventId)
 	if err != nil {
 		return nil, err
