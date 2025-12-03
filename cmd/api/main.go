@@ -9,6 +9,7 @@ import (
 	calendarGateway "github.com/TokujouKaisenDonburi/optical-backend/internal/calendar/gateway"
 	calendarHandler "github.com/TokujouKaisenDonburi/optical-backend/internal/calendar/handler"
 	calendarCommand "github.com/TokujouKaisenDonburi/optical-backend/internal/calendar/service/command"
+	calendarQuery "github.com/TokujouKaisenDonburi/optical-backend/internal/calendar/service/query"
 	optionGateway "github.com/TokujouKaisenDonburi/optical-backend/internal/option/gateway"
 	userGateway "github.com/TokujouKaisenDonburi/optical-backend/internal/user/gateway"
 	userHandler "github.com/TokujouKaisenDonburi/optical-backend/internal/user/handler"
@@ -41,8 +42,9 @@ func main() {
 	eventRepository := calendarGateway.NewEventPsqlRepository(db)
 	calendarRepository := calendarGateway.NewCalendarPsqlRepository(db)
 	eventCommand := calendarCommand.NewEventCommand(eventRepository)
+	eventQuery := calendarQuery.NewEventQuery(eventRepository)
 	calendarCommand := calendarCommand.NewCalendarCommand(calendarRepository, optionRepository)
-	caledarHandler := calendarHandler.NewCalendarHttpHandler(eventCommand, calendarCommand)
+	caledarHandler := calendarHandler.NewCalendarHttpHandler(eventCommand, calendarCommand, eventQuery)
 
 	// Unprotected Routes
 	r.Group(func(r chi.Router) {
@@ -63,6 +65,7 @@ func main() {
 
 		// Events
 		r.Post("/calendars/{calendarId}/events", caledarHandler.CreateEvent)
+		r.Get("/calendars/{calendarId}/events", caledarHandler.ListGetEvents)
 	})
 
 	// Start Serving
