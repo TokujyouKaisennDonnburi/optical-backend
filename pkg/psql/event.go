@@ -2,7 +2,6 @@ package psql
 
 import (
 	"context"
-	"fmt"
 	"time"
 
 	"github.com/TokujouKaisenDonburi/optical-backend/internal/calendar"
