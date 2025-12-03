@@ -2,6 +2,7 @@ package psql
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/TokujouKaisenDonburi/optical-backend/internal/calendar"
@@ -11,7 +12,7 @@ import (
 
 type EventModel struct {
 	Id         uuid.UUID `db:"id"`
-	CalendarId uuid.UUID `db:"calendarId"`
+	CalendarId uuid.UUID `db:"calendar_id"`
 	Title      string    `db:"title"`
 	Memo       string    `db:"memo"`
 	Color      string    `db:"color"`
@@ -24,10 +25,12 @@ type EventModel struct {
 func FindEventByUserIdAndId(ctx context.Context, tx *sqlx.Tx, userId, eventId uuid.UUID) (*calendar.Event, error) {
 	query := `
 		SELECT 
-			id, calendar_id, title, memo, color, location, all_day, start_at, end_at
+			events.id, events.calendar_id, title, memo, color, event_locations.location, all_day, start_at, end_at
 		FROM events
 		JOIN calendar_members
 			ON calendar_members.calendar_id = events.calendar_id
+		JOIN event_locations
+			ON event_locations.event_id = events.id
 		WHERE 
 			id = $2 AND 
 			calendar_members.user_id = $1 AND
@@ -35,6 +38,7 @@ func FindEventByUserIdAndId(ctx context.Context, tx *sqlx.Tx, userId, eventId uu
 			deleted_at IS NULL
 	`
 	var eventModel EventModel
+	fmt.Println(userId.String() + "," + eventId.String())
 	err := tx.GetContext(ctx, &eventModel, query, userId, eventId)
 	if err != nil {
 		return nil, err
