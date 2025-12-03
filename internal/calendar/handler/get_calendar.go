@@ -47,7 +47,7 @@ func (h *CalendarHttpHandler) GetCalendar(w http.ResponseWriter, r *http.Request
 	}
 	// output
 	response := CalendarResponse{
-		Id:		 string(output.Id),
+		Id:		 output.Id.String(),
 		Name:	 output.Name,
 		Color:	 output.Color,
 		Image:	 output.Image.Url,
