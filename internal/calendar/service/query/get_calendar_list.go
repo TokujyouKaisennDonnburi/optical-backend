@@ -7,6 +7,7 @@ import (
 	"github.com/TokujouKaisenDonburi/optical-backend/internal/calendar/service/query/output"
 )
 
+<<<<<<< HEAD
 type CalendarQueryInput struct {
 	UserId uuid.UUID
 }
