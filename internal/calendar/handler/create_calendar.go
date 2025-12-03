@@ -63,7 +63,7 @@ func (h *CalendarHttpHandler) CreateCalendar(w http.ResponseWriter, r *http.Requ
 		}
 	}
 	// カレンダーを作成
-	output, err := h.calendarCommand.CreateCalendar(context.Background(), command.CalendarCreateArgs{
+	output, err := h.calendarCommand.CreateCalendar(context.Background(), command.CalendarCreateInput{
 		UserId:        userId,
 		ImageId:       imageId,
 		CalendarName:  request.Name,

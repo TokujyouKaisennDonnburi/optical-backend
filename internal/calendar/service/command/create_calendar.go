@@ -10,7 +10,7 @@ import (
 	"github.com/google/uuid"
 )
 
-type CalendarCreateArgs struct {
+type CalendarCreateInput struct {
 	UserId        uuid.UUID
 	UserName      string
 	CalendarName  string
@@ -25,7 +25,7 @@ type CalendarCreateOutput struct {
 }
 
 // カレンダーを新規作成する
-func (s *CalendarCommand) CreateCalendar(ctx context.Context, args CalendarCreateArgs) (*CalendarCreateOutput, error) {
+func (s *CalendarCommand) CreateCalendar(ctx context.Context, args CalendarCreateInput) (*CalendarCreateOutput, error) {
 	var newCalendar *calendar.Calendar
 	// カレンダーをリポジトリで作成
 	err := s.calendarRepository.Create(ctx, args.UserId, args.ImageId, args.OptionIds, func(user *user.User, image *calendar.Image, options []option.Option) (*calendar.Calendar, error) {
@@ -38,6 +38,8 @@ func (s *CalendarCommand) CreateCalendar(ctx context.Context, args CalendarCreat
 		if err != nil {
 			return nil, err
 		}
+		// 参加済みとして設定
+		member.SetAsJoined()
 		// カレンダーを作成
 		newCalendar, err = calendar.NewCalendar(args.CalendarName, args.CalendarColor, *image, []calendar.Member{*member}, options)
 		if err != nil {
