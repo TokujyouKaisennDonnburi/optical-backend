@@ -17,7 +17,9 @@ type UserCreateRequest struct {
 }
 
 type UserCreateResponse struct {
-	Id string `json:"id"`
+	Id           string `json:"id"`
+	AccessToken  string `json:"accessToken"`
+	RefreshToken string `json:"refreshToken"`
 }
 
 // ユーザーを新規作成する
@@ -34,8 +36,8 @@ func (h *UserHttpHandler) Create(w http.ResponseWriter, r *http.Request) {
 	}
 	// ユーザー作成
 	output, err := h.userCommand.CreateUser(context.Background(), command.UserCreateInput{
-		Name: request.Name,
-		Email: request.Email,
+		Name:     request.Name,
+		Email:    request.Email,
 		Password: request.Password,
 	})
 	if err != nil {
@@ -44,6 +46,8 @@ func (h *UserHttpHandler) Create(w http.ResponseWriter, r *http.Request) {
 	}
 	// レスポンス書き込み
 	render.JSON(w, r, UserCreateResponse{
-		Id: output.Id.String(),
+		Id:           output.Id.String(),
+		AccessToken:  output.AccessToken,
+		RefreshToken: output.RefreshToken,
 	})
 }

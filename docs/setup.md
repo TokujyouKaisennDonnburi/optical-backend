@@ -6,6 +6,24 @@
 go install github.com/rubenv/sql-migrate/...@latest
 ```
 
+## airのインストール
+
+```bash
+go install github.com/air-verse/air@latest
+```
+
+## MinioMCのインストール
+
+```bash
+# macOS
+brew install minio/stable/mc
+
+# linux
+wget https://dl.min.io/client/mc/release/linux-amd64/mc
+chmod +x mc
+sudo mv mc /usr/local/bin
+```
+
 ## 環境変数の設定
 
 ```bash

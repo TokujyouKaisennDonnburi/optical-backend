@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/TokujouKaisenDonburi/optical-backend/internal/calendar"
+	"github.com/TokujouKaisenDonburi/optical-backend/internal/calendar/service/query/output"
 	"github.com/TokujouKaisenDonburi/optical-backend/internal/option"
 	"github.com/TokujouKaisenDonburi/optical-backend/internal/user"
 	"github.com/TokujouKaisenDonburi/optical-backend/pkg/db"
@@ -11,6 +12,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
 )
+
 
 type CalendarPsqlRepository struct {
 	db *sqlx.DB
@@ -28,9 +30,9 @@ func NewCalendarPsqlRepository(db *sqlx.DB) *CalendarPsqlRepository {
 // スケジュールを新規作成する
 func (r *CalendarPsqlRepository) Create(
 	ctx context.Context,
-	userId uuid.UUID,
+	userId, imageId uuid.UUID,
 	optionIds []uuid.UUID,
-	createFn func(user *user.User, options []option.Option) (*calendar.Calendar, error),
+	createFn func(user *user.User, image *calendar.Image, options []option.Option) (*calendar.Calendar, error),
 ) error {
 	return db.RunInTx(r.db, func(tx *sqlx.Tx) error {
 		// オプション取得
@@ -43,19 +45,29 @@ func (r *CalendarPsqlRepository) Create(
 		if err != nil {
 			return err
 		}
+		// 画像を取得
+		image, err := psql.FindImageById(ctx, tx, imageId)
+		if err != nil {
+			return err
+		}
 		// スケジュール作成関数を実行
-		calendar, err := createFn(user, options)
+		calendar, err := createFn(user, image, options)
 		if err != nil {
 			return err
 		}
 		// スケジュール作成
 		query := `
-			INSERT INTO calendars(id, name)
-			VALUES (:id, :name)
+			INSERT INTO calendars(id, name, color, image_id)
+			VALUES (:id, :name, :color, :imageId)
 		`
 		_, err = tx.NamedExecContext(ctx, query, map[string]any{
-			"id":   calendar.Id,
-			"name": calendar.Name,
+			"id":    calendar.Id,
+			"name":  calendar.Name,
+			"color": calendar.Color,
+			"imageId": uuid.NullUUID{
+				UUID:  image.Id,
+				Valid: image.Valid,
+			},
 		})
 		if err != nil {
 			return err
@@ -85,7 +97,7 @@ func (r *CalendarPsqlRepository) Create(
 			`
 			calendarOptionMaps := []map[string]any{}
 			for _, option := range calendar.Options {
-				calendarMemberMaps = append(calendarMemberMaps, map[string]any{
+				calendarOptionMaps = append(calendarOptionMaps, map[string]any{
 					"calendarId": calendar.Id,
 					"optionId":   option.Id,
 				})
@@ -97,4 +109,37 @@ func (r *CalendarPsqlRepository) Create(
 		}
 		return nil
 	})
+}
+
+type CalendarListQueryModel struct{
+	Id uuid.UUID `db:"id"`
+	Name  string `db:"name"`
+	Color string `db:"color"`
+}
+
+// ユーザーが所属するカレンダー一覧を取得する
+func (r *CalendarPsqlRepository) FindByUserId(ctx context.Context, userId uuid.UUID) ([]output.CalendarQueryOutput, error) {
+	query := `
+		SELECT c.id, c.name, c.color
+		FROM calendars c
+		INNER JOIN calendar_members m ON c.id = m.calendar_id
+		WHERE m.user_id = $1
+		AND c.deleted_at IS NULL
+		ORDER BY c.id
+	`
+	var rows []CalendarListQueryModel
+	err := r.db.SelectContext(ctx, &rows, query, userId)
+	if err != nil {
+		return nil, err
+	}
+
+	calendars := make([]output.CalendarQueryOutput, len(rows))
+	for i, row := range rows {
+		calendars[i] = output.CalendarQueryOutput{
+			Id:    row.Id,
+			Name:  row.Name,
+			Color: row.Color,
+		}
+	}
+	return calendars, nil
 }
