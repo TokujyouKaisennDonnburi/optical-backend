@@ -14,7 +14,7 @@ jobs:
       - uses: oven-sh/setup-bun@v2
 
       - run: bun install -g opencode-ai
-      - run: opencode run --agent=review "review $(git diff $(git merge-base HEAD main))" > ai-review.md
+      - run: opencode run --agent=review "review $(git diff main)" > ai-review.md
 
       - name: PR comment with file
         uses: thollander/actions-comment-pull-request@v3
