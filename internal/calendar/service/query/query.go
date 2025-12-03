@@ -8,3 +8,10 @@ import (
 type EventQuery struct {
 	eventRepository repository.EventRepository
 }
+
+// コンストラクタ DI
+func NewEventQuery(eventRepo repository.EventRepository) *EventQuery {
+	return &EventQuery{
+		eventRepository: eventRepo,
+	}
+}
