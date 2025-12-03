@@ -1,7 +1,7 @@
 name: ai-review
 on:
   workflow_dispatch:
-  push:
+  pull_request:
 permissions:
   contents: write
   pull-requests: write
@@ -10,13 +10,17 @@ jobs:
     name: opencode
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: oven-sh/setup-bun@v2
+      - uses: actions/checkout@v2
+        with:
+          ref: ${{ github.head_ref }}
+      - uses: rmacklin/fetch-through-merge-base@v0
+      - run: echo "$(git diff ${{ github.base_ref }})"
 
+      - uses: oven-sh/setup-bun@v2
       - run: bun install -g opencode-ai
-      - run: opencode run --agent=review "review $(git diff main)" > ai-review.md
+      - run: opencode run --agent=review "review $(git diff ${{ github.base_ref }})" > ai-review.md
 
       - name: PR comment with file
-        uses: thollander/actions-comment-pull-request@v3
+        uses: mshick/add-pr-comment@v2
         with:
-          file-path: ai-review.md
+          message-path: ai-review.md
