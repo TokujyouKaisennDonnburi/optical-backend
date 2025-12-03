@@ -29,7 +29,7 @@ func (h *CalendarHttpHandler) UpdateEvent(w http.ResponseWriter, r *http.Request
 		_ = render.Render(w, r, apperr.ErrInternalServerError(err))
 		return
 	}
-	eventId, err := uuid.Parse(chi.URLParam(r, "calendarId"))
+	eventId, err := uuid.Parse(chi.URLParam(r, "eventId"))
 	if err != nil {
 		err = render.Render(w, r, apperr.ErrInvalidRequest(err))
 		if err != nil {
