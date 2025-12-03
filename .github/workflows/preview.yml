@@ -19,3 +19,4 @@ jobs:
         uses: rajyan/preview-pages@v1
         with:
           source-dir: swagger
+          pr-comment: 'recreate'
