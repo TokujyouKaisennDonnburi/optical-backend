@@ -1,5 +1,7 @@
 package repository
 
+import "github.com/TokujouKaisenDonburi/optical-backend/internal/calendar"
+
 type MemberRepository interface {
-	create(mail string)(error)
+	create(Email string)(calendar.Member, error)
 }
