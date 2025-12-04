@@ -1,11 +1,9 @@
 package gateway
 
-
 import (
-	"context"
-
 	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
+	"golang.org/x/net/context"
 )
 
 type MemberPsqlRepository struct {
@@ -25,20 +23,10 @@ func (r *MemberPsqlRepository)Create(ctx context.Context, userId, calendarId uui
 			WHERE cm.calendar_id = $3 
 			AND cm.user_id = $2)
 			`
-	err := r.db.GetContext(ctx, &userId, query, email, userId, calendarId)
+	_, err := r.db.ExecContext(ctx, query, email, userId, calendarId)
 	if err != nil {
 		return err
 	}
-	// memberをDBに挿入
-	query =`
-		INSERT INTO calendar_members(calendar_id,member_id)
-		VALUES ($1, $2)
-	`
-	_, err = r.db.ExecContext(ctx, query, calendarId, ???)
-	if err != nil {
-		return err
-	}
-	// member
 	return nil
 }
 
