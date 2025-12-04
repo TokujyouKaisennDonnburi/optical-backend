@@ -12,7 +12,6 @@ type MemberPsqlRepository struct {
 }
 
 func (r *MemberPsqlRepository)Create(ctx context.Context, userId, calendarId uuid.UUID, email string)error{
-	// userIdをDBから取得
 	query := `
 		INSERT INTO calendar_members (calendar_id, user_id)
 		SELECT $3, u.id

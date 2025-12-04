@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/TokujouKaisenDonburi/optical-backend/internal/calendar/service/command"
+	"github.com/TokujouKaisenDonburi/optical-backend/internal/user"
 	"github.com/TokujouKaisenDonburi/optical-backend/internal/user/handler"
 	"github.com/TokujouKaisenDonburi/optical-backend/pkg/apperr"
 	"github.com/go-chi/chi/v5"
@@ -13,8 +14,6 @@ import (
 )
 
 type MemberCreateRequest struct {
-	UserId     uuid.UUID `JSON:"userId"`
-	CalendarId uuid.UUID `JSON:"calendarId"`
 	Email      string    `JSON:"email"`
 }
 
@@ -36,20 +35,23 @@ func (h *CalendarHttpHandler) CreateMembers(w http.ResponseWriter, r *http.Reque
 	var request MemberCreateRequest
 	err = json.NewDecoder(r.Body).Decode(&request)
 	if err != nil {
-		_ = render.Render(w,r,apperr.ErrInvalidRequest(err))
+		render.Render(w,r,apperr.ErrInvalidRequest(err))
 		return
 	}
-
+	email, err := user.NewEmail(request.Email)
+	if err != nil {
+		render.Render(w,r,apperr.ErrInvalidRequest(err))
+		return
+	}
 	// 情報をinput
 	err = h.calendarCommand.CreateMember(r.Context(), command.MemberCreateInput{
 		UserId:     userId,
 		CalendarId: calendarId,
-		Email: 		request.Email,
+		Email: 		string(email),
 	})
 	if err != nil {
 		render.Render(w,r,apperr.ErrInternalServerError(err))
 		return
 	}
-	// TODO: 204で返す
 	w.WriteHeader(http.StatusNoContent)
 }
