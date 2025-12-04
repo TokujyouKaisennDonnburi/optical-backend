@@ -1,9 +1,10 @@
 package gateway
 
 import (
+	"context"
+
 	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
-	"golang.org/x/net/context"
 )
 
 type MemberPsqlRepository struct {
