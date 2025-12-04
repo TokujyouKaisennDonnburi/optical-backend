@@ -3,7 +3,6 @@ package handler
 import (
 	"encoding/json"
 	"net/http"
-	"time"
 
 	"github.com/TokujouKaisenDonburi/optical-backend/internal/calendar/service/command"
 	"github.com/TokujouKaisenDonburi/optical-backend/internal/user/handler"
@@ -19,18 +18,8 @@ type MemberCreateRequest struct {
 	Email      string    `JSON:"email"`
 }
 
-type MemberCreateResponse struct {
-	UserId 		uuid.UUID
-	Name		string
-	JoinedAt 	time.Time
-}
 
 func (h *CalendarHttpHandler) CreateMembers(w http.ResponseWriter, r *http.Request) {
-	// TODO: リクエストから必要な情報を取得する
-	//   1. コンテキストからUserId
-	//   2. URLパラメータからCalendarId
-	//   3. リクエストボディからEmail
-
 	// UserId
 	userId, err := handler.GetUserIdFromContext(r)
 	if err != nil {
@@ -51,8 +40,8 @@ func (h *CalendarHttpHandler) CreateMembers(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	// TODO: サービス層を呼び出してメンバーを作成する
-	output, err := h.calendarCommand.CreateMember(r.Context(), command.MemberCreateInput{
+	// 情報をinput
+	err = h.calendarCommand.CreateMember(r.Context(), command.MemberCreateInput{
 		UserId:     userId,
 		CalendarId: calendarId,
 		Email: 		request.Email,
@@ -61,12 +50,6 @@ func (h *CalendarHttpHandler) CreateMembers(w http.ResponseWriter, r *http.Reque
 		_ = render.Render(w,r,apperr.ErrInternalServerError(err))
 		return
 	}
-
-	// TODO: レスポンスを作成してJSONで返す
-	render.JSON(w, r, MemberCreateResponse{
-		UserId:   output.UserId,
-		Name:     output.Name,
-		JoinedAt: output.JoinedAt,
-
-	})
+	// TODO: 204で返す
+	w.WriteHeader(http.StatusNoContent)
 }
