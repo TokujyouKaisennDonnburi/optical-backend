@@ -1,10 +1,9 @@
 package gateway
 
+
 import (
 	"context"
-	"errors"
 
-	"github.com/TokujouKaisenDonburi/optical-backend/internal/calendar"
 	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
 )
@@ -13,23 +12,33 @@ type MemberPsqlRepository struct {
 	db *sqlx.DB
 }
 
-func (r *MemberPsqlRepository)Create(ctx context.Context, calendarId uuid.UUID, email string)(*calendar.Member, error){
-	// TODO: 1. emailからusersテーブルでユーザー情報を取得する
+func (r *MemberPsqlRepository)Create(ctx context.Context, userId, calendarId uuid.UUID, email string)error{
+	// userIdをDBから取得
 	query := `
-		SELECT u.id
+		INSERT INTO calendar_members (calendar_id, user_id)
+		SELECT $3, u.id
 		FROM users u
-		WHERE email = $1
-	`
-	// TODO: 2. ユーザーが見つからなかった場合はエラーを返す
-	if query = nil {
-		return nil, errors.New("user not found")
+		WHERE u.email = $1
+		AND EXISTS (
+			SELECT 1 
+			FROM calendar_members cm 
+			WHERE cm.calendar_id = $3 
+			AND cm.user_id = $2)
+			`
+	err := r.db.GetContext(ctx, &userId, query, email, userId, calendarId)
+	if err != nil {
+		return err
 	}
-	// TODO: 3. calendar_membersテーブルに挿入する
-	query :=`
+	// memberをDBに挿入
+	query =`
 		INSERT INTO calendar_members(calendar_id,member_id)
-		VALUES (calendarId,userId)
+		VALUES ($1, $2)
 	`
-	// TODO: 4. 取得したユーザー情報からMemberを作成して返す
-	calendar.NewMember(userId uuid.UUID, name string)(*calendar.Member, error)
+	_, err = r.db.ExecContext(ctx, query, calendarId, ???)
+	if err != nil {
+		return err
+	}
+	// member
+	return nil
 }
 
