@@ -43,6 +43,8 @@ tools:
 
 ![good](https://cdn.discordapp.com/attachments/1411160182293004388/1440970845551071244/19a590e56f39172d.gif?ex=6931e46d&is=693092ed&hm=5b299a9c292020ecb0899f740796fe24e665ecd3253d061072d0ee222870ae04)
 
+![mid](https://cdn.discordapp.com/attachments/1272098548694908993/1445990912726532246/fetchpik.com-qEkS0Nb8oj.gif?ex=69325b7a&is=693109fa&hm=f62436ad2568503da93de728d169b2157f20dd11cceea662aa95014f3d4a8591)
+
 ### 中評価
 
 ![mid](https://pbs.twimg.com/media/G7O9J_racAA1JCk?format=jpg&name=900x900)
@@ -52,6 +54,8 @@ tools:
 ### 低評価
 
 ![bad](https://media.discordapp.net/stickers/1445577437743288450.webp?size=240&quality=lossless)
+
+![bad](https://media.discordapp.net/attachments/1272098548694908993/1445987683439611965/image.png?ex=69325878&is=693106f8&hm=1a64708f7ec8550c289e41c4bfb4b3efbee8971c1fc070c1dbe62b384f88ccf6&=&format=webp&quality=lossless&width=482&height=490)
 
 ## 出力テンプレート
 
