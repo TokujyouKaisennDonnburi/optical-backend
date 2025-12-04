@@ -154,7 +154,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/EventQueryOutput'
+                  $ref: '#/components/schemas/EventListResponse'
         '400':
           description: Invalid request
         '403':
@@ -334,7 +334,7 @@ components:
           type: string
         color:
           type: string
-        allDay:
+        isAllDay:
           type: boolean
         startAt:
           type: string

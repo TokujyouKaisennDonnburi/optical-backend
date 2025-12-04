@@ -98,7 +98,7 @@ func (r *EventPsqlRepository) ListEventsByCalendarId(
 			Title:      row.Title,
 			Memo:       row.Memo,
 			Color:      row.Color,
-			AllDay:     row.AllDay,
+			IsAllDay:   row.AllDay,
 			StartAt:    row.StartAt,
 			EndAt:      row.EndAt,
 			CreatedAt:  row.CreatedAt,
