@@ -3,7 +3,6 @@ package user
 import (
 	"errors"
 	"time"
-	"strings"
 	"unicode/utf8"
 
 	"github.com/google/uuid"
@@ -13,7 +12,6 @@ import (
 const (
 	MIN_USER_NAME_LENGTH = 1
 	MAX_USER_NAME_LENGTH = 50
-	MIN_EMAIL_LENGTH    = 3
 	MIN_PASSWORD_LENGTH = 8
 )
 
@@ -28,7 +26,6 @@ type User struct {
 }
 
 var (
-	ErrInvalidEmail    = errors.New("無効なメールアドレスです")
 	ErrInvalidName     = errors.New("ユーザー名は1文字以上50文字以下である必要があります")
 	ErrInvalidPassword = errors.New("パスワードは8文字以上である必要があります")
 )
@@ -132,15 +129,6 @@ func validateName(name string) error {
 	length := utf8.RuneCountInString(name)
 	if length < MIN_USER_NAME_LENGTH || length > MAX_USER_NAME_LENGTH {
 		return ErrInvalidName
-	}
-	return nil
-}
-
-// validate email
-func validateEmail(email string) error {
-	length := utf8.RuneCountInString(email)
-	if length < MIN_EMAIL_LENGTH || !strings.Contains(email, "@") {
-		return ErrInvalidEmail
 	}
 	return nil
 }

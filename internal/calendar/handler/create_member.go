@@ -23,17 +23,17 @@ func (h *CalendarHttpHandler) CreateMembers(w http.ResponseWriter, r *http.Reque
 	// UserId
 	userId, err := handler.GetUserIdFromContext(r)
 	if err != nil {
-		_ =render.Render(w,r,apperr.ErrInternalServerError(err))
+		render.Render(w,r,apperr.ErrInternalServerError(err))
 		return
 	}
 	// CalendarId
 	calendarId, err := uuid.Parse(chi.URLParam(r,"calendarId"))
 	if err != nil {
-		_ =render.Render(w,r,apperr.ErrInternalServerError(err))
+		render.Render(w,r,apperr.ErrInternalServerError(err))
 		return
 	}
-	var request MemberCreateRequest
 	// Email
+	var request MemberCreateRequest
 	err = json.NewDecoder(r.Body).Decode(&request)
 	if err != nil {
 		_ = render.Render(w,r,apperr.ErrInvalidRequest(err))
@@ -47,7 +47,7 @@ func (h *CalendarHttpHandler) CreateMembers(w http.ResponseWriter, r *http.Reque
 		Email: 		request.Email,
 	})
 	if err != nil {
-		_ = render.Render(w,r,apperr.ErrInternalServerError(err))
+		render.Render(w,r,apperr.ErrInternalServerError(err))
 		return
 	}
 	// TODO: 204で返す
