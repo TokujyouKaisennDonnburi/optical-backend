@@ -47,11 +47,9 @@ tools:
 
 ![mid](https://pbs.twimg.com/media/G7O9J_racAA1JCk?format=jpg&name=900x900)
 
-![mid](https://cdn.discordapp.com/attachments/1272098548694908993/1445962548364054568/fetchpik.com-oI19PGwe5p.gif?ex=69324110&is=6930ef90&hm=7461c801f9e2d770438966c0b86891ca3db67478ae241cee9d6108380aaa1d77)
-
 ### 低評価
 
-![bad](https://media.discordapp.net/stickers/1445577437743288450.webp?size=240&quality=lossless)
+![bad](https://i.imgur.com/HqRunBZ.png)
 
 ## 出力テンプレート
 
