@@ -13,6 +13,18 @@ import (
 	"github.com/google/uuid"
 )
 
+type ListGetEventResponse struct {
+	Id         string `json:"id"`
+	CalendarId string `json:"calendar_id"`
+	Title      string `json:"title"`
+	Memo       string `json:"memo"`
+	Color      string `json:"color"`
+	AllDay     bool   `json:"all_day"`
+	StartTime  string `json:"start_time"`
+	EndTime    string `json:"end_time"`
+	CreateAt   string `json:"create_at"`
+}
+
 // GET /calendars/{calendarId}/events
 func (h *CalendarHttpHandler) ListGetEvents(w http.ResponseWriter, r *http.Request) {
 	// 1. JWTからuserIDを取得
@@ -45,5 +57,19 @@ func (h *CalendarHttpHandler) ListGetEvents(w http.ResponseWriter, r *http.Reque
 	}
 
 	// 4. レスポンスを返す
-	render.JSON(w, r, events)
+	response := make([]ListGetEventResponse, 0, len(events))
+	for _, event := range events {
+		response = append(response, ListGetEventResponse{
+			Id:         event.Id.String(),
+			CalendarId: event.CalendarId.String(),
+			Title:      event.Title,
+			Memo:       event.Memo,
+			Color:      event.Color,
+			AllDay:     event.AllDay,
+			StartTime:  event.StartAt,
+			EndTime:    event.EndAt,
+			CreateAt:   event.CreatedAt,
+		})
+	}
+	render.JSON(w, r, response)
 }

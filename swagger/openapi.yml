@@ -319,7 +319,7 @@ components:
       properties:
         id:
           type: string
-    EventQueryOutput:
+    EventListResponse:
       type: object
       properties:
         id:
