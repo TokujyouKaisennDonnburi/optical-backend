@@ -12,7 +12,6 @@ import (
 const (
 	MIN_EVENT_TITLE_LENGTH    = 1
 	MAX_EVENT_TITLE_LENGTH    = 32
-	MIN_EVENT_LOCATION_LENGTH = 1
 	MAX_EVENT_LOCATION_LENGTH = 32
 	MAX_EVENT_MEMO_LENGTH     = 255
 )
@@ -101,7 +100,7 @@ func (e *Event) SetMemo(memo string) error {
 
 func (e *Event) SetLocation(location string) error {
 	locationLength := utf8.RuneCountInString(location)
-	if locationLength < MIN_EVENT_LOCATION_LENGTH || locationLength > MAX_EVENT_LOCATION_LENGTH {
+	if locationLength > MAX_EVENT_LOCATION_LENGTH {
 		return errors.New("Event `location` length is invalid")
 	}
 	e.Location = location
