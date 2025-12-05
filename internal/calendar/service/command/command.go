@@ -22,6 +22,7 @@ func NewCalendarCommand(
 	optionRepository optionRepo.OptionRepository,
 	imageRepository calendarRepo.ImageRepository,
 	memberRepository calendarRepo.MemberRepository,
+
 ) *CalendarCommand {
 	if calendarRepository == nil {
 		panic("calendarRepository is nil")
