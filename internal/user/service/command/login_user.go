@@ -14,15 +14,11 @@ type UserLoginInput struct {
 }
 
 type UserLoginOutput struct {
+	Id           uuid.UUID
+	Name         string
+	Email        string
 	AccessToken  string
 	RefreshToken string
-	User         UserLoginOutputItem
-}
-
-type UserLoginOutputItem struct {
-	Id    uuid.UUID
-	Name  string
-	Email string
 }
 
 // ユーザーにログインする
@@ -54,12 +50,10 @@ func (c *UserCommand) LoginUser(ctx context.Context, input UserLoginInput) (*Use
 		return nil, err
 	}
 	return &UserLoginOutput{
+		Id:           loginUser.Id,
+		Name:         loginUser.Name,
+		Email:        loginUser.Email,
 		AccessToken:  accessToken.Token,
 		RefreshToken: refreshToken.Token,
-		User: UserLoginOutputItem{
-			Id:    loginUser.Id,
-			Name:  loginUser.Name,
-			Email: loginUser.Email,
-		},
 	}, nil
 }

@@ -53,9 +53,9 @@ func (h *UserHttpHandler) Login(w http.ResponseWriter, r *http.Request) {
 		AccessToken:  output.AccessToken,
 		RefreshToken: output.RefreshToken,
 		User: UserLoginResponseUser{
-			Id:    output.User.Id.String(),
-			Name:  output.User.Name,
-			Email: output.User.Email,
+			Id:    output.Id.String(),
+			Name:  output.Name,
+			Email: output.Email,
 		},
 	})
 }
