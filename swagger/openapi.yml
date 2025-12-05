@@ -183,7 +183,11 @@ components:
     UserCreateResponse:
       type: object
       properties:
-        id:
+        user:
+          $ref: '#/components/schemas/UserCreateResponseUser'
+        accessToken:
+          type: string
+        refreshToken:
           type: string
     UserResponse:
       type: object
@@ -313,6 +317,16 @@ components:
           type: string
           format: date-time
     UserLoginResponseUser:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        email:
+          type: string
+          format: email
+    UserCreateResponseUser:
       type: object
       properties:
         id:
