@@ -11,6 +11,7 @@ type EventQueryOutput struct {
 	Title      string
 	Memo       string
 	Color      string
+	Location   string
 	IsAllDay   bool
 	StartAt    string
 	EndAt      string

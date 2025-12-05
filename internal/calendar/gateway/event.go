@@ -63,6 +63,7 @@ type EventListQueryModel struct {
 	Title      string    `db:"title"`
 	Memo       string    `db:"memo"`
 	Color      string    `db:"color"`
+	Location   string    `db:"location"`
 	AllDay     bool      `db:"all_day"`
 	StartAt    string    `db:"start_at"`
 	EndAt      string    `db:"end_at"`
@@ -75,8 +76,9 @@ func (r *EventPsqlRepository) ListEventsByCalendarId(
 	calendarId uuid.UUID,
 ) ([]output.EventQueryOutput, error) {
 	query := `
-		SELECT e.id, e.calendar_id, e.title, e.memo, e.color, e.all_day, e.start_at, e.end_at, e.created_at
+		SELECT e.id, e.calendar_id, e.title, e.memo, e.color, el.location, e.all_day, e.start_at, e.end_at, e.created_at
 		FROM events e
+		LEFT JOIN event_locations el ON e.id = el.event_id
 		WHERE e.calendar_id = $1
 			AND e.deleted_at IS NULL -- 論理削除されていないもののみ取得
 		ORDER BY e.start_at ASC
@@ -98,6 +100,7 @@ func (r *EventPsqlRepository) ListEventsByCalendarId(
 			Title:      row.Title,
 			Memo:       row.Memo,
 			Color:      row.Color,
+			Location:   row.Location,
 			IsAllDay:   row.AllDay,
 			StartAt:    row.StartAt,
 			EndAt:      row.EndAt,

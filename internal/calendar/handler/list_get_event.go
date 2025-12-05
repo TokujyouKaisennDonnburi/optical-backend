@@ -19,6 +19,7 @@ type ListGetEventResponse struct {
 	Title      string `json:"title"`
 	Memo       string `json:"memo"`
 	Color      string `json:"color"`
+	Location   string `json:"location"`
 	IsAllDay   bool   `json:"is_all_day"`
 	StartAt    string `json:"start_at"`
 	EndAt      string `json:"end_at"`
@@ -65,6 +66,7 @@ func (h *CalendarHttpHandler) ListGetEvents(w http.ResponseWriter, r *http.Reque
 			Title:      event.Title,
 			Memo:       event.Memo,
 			Color:      event.Color,
+			Location:   event.Location,
 			IsAllDay:   event.IsAllDay,
 			StartAt:    event.StartAt,
 			EndAt:      event.EndAt,

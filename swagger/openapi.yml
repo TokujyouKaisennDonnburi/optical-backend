@@ -334,6 +334,8 @@ components:
           type: string
         color:
           type: string
+        location:
+          type: string
         isAllDay:
           type: boolean
         startAt:
