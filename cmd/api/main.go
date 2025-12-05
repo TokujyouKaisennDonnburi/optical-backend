@@ -33,9 +33,10 @@ func main() {
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
 	r.Use(cors.Handler(cors.Options{
-		AllowedOrigins:   []string{"http://localhost:3000"},
-		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowedOrigins:   []string{"http://*", "https://*"},
+		AllowedMethods:   []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
 		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
+		ExposedHeaders:   []string{"Link"},
 		AllowCredentials: false,
 		MaxAge:           300,
 	}))
@@ -58,9 +59,10 @@ func main() {
 	calendarRepository := calendarGateway.NewCalendarPsqlRepository(db)
 	imageRepository := calendarGateway.NewImagePsqlAndMinioRepository(db, minioClient, getBucketName())
 	eventCommand := calendarCommand.NewEventCommand(eventRepository)
+	eventQuery := calendarQuery.NewEventQuery(eventRepository)
 	calendarCommand := calendarCommand.NewCalendarCommand(calendarRepository, optionRepository, imageRepository)
 	calendarQuery := calendarQuery.NewCalendarQuery(calendarRepository)
-	caledarHandler := calendarHandler.NewCalendarHttpHandler(eventCommand, calendarCommand, calendarQuery)
+	caledarHandler := calendarHandler.NewCalendarHttpHandler(eventCommand, eventQuery, calendarCommand, calendarQuery)
 
 	// Unprotected Routes
 	r.Group(func(r chi.Router) {
