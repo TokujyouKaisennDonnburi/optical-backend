@@ -57,10 +57,11 @@ func main() {
 	eventRepository := calendarGateway.NewEventPsqlRepository(db)
 	calendarRepository := calendarGateway.NewCalendarPsqlRepository(db)
 	imageRepository := calendarGateway.NewImagePsqlAndMinioRepository(db, minioClient, getBucketName())
+	memberRepository := calendarGateway.NewMemberPsqlRepository(db)
 	eventCommand := calendarCommand.NewEventCommand(eventRepository)
-	calendarCommand := calendarCommand.NewCalendarCommand(calendarRepository, optionRepository, imageRepository)
+	calendarCommand := calendarCommand.NewCalendarCommand(calendarRepository, optionRepository, imageRepository, memberRepository)
 	calendarQuery := calendarQuery.NewCalendarQuery(calendarRepository)
-	caledarHandler := calendarHandler.NewCalendarHttpHandler(eventCommand, calendarCommand, calendarQuery)
+	calendarHandler := calendarHandler.NewCalendarHttpHandler(eventCommand, calendarCommand, calendarQuery)
 
 	// Unprotected Routes
 	r.Group(func(r chi.Router) {
@@ -78,16 +79,22 @@ func main() {
 		r.Get("/users/@me", userHandler.GetMe)
 
 		// Calendars
-		r.Post("/calendars", caledarHandler.CreateCalendar)
-		r.Post("/calendars/images", caledarHandler.UploadImage)
-		r.Get("/calendars", caledarHandler.GetCalendars)
+		r.Post("/calendars", calendarHandler.CreateCalendar)
+		r.Post("/calendars/images", calendarHandler.UploadImage)
+		r.Get("/calendars", calendarHandler.GetCalendars)
+
+		// TODO Members
+		r.Post("/calendars/{calendarId}/members", calendarHandler.CreateMembers)
 
 		// Events
-		r.Post("/calendars/{calendarId}/events", caledarHandler.CreateEvent)
+		r.Post("/calendars/{calendarId}/events", calendarHandler.CreateEvent)
 	})
 
 	// Start Serving
-	http.ListenAndServe(":8000", r)
+	err := http.ListenAndServe(":8000", r)
+	if err != nil {
+		panic(err)
+	}
 }
 
 func MigrateMinio(client *minio.Client) {

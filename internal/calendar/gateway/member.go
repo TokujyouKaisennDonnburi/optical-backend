@@ -1,0 +1,41 @@
+package gateway
+
+import (
+	"context"
+
+	"github.com/google/uuid"
+	"github.com/jmoiron/sqlx"
+)
+
+type MemberPsqlRepository struct {
+	db *sqlx.DB
+}
+
+func NewMemberPsqlRepository(db *sqlx.DB) *MemberPsqlRepository {
+	if db == nil {
+		panic("db is nil")
+	}
+	return &MemberPsqlRepository{
+		db: db,
+	}
+}
+
+func (r *MemberPsqlRepository)Create(ctx context.Context, userId, calendarId uuid.UUID, email string)error{
+	query := `
+		INSERT INTO calendar_members (calendar_id, user_id)
+		SELECT $3, u.id
+		FROM users u
+		WHERE u.email = $1
+		AND EXISTS (
+			SELECT 1 
+			FROM calendar_members cm 
+			WHERE cm.calendar_id = $3 
+			AND cm.user_id = $2)
+			`
+	_, err := r.db.ExecContext(ctx, query, email, userId, calendarId)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+

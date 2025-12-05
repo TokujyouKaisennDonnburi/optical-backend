@@ -3,7 +3,6 @@ package user
 import (
 	"errors"
 	"time"
-	"strings"
 	"unicode/utf8"
 
 	"github.com/google/uuid"
@@ -13,7 +12,6 @@ import (
 const (
 	MIN_USER_NAME_LENGTH = 1
 	MAX_USER_NAME_LENGTH = 50
-	MIN_EMAIL_LENGTH    = 3
 	MIN_PASSWORD_LENGTH = 8
 )
 
@@ -28,7 +26,6 @@ type User struct {
 }
 
 var (
-	ErrInvalidEmail    = errors.New("無効なメールアドレスです")
 	ErrInvalidName     = errors.New("ユーザー名は1文字以上50文字以下である必要があります")
 	ErrInvalidPassword = errors.New("パスワードは8文字以上である必要があります")
 )
@@ -37,7 +34,7 @@ func NewUser(name, email, password string) (*User, error) {
 	if err := validateName(name); err != nil {
 		return nil, err
 	}
-	if err := validateEmail(email); err != nil {
+	if _, err := NewEmail(email); err != nil {
 		return nil, err
 	}
 	if err := validatePassword(password); err != nil {
@@ -78,7 +75,7 @@ func (u *User) UpdateName(name string) error {
 
 // update email
 func (u *User) UpdateEmail(email string) error {
-	if err := validateEmail(email); err != nil {
+	if _, err := NewEmail(email); err != nil {
 		return err
 	}
 	u.Email = email
@@ -136,15 +133,6 @@ func validateName(name string) error {
 	return nil
 }
 
-// validate email
-func validateEmail(email string) error {
-	length := utf8.RuneCountInString(email)
-	if length < MIN_EMAIL_LENGTH || !strings.Contains(email, "@") {
-		return ErrInvalidEmail
-	}
-	return nil
-}
-
 // validate pass
 func validatePassword(password string) error {
 	length := utf8.RuneCountInString(password)
@@ -153,3 +141,4 @@ func validatePassword(password string) error {
 	}
 	return nil
 }
+
