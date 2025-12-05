@@ -15,8 +15,15 @@ type UserLoginRequest struct {
 }
 
 type UserLoginResponse struct {
-	AccessToken  string `json:"accessToken"`
-	RefreshToken string `json:"refreshToken"`
+	AccessToken  string                `json:"accessToken"`
+	RefreshToken string                `json:"refreshToken"`
+	User         UserLoginResponseUser `json:"user"`
+}
+
+type UserLoginResponseUser struct {
+	Id    string `json:"id"`
+	Name  string `json:"name"`
+	Email string `json:"email"`
 }
 
 // ユーザにログインする
@@ -43,7 +50,12 @@ func (h *UserHttpHandler) Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	render.JSON(w, r, UserLoginResponse{
-		AccessToken: output.AccessToken,
+		AccessToken:  output.AccessToken,
 		RefreshToken: output.RefreshToken,
+		User: UserLoginResponseUser{
+			Id:    output.Id.String(),
+			Name:  output.Name,
+			Email: output.Email,
+		},
 	})
 }

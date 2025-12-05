@@ -5,6 +5,7 @@ import (
 	"errors"
 
 	"github.com/TokujouKaisenDonburi/optical-backend/internal/user"
+	"github.com/google/uuid"
 )
 
 type UserLoginInput struct {
@@ -13,6 +14,9 @@ type UserLoginInput struct {
 }
 
 type UserLoginOutput struct {
+	Id           uuid.UUID
+	Name         string
+	Email        string
 	AccessToken  string
 	RefreshToken string
 }
@@ -46,7 +50,10 @@ func (c *UserCommand) LoginUser(ctx context.Context, input UserLoginInput) (*Use
 		return nil, err
 	}
 	return &UserLoginOutput{
-		AccessToken: accessToken.Token,
+		Id:           loginUser.Id,
+		Name:         loginUser.Name,
+		Email:        loginUser.Email,
+		AccessToken:  accessToken.Token,
 		RefreshToken: refreshToken.Token,
 	}, nil
 }
