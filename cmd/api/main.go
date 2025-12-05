@@ -10,6 +10,9 @@ import (
 	calendarHandler "github.com/TokujouKaisenDonburi/optical-backend/internal/calendar/handler"
 	calendarCommand "github.com/TokujouKaisenDonburi/optical-backend/internal/calendar/service/command"
 	calendarQuery "github.com/TokujouKaisenDonburi/optical-backend/internal/calendar/service/query"
+	githubGateway "github.com/TokujouKaisenDonburi/optical-backend/internal/github/gateway"
+	githubHandler "github.com/TokujouKaisenDonburi/optical-backend/internal/github/handler"
+	githubCommand "github.com/TokujouKaisenDonburi/optical-backend/internal/github/service/command"
 	optionGateway "github.com/TokujouKaisenDonburi/optical-backend/internal/option/gateway"
 	userGateway "github.com/TokujouKaisenDonburi/optical-backend/internal/user/gateway"
 	userHandler "github.com/TokujouKaisenDonburi/optical-backend/internal/user/handler"
@@ -20,6 +23,7 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+	"github.com/go-chi/cors"
 	"github.com/jmoiron/sqlx"
 	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
@@ -31,6 +35,13 @@ func main() {
 
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
+	r.Use(cors.Handler(cors.Options{
+		AllowedOrigins: []string{"https://*", "http://localhost:3000"},
+		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
+		AllowCredentials: false,
+		MaxAge:           300, // Maximum value not ignored by any of major browsers
+	}))
 	jwtMiddleware := userHandler.NewUserAuthMiddleware()
 
 	db := getPostgresDB()
@@ -42,6 +53,9 @@ func main() {
 
 	userRepository := userGateway.NewUserPsqlRepository(db)
 	tokenRepository := userGateway.NewTokenRedisRepository(redisClient)
+	githubRepository := githubGateway.NewGithubApiRepository()
+	githubCommand := githubCommand.NewGithubCommand(githubRepository)
+	githubHandler := githubHandler.NewGithubHandler(githubCommand)
 	userQuery := userQuery.NewUserQuery(userRepository)
 	userCommand := userCommand.NewUserCommand(userRepository, tokenRepository)
 	userHandler := userHandler.NewUserHttpHandler(userQuery, userCommand)
@@ -60,6 +74,9 @@ func main() {
 		r.Post("/register", userHandler.Create)
 		r.Post("/login", userHandler.Login)
 		r.Post("/refresh", userHandler.Refresh)
+
+		// Github
+		r.Post("/auth/github/install", githubHandler.LinkGithub)
 	})
 
 	// Protected Routes
