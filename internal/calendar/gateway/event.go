@@ -51,7 +51,26 @@ func (r *EventPsqlRepository) Create(
 			"createdAt":  time.Now(),
 			"updatedAt":  time.Now(),
 		})
-		return err
+		if err != nil {
+			return err
+		}
+
+		// locationが空でない場合はevent_locationsテーブルにも保存
+		if event.Location != "" {
+			locationQuery := `
+				INSERT INTO event_locations(event_id, location)
+				VALUES(:eventId, :location)
+			`
+			_, err = tx.NamedExecContext(ctx, locationQuery, map[string]any{
+				"eventId":  event.Id,
+				"location": event.Location,
+			})
+			if err != nil {
+				return err
+			}
+		}
+
+		return nil
 	})
 }
 
@@ -76,7 +95,7 @@ func (r *EventPsqlRepository) ListEventsByCalendarId(
 	calendarId uuid.UUID,
 ) ([]output.EventQueryOutput, error) {
 	query := `
-		SELECT e.id, e.calendar_id, e.title, e.memo, e.color, el.location, e.all_day, e.start_at, e.end_at, e.created_at
+		SELECT e.id, e.calendar_id, e.title, e.memo, e.color, COALESCE(el.location, '') as location, e.all_day, e.start_at, e.end_at, e.created_at
 		FROM events e
 		LEFT JOIN event_locations el ON e.id = el.event_id
 		WHERE e.calendar_id = $1
