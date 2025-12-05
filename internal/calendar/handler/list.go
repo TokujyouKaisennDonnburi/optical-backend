@@ -4,8 +4,8 @@ import (
 	"net/http"
 
 	"github.com/TokujouKaisenDonburi/optical-backend/internal/calendar/service/query"
-	"github.com/TokujouKaisenDonburi/optical-backend/internal/user/handler"
 	"github.com/TokujouKaisenDonburi/optical-backend/pkg/apperr"
+	"github.com/TokujouKaisenDonburi/optical-backend/pkg/auth"
 	"github.com/go-chi/render"
 )
 
@@ -22,7 +22,7 @@ type CalendarResponse struct {
 // カレンダー一覧を取得する
 func (h *CalendarHttpHandler) GetCalendars(w http.ResponseWriter, r *http.Request) {
 	// ユーザーIDを取得
-	userId, err := handler.GetUserIdFromContext(r)
+	userId, err := auth.GetUserIdFromContext(r)
 	if err != nil {
 		_ = render.Render(w, r, apperr.ErrInternalServerError(err))
 		return

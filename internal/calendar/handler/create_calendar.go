@@ -6,8 +6,8 @@ import (
 	"net/http"
 
 	"github.com/TokujouKaisenDonburi/optical-backend/internal/calendar/service/command"
-	"github.com/TokujouKaisenDonburi/optical-backend/internal/user/handler"
 	"github.com/TokujouKaisenDonburi/optical-backend/pkg/apperr"
+	"github.com/TokujouKaisenDonburi/optical-backend/pkg/auth"
 	"github.com/go-chi/render"
 	"github.com/google/uuid"
 )
@@ -25,7 +25,7 @@ type CalendarCreateResponse struct {
 }
 
 func (h *CalendarHttpHandler) CreateCalendar(w http.ResponseWriter, r *http.Request) {
-	userId, err := handler.GetUserIdFromContext(r)
+	userId, err := auth.GetUserIdFromContext(r)
 	if err != nil {
 		_ = render.Render(w, r, apperr.ErrInternalServerError(err))
 		return
@@ -63,7 +63,7 @@ func (h *CalendarHttpHandler) CreateCalendar(w http.ResponseWriter, r *http.Requ
 		}
 	}
 	// カレンダーを作成
-	output, err := h.calendarCommand.CreateCalendar(context.Background(), command.CalendarCreateArgs{
+	output, err := h.calendarCommand.CreateCalendar(context.Background(), command.CalendarCreateInput{
 		UserId:        userId,
 		ImageId:       imageId,
 		CalendarName:  request.Name,
