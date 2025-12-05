@@ -83,7 +83,10 @@ func main() {
 	})
 
 	// Start Serving
-	http.ListenAndServe(":8000", r)
+	err := http.ListenAndServe(":8000", r)
+	if err != nil {
+		panic(err)
+	}
 }
 
 func MigrateMinio(client *minio.Client) {
