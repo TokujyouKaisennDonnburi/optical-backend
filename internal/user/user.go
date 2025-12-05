@@ -34,7 +34,7 @@ func NewUser(name, email, password string) (*User, error) {
 	if err := validateName(name); err != nil {
 		return nil, err
 	}
-	if err := validateEmail(email); err != nil {
+	if _, err := NewEmail(email); err != nil {
 		return nil, err
 	}
 	if err := validatePassword(password); err != nil {
@@ -75,7 +75,7 @@ func (u *User) UpdateName(name string) error {
 
 // update email
 func (u *User) UpdateEmail(email string) error {
-	if err := validateEmail(email); err != nil {
+	if _, err := NewEmail(email); err != nil {
 		return err
 	}
 	u.Email = email
@@ -141,3 +141,4 @@ func validatePassword(password string) error {
 	}
 	return nil
 }
+
