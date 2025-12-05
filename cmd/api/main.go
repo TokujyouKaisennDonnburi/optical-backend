@@ -49,8 +49,9 @@ func main() {
 	eventRepository := calendarGateway.NewEventPsqlRepository(db)
 	calendarRepository := calendarGateway.NewCalendarPsqlRepository(db)
 	imageRepository := calendarGateway.NewImagePsqlAndMinioRepository(db, minioClient, getBucketName())
+	memberRepository := calendarGateway.NewMemberPsqlRepository(db)
 	eventCommand := calendarCommand.NewEventCommand(eventRepository)
-	calendarCommand := calendarCommand.NewCalendarCommand(calendarRepository, optionRepository, imageRepository)
+	calendarCommand := calendarCommand.NewCalendarCommand(calendarRepository, optionRepository, imageRepository, memberRepository)
 	calendarQuery := calendarQuery.NewCalendarQuery(calendarRepository)
 	caledarHandler := calendarHandler.NewCalendarHttpHandler(eventCommand, calendarCommand, calendarQuery)
 
@@ -73,6 +74,9 @@ func main() {
 		r.Post("/calendars", caledarHandler.CreateCalendar)
 		r.Post("/calendars/images", caledarHandler.UploadImage)
 		r.Get("/calendars", caledarHandler.GetCalendars)
+
+		// TODO Members
+		r.Post("/calendars/{calendarId}/members", calendarHandler.CreateMembers)
 
 		// Events
 		r.Post("/calendars/{calendarId}/events", caledarHandler.CreateEvent)

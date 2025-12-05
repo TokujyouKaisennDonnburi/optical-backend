@@ -11,6 +11,15 @@ type MemberPsqlRepository struct {
 	db *sqlx.DB
 }
 
+func NewMemberPsqlRepository(db *sqlx.DB) *MemberPsqlRepository {
+	if db == nil {
+		panic("db is nil")
+	}
+	return &MemberPsqlRepository{
+		db: db,
+	}
+}
+
 func (r *MemberPsqlRepository)Create(ctx context.Context, userId, calendarId uuid.UUID, email string)error{
 	query := `
 		INSERT INTO calendar_members (calendar_id, user_id)
