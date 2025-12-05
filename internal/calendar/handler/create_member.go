@@ -22,25 +22,25 @@ func (h *CalendarHttpHandler) CreateMembers(w http.ResponseWriter, r *http.Reque
 	// UserId
 	userId, err := handler.GetUserIdFromContext(r)
 	if err != nil {
-		render.Render(w,r,apperr.ErrInternalServerError(err))
+		_ = render.Render(w,r,apperr.ErrInternalServerError(err))
 		return
 	}
 	// CalendarId
 	calendarId, err := uuid.Parse(chi.URLParam(r,"calendarId"))
 	if err != nil {
-		render.Render(w,r,apperr.ErrInternalServerError(err))
+		_ = render.Render(w,r,apperr.ErrInternalServerError(err))
 		return
 	}
 	// Email
 	var request MemberCreateRequest
 	err = json.NewDecoder(r.Body).Decode(&request)
 	if err != nil {
-		render.Render(w,r,apperr.ErrInvalidRequest(err))
+		_ = render.Render(w,r,apperr.ErrInvalidRequest(err))
 		return
 	}
 	email, err := user.NewEmail(request.Email)
 	if err != nil {
-		render.Render(w,r,apperr.ErrInvalidRequest(err))
+		_ = render.Render(w,r,apperr.ErrInvalidRequest(err))
 		return
 	}
 	// 情報をinput
@@ -50,7 +50,7 @@ func (h *CalendarHttpHandler) CreateMembers(w http.ResponseWriter, r *http.Reque
 		Email: 		string(email),
 	})
 	if err != nil {
-		render.Render(w,r,apperr.ErrInternalServerError(err))
+		_ = render.Render(w,r,apperr.ErrInternalServerError(err))
 		return
 	}
 	w.WriteHeader(http.StatusNoContent)
