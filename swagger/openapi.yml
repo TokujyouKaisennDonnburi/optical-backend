@@ -73,6 +73,8 @@ paths:
   /users/@me:
     get:
       summary: Get current user information
+      security:
+        - bearerAuth: []
       responses:
         '200':
           description: User information retrieved successfully
@@ -83,6 +85,8 @@ paths:
   /calendars:
     get:
       summary: Get list of calendars
+      security:
+        - bearerAuth: []
       responses:
         '200':
           description: Calendar list retrieved successfully
@@ -94,6 +98,8 @@ paths:
           description: Internal server error
     post:
       summary: Create a new calendar
+      security:
+        - bearerAuth: []
       requestBody:
         required: true
         content:
@@ -114,6 +120,8 @@ paths:
   /calendars/{calendarId}/events:
     post:
       summary: Create a new event
+      security:
+        - bearerAuth: []
       parameters:
         - name: calendarId
           in: path
@@ -140,6 +148,8 @@ paths:
   /calendars/images:
     post:
       summary: Upload an image
+      security:
+        - bearerAuth: []
       requestBody:
         required: true
         content:
@@ -162,6 +172,11 @@ paths:
         '500':
           description: Internal server error
 components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
   schemas:
     UserCreateRequest:
       type: object
@@ -342,3 +357,9 @@ components:
         id:
           type: string
           format: uuid
+securityDefinitions:
+  bearerAuth:
+    type: apiKey
+    in: header
+    name: Authorization
+    description: Enter your bearer token in the format **Bearer <token>**
