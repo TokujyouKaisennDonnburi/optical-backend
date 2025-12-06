@@ -267,6 +267,29 @@ paths:
            description: Invalid request
          '401':
            description: Unauthorized
+  /calendars/{calendarId}/members:
+    post:
+      summary: Add a member to a calendar
+      parameters:
+        - name: calendarId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MemberCreateRequest'
+      responses:
+        '204':
+          description: Member added successfully
+        '400':
+          description: Invalid request
+        '500':
+          description: Internal server error
 components:
   securitySchemes:
     bearerAuth:
@@ -558,4 +581,19 @@ components:
           format: date-time
         isAllDay:
           type: boolean
+    securityDefinitions:
+      bearerAuth:
+        type: apiKey
+        in: header
+        name: Authorization
+        description: Enter your bearer token in the format **Bearer <token>**
+    MemberCreateRequest:
+      type: object
+      required:
+        - email
+      properties:
+        email:
+          type: string
+          format: email
+          example: member@example.com
 

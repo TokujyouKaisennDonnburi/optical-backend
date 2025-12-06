@@ -14,7 +14,7 @@ import (
 )
 
 type MemberCreateRequest struct {
-	Email      string    `JSON:"email"`
+	Email      string    `json:"email"`
 }
 
 

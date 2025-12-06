@@ -2,6 +2,7 @@ package gateway
 
 import (
 	"context"
+	"errors"
 
 	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
@@ -20,21 +21,34 @@ func NewMemberPsqlRepository(db *sqlx.DB) *MemberPsqlRepository {
 	}
 }
 
-func (r *MemberPsqlRepository)Create(ctx context.Context, userId, calendarId uuid.UUID, email string)error{
+func (r *MemberPsqlRepository) Create(ctx context.Context, userId, calendarId uuid.UUID, email string) error {
 	query := `
-		INSERT INTO calendar_members (calendar_id, user_id)
-		SELECT $3, u.id
+		INSERT INTO calendar_members (calendar_id, user_id, joined_at)
+		SELECT $3, u.id, NULL
 		FROM users u
 		WHERE u.email = $1
 		AND EXISTS (
-			SELECT 1 
-			FROM calendar_members cm 
+			SELECT 1 FROM calendar_members cm 
 			WHERE cm.calendar_id = $3 
-			AND cm.user_id = $2)
-			`
-	_, err := r.db.ExecContext(ctx, query, email, userId, calendarId)
+			AND cm.user_id = $2
+		)
+		AND NOT EXISTS (
+			SELECT 1 FROM calendar_members cm
+			WHERE cm.calendar_id = $3
+			AND cm.user_id = u.id
+		)
+		`
+	result, err := r.db.ExecContext(ctx, query, email, userId, calendarId)
 	if err != nil {
 		return err
+	}
+	// 実行できている行数をとってくる
+	rows, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+	if rows == 0 {
+		return errors.New("already member or not member for me")
 	}
 	return nil
 }
