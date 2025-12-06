@@ -220,6 +220,7 @@ paths:
           description: Invalid request
         '500':
           description: Internal server error
+<<<<<<< HEAD
   /events/todays:
     get:
       summary: Get today's events
@@ -511,6 +512,7 @@ components:
         id:
           type: string
           format: uuid
+<<<<<<< HEAD
     EventTodayResponse:
       type: object
       properties:
