@@ -5,10 +5,17 @@ info:
   title: Optical Backend API
   version: 1.0.0
   description: API for Optical Backend
+tags:
+  users:
+    description: Users and authorization
+  calendars:
+    description: Calendars and events
 paths:
   /register:
     post:
       summary: Create a new user
+      tags: 
+        - users
       requestBody:
         required: true
         content:
@@ -29,6 +36,8 @@ paths:
   /login:
     post:
       summary: Login a user
+      tags: 
+        - users
       requestBody:
         required: true
         content:
@@ -51,6 +60,8 @@ paths:
   /refresh:
     post:
       summary: Refresh access token
+      tags: 
+        - users
       requestBody:
         required: true
         content:
@@ -73,6 +84,8 @@ paths:
   /users/@me:
     get:
       summary: Get current user information
+      tags: 
+        - users
       security:
         - bearerAuth: []
       responses:
@@ -85,6 +98,8 @@ paths:
   /calendars:
     get:
       summary: Get list of calendars
+      tags: 
+        - calendars
       security:
         - bearerAuth: []
       responses:
@@ -98,6 +113,8 @@ paths:
           description: Internal server error
     post:
       summary: Create a new calendar
+      tags: 
+        - calendars
       security:
         - bearerAuth: []
       requestBody:
@@ -120,6 +137,8 @@ paths:
   /calendars/{calendarId}/events:
     post:
       summary: Create a new event
+      tags: 
+        - calendars
       security:
         - bearerAuth: []
       parameters:
@@ -148,6 +167,8 @@ paths:
   /calendars/images:
     post:
       summary: Upload an image
+      tags: 
+        - calendars
       security:
         - bearerAuth: []
       requestBody:
