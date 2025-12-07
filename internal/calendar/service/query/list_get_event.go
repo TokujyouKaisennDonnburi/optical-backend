@@ -2,13 +2,11 @@ package query
 
 import (
 	"context"
-	"errors"
 
 	"github.com/TokujouKaisenDonburi/optical-backend/internal/calendar/service/query/output"
+	"github.com/TokujouKaisenDonburi/optical-backend/pkg/apperr"
 	"github.com/google/uuid"
 )
-
-var ErrCalendarNotBelongToUser = errors.New("calendar does not belong to user")
 
 // Input: Handler層から受け取るデータ
 type EventQueryInput struct {
@@ -24,7 +22,7 @@ func (q *EventQuery) ListGetEvents(ctx context.Context, input EventQueryInput) (
 		return nil, err
 	}
 	if !exists {
-		return nil, ErrCalendarNotBelongToUser
+		return nil, apperr.ForbiddenError("calendar does not belong to user")
 	}
 
 	events, err := q.eventRepository.ListEventsByCalendarId(ctx, input.CalendarID)
