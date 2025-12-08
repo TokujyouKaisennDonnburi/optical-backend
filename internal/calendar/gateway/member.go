@@ -6,6 +6,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
+	"github.com/lib/pq"
 )
 
 type MemberPsqlRepository struct {
@@ -21,12 +22,12 @@ func NewMemberPsqlRepository(db *sqlx.DB) *MemberPsqlRepository {
 	}
 }
 
-func (r *MemberPsqlRepository) Create(ctx context.Context, userId, calendarId uuid.UUID, email string) error {
+func (r *MemberPsqlRepository) Create(ctx context.Context, userId, calendarId uuid.UUID, emails []string) error {
 	query := `
 		INSERT INTO calendar_members (calendar_id, user_id, joined_at)
 		SELECT $3, u.id, NULL
 		FROM users u
-		WHERE u.email = $1
+		WHERE u.email = ANY($1)
 		AND EXISTS (
 			SELECT 1 FROM calendar_members cm 
 			WHERE cm.calendar_id = $3 
@@ -38,7 +39,7 @@ func (r *MemberPsqlRepository) Create(ctx context.Context, userId, calendarId uu
 			AND cm.user_id = u.id
 		)
 		`
-	result, err := r.db.ExecContext(ctx, query, email, userId, calendarId)
+	result, err := r.db.ExecContext(ctx, query, pq.Array(emails), userId, calendarId)
 	if err != nil {
 		return err
 	}

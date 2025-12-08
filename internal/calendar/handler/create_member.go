@@ -14,7 +14,7 @@ import (
 )
 
 type MemberCreateRequest struct {
-	Email      string    `json:"email"`
+	Email      []string    `json:"email"`
 }
 
 
@@ -38,20 +38,20 @@ func (h *CalendarHttpHandler) CreateMembers(w http.ResponseWriter, r *http.Reque
 		_ = render.Render(w,r,apperr.ErrInvalidRequest(err))
 		return
 	}
-	email, err := user.NewEmail(request.Email)
+	emails, err := user.NewEmails(request.Email)
 	if err != nil {
 		_ = render.Render(w,r,apperr.ErrInvalidRequest(err))
 		return
 	}
-	// 情報をinput
-	err = h.calendarCommand.CreateMember(r.Context(), command.MemberCreateInput{
-		UserId:     userId,
-		CalendarId: calendarId,
-		Email: 		string(email),
-	})
-	if err != nil {
-		_ = render.Render(w,r,apperr.ErrInternalServerError(err))
-		return
-	}
+	// roop create
+		err = h.calendarCommand.CreateMember(r.Context(), command.MemberCreateInput{
+			UserId:     userId,
+			CalendarId: calendarId,
+			Emails:      emails,
+		})
+		if err != nil {
+			_ = render.Render(w,r,apperr.ErrInternalServerError(err))
+			return
+		}
 	w.WriteHeader(http.StatusNoContent)
 }

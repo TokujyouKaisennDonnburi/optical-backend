@@ -6,5 +6,5 @@ import (
 )
 
 type MemberRepository interface {
-	Create(ctx context.Context, userId, calendarId uuid.UUID, email string)error
+	Create(ctx context.Context, userId, calendarId uuid.UUID, emails []string)error
 }

@@ -7,13 +7,13 @@ import (
 )
 
 type MemberCreateInput struct {
-	UserId 		uuid.UUID
-	CalendarId  uuid.UUID
-	Email 		string 
+	UserId     uuid.UUID
+	CalendarId uuid.UUID
+	Emails     []string
 }
 
-func (c *CalendarCommand) CreateMember (ctx context.Context, input MemberCreateInput)error {
-	err := c.memberRepository.Create(ctx, input.UserId, input.CalendarId, input.Email)
+func (c *CalendarCommand) CreateMember(ctx context.Context, input MemberCreateInput) error {
+	err := c.memberRepository.Create(ctx, input.UserId, input.CalendarId, input.Emails[])
 	if err != nil {
 		return err
 	}
