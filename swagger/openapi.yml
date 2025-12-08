@@ -468,12 +468,16 @@ components:
       properties:
         title:
           type: string
+          example: title-example
         memo:
           type: string
+          example: memo-example
         color:
           type: string
+          example: 112233
         location:
           type: string
+          example: location-example
         startTime:
           type: string
           format: date-time
@@ -595,12 +599,16 @@ components:
       properties:
         title:
           type: string
+          example: title-example
         memo:
           type: string
+          example: memo-example
         color:
           type: string
+          example: 112233
         location:
           type: string
+          example: location-example
         startTime:
           type: string
           format: date-time
@@ -646,12 +654,6 @@ components:
           format: date-time
         isAllDay:
           type: boolean
-    securityDefinitions:
-      bearerAuth:
-        type: apiKey
-        in: header
-        name: Authorization
-        description: Enter your bearer token in the format **Bearer <token>**
     MemberCreateRequest:
       type: object
       required:
