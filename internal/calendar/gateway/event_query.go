@@ -121,7 +121,9 @@ func (r *EventPsqlRepository) GetEventsByDate(
 		JOIN calendar_members
 			ON calendar_members.calendar_id = events.calendar_id
 		WHERE
-			calendar_members.user_id = $1
+		    events.deleted_at IS NULL 
+			AND calendars.deleted_at IS NULL 
+			AND	calendar_members.user_id = $1
 			AND	
 			(
 				events.start_at::date = $2 OR events.end_at::date = $2 
@@ -131,6 +133,60 @@ func (r *EventPsqlRepository) GetEventsByDate(
 	var models []EventTodayQueryModel
 	date := datetime.Format("2006-01-02")
 	err := r.db.SelectContext(ctx, &models, query, userId, date)
+	if err != nil {
+		return nil, err
+	}
+	outputs := make([]output.EventTodayQueryOutputItem, len(models))
+	for i, model := range models {
+		outputs[i] = output.EventTodayQueryOutputItem{
+			CalendarId:    model.CalendarId,
+			CalendarName:  model.CalendarName,
+			CalendarColor: model.CalendarColor,
+			Id:            model.EventId,
+			Title:         model.EventTitle,
+			Color:         model.EventColor,
+			Location:      model.Location,
+			Memo:          model.Memo,
+			StartAt:       model.StartAt,
+			EndAt:         model.EndAt,
+			IsAllDay:      model.IsAllDay,
+		}
+	}
+	return outputs, nil
+}
+
+
+func (r *EventPsqlRepository) GetEventsByMonth(
+	ctx context.Context,
+	userId uuid.UUID,
+	datetime time.Time,
+) ([]output.EventTodayQueryOutputItem, error) {
+	query := `
+		SELECT 
+			calendars.id AS calendar_id, calendars.name AS calendar_name, calendars.color AS calendar_color,
+			events.id AS event_id, events.title AS event_title, events.color AS event_color, location, memo, start_at, end_at, all_day
+		FROM events
+		JOIN event_locations
+			ON events.id = event_locations.event_id
+		JOIN calendars
+			ON events.calendar_id = calendars.id
+		JOIN calendar_members
+			ON calendar_members.calendar_id = events.calendar_id
+		WHERE
+		    events.deleted_at IS NULL 
+			AND calendars.deleted_at IS NULL 
+			AND	calendar_members.user_id = $1
+			AND	
+			(
+				TO_CHAR(events.start_at, 'YYYY-MM') = $2 OR TO_CHAR(events.end_at, 'YYYY-MM') = $2 
+				OR events.start_at::date < $3 AND events.end_at::date >= $4
+			)
+	`
+	var models []EventTodayQueryModel
+	month := datetime.Format("2006-01")
+	firstDay := datetime.Format("2006-01")+"-01"
+	nextFirstDay := datetime.AddDate(0, 1, 0).Format("2006-01")+"-01"
+	err := r.db.SelectContext(ctx, &models, query, userId, month, firstDay, nextFirstDay)
 	if err != nil {
 		return nil, err
 	}
