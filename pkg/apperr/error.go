@@ -56,4 +56,3 @@ func NotFoundError(message string) error {
 		Message:    message,
 	}
 }
-

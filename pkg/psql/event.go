@@ -2,9 +2,11 @@ package psql
 
 import (
 	"context"
+	"database/sql"
 	"time"
 
 	"github.com/TokujouKaisenDonburi/optical-backend/internal/calendar"
+	"github.com/TokujouKaisenDonburi/optical-backend/pkg/apperr"
 	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
 )
@@ -39,6 +41,9 @@ func FindEventByUserIdAndId(ctx context.Context, tx *sqlx.Tx, userId, eventId uu
 	var eventModel EventModel
 	err := tx.GetContext(ctx, &eventModel, query, userId, eventId)
 	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, apperr.NotFoundError("event not found")
+		}
 		return nil, err
 	}
 	return &calendar.Event{
