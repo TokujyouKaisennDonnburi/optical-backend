@@ -29,4 +29,5 @@ type EventRepository interface {
 		calendarId uuid.UUID,
 	) (bool, error)
 	GetEventsByDate(ctx context.Context, userId uuid.UUID, date time.Time) ([]output.EventTodayQueryOutputItem, error)
+	GetEventsByMonth(ctx context.Context, userId uuid.UUID, date time.Time) ([]output.EventTodayQueryOutputItem, error)
 }
