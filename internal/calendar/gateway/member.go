@@ -59,13 +59,13 @@ func (r *MemberPsqlRepository) Create(ctx context.Context, userId, calendarId uu
 	return nil
 }
 
-func (r *MemberPsqlRepository)JOIN(ctx context.Context, userId, calendarId uuid.UUID)error{
+func (r *MemberPsqlRepository) Join(ctx context.Context, userId, calendarId uuid.UUID) error {
 	query := `
-	INSERT INTO calendar_members joined_at
-	SELECT time
-	FROM calendar_members cm
-	WHERE cm.user_id = $1
-	AND cm.calendar_id = $2
+	UPDATE calendar_members
+	SET joined_at = NOW()
+	WHERE user_id = $1
+	AND calendar_id = $2
+	AND joined_at IS NULL
 	`
 	result, err := r.db.ExecContext(ctx, query, userId, calendarId)
 	if err != nil {
@@ -76,7 +76,7 @@ func (r *MemberPsqlRepository)JOIN(ctx context.Context, userId, calendarId uuid.
 		return err
 	}
 	if rows == 0 {
-		return errors.New("calendarId or userId is not found")
+		return errors.New("not invited or already joined")
 	}
 	return nil
 }

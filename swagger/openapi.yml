@@ -295,6 +295,25 @@ paths:
           description: Invalid request
         '500':
           description: Internal server error
+    put:
+      summary: Join a calendar as an invited member
+      description: Allows an invited user to join a calendar. The user must have been previously invited.
+      tags:
+        - calendars
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: calendarId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Successfully joined the calendar
+        '500':
+          description: Not invited or already joined
 components:
   securitySchemes:
     bearerAuth:

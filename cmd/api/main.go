@@ -86,6 +86,7 @@ func main() {
 
 		// TODO Members
 		r.Post("/calendars/{calendarId}/members", calendarHandler.CreateMembers)
+		r.Put("/calendars/{calendarId}/members", calendarHandler.JoinMember)
 
 		// Events
 		r.Post("/calendars/{calendarId}/events", calendarHandler.CreateEvent)
