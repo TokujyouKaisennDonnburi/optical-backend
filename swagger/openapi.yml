@@ -588,6 +588,10 @@ components:
         name: Authorization
         description: Enter your bearer token in the format **Bearer <token>**
     MemberCreateRequest:
+      tags: 
+        - calendars
+      security:
+        - bearerAuth: []
       type: object
       required:
         - email
@@ -599,5 +603,5 @@ components:
             format: email
           example: member@example.com
           example:
-            - member1@example.com
-            - member2@example.com
+            - optical-user1@example.com
+            - optical-user2@example.com
