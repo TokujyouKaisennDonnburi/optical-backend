@@ -48,13 +48,35 @@ func (r *MemberPsqlRepository) Create(ctx context.Context, userId, calendarId uu
 	if err != nil {
 		return err
 	}
-	// 実行できている行数をとってくる
+	// 実行できている行数
 	rows, err := result.RowsAffected()
 	if err != nil {
 		return err
 	}
 	if rows == 0 {
 		return errors.New("already member or not member for me")
+	}
+	return nil
+}
+
+func (r *MemberPsqlRepository)JOIN(ctx context.Context, userId, calendarId uuid.UUID)error{
+	query := `
+	INSERT INTO calendar_members joined_at
+	SELECT time
+	FROM calendar_members cm
+	WHERE cm.user_id = $1
+	AND cm.calendar_id = $2
+	`
+	result, err := r.db.ExecContext(ctx, query, userId, calendarId)
+	if err != nil {
+		return err
+	}
+	rows, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+	if rows == 0 {
+		return errors.New("calendarId or userId is not found")
 	}
 	return nil
 }
