@@ -13,7 +13,7 @@ type MemberCreateInput struct {
 }
 
 func (c *CalendarCommand) CreateMember(ctx context.Context, input MemberCreateInput) error {
-	err := c.memberRepository.Create(ctx, input.UserId, input.CalendarId, input.Emails[])
+	err := c.memberRepository.Create(ctx, input.UserId, input.CalendarId, input.Emails)
 	if err != nil {
 		return err
 	}
