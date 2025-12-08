@@ -593,6 +593,10 @@ components:
         name: Authorization
         description: Enter your bearer token in the format **Bearer <token>**
     MemberCreateRequest:
+      tags: 
+        - calendars
+      security:
+        - bearerAuth: []
       type: object
       required:
         - email
