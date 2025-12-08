@@ -33,7 +33,7 @@ func NewImagePsqlAndMinioRepository(db *sqlx.DB, minoiClient *minio.Client, buck
 }
 
 func (r *ImagePsqlAndMinioRepository) Upload(ctx context.Context, file multipart.File, header *multipart.FileHeader) (string, error) {
-	filePath := "/calendars/images/"
+	filePath := "calendars/images/"
 	_, err := r.minioClient.PutObject(ctx, r.bucketName, filePath+header.Filename, file, header.Size, minio.PutObjectOptions{
 		ContentType: "image/png",
 	})
