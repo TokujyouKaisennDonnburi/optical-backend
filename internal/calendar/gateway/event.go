@@ -88,17 +88,19 @@ func (r *EventPsqlRepository) Update(
 				all_day = :allDay,
 				start_at = :startAt,
 				end_at = :endAt
+				updated_at = :updatedAt
 			WHERE 
 				id = :id AND deleted_at IS NULL
 		`
 		_, err = tx.NamedExecContext(ctx, query, map[string]any{
-			"id":       event.Id,
-			"title":    event.Title,
-			"memo":     event.Memo,
-			"color":    event.Color,
-			"allDay":   event.ScheduledTime.AllDay,
-			"startAt":  event.ScheduledTime.StartTime,
-			"endAt":    event.ScheduledTime.EndTime,
+			"id":        event.Id,
+			"title":     event.Title,
+			"memo":      event.Memo,
+			"color":     event.Color,
+			"allDay":    event.ScheduledTime.AllDay,
+			"startAt":   event.ScheduledTime.StartTime,
+			"endAt":     event.ScheduledTime.EndTime,
+			"updatedAt": time.Now(),
 		})
 		if err != nil {
 			return err
@@ -109,7 +111,7 @@ func (r *EventPsqlRepository) Update(
 		WHERE event_id = :eventId
 		`
 		_, err = tx.NamedExecContext(ctx, query, map[string]any{
-			"eventId": event.Id,
+			"eventId":  event.Id,
 			"location": event.Location,
 		})
 		return err
