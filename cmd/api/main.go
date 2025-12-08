@@ -86,6 +86,7 @@ func main() {
 		// Events
 		r.Post("/calendars/{calendarId}/events", calendarHandler.CreateEvent)
 		r.Get("/calendars/{calendarId}/events", calendarHandler.ListGetEvents)
+		r.Get("/events/todays", calendarHandler.GetToday)
 	})
 
 	// Start Serving
