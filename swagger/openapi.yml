@@ -270,6 +270,10 @@ paths:
   /calendars/{calendarId}/members:
     post:
       summary: Add a member to a calendar
+      tags:
+        - calendars
+      security:
+        - bearerAuth: []
       parameters:
         - name: calendarId
           in: path
@@ -588,10 +592,6 @@ components:
         name: Authorization
         description: Enter your bearer token in the format **Bearer <token>**
     MemberCreateRequest:
-      tags: 
-        - calendars
-      security:
-        - bearerAuth: []
       type: object
       required:
         - email
