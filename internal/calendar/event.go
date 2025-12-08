@@ -76,6 +76,8 @@ func NewEvent(calendarId uuid.UUID, title, memo, color, location string, schedul
 func NewScheduledTime(allDay bool, startTime, endTime time.Time) (*ScheduledTime, error) {
 	if allDay {
 		return &ScheduledTime{
+			StartTime: startTime,
+			EndTime: endTime,
 			AllDay: true,
 		}, nil
 	}
