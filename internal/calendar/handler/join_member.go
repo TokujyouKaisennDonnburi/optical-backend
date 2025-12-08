@@ -3,8 +3,8 @@ package handler
 import (
 	"net/http"
 
-	"github.com/TokujouKaisenDonburi/optical-backend/internal/user/handler"
 	"github.com/TokujouKaisenDonburi/optical-backend/internal/calendar/service/command"
+	"github.com/TokujouKaisenDonburi/optical-backend/internal/user/handler"
 	"github.com/TokujouKaisenDonburi/optical-backend/pkg/apperr"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
@@ -15,7 +15,7 @@ func (h *CalendarHttpHandler) JoinMember(w http.ResponseWriter, r *http.Request)
 	// userId
 	user, err := handler.GetUserIdFromContext(r)
 	if err != nil {
-		_ = render.Render(w,r,apperr.ErrInternalServerError(err))
+		_ = render.Render(w, r, apperr.ErrInternalServerError(err))
 		return
 	}
 	// CalendarId
