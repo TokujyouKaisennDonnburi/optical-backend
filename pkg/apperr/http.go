@@ -19,20 +19,27 @@ func (er *AppError) Render(w http.ResponseWriter, r *http.Request) error {
 func ErrInvalidRequest(err error) render.Renderer {
 	return &AppError{
 		StatusCode: http.StatusBadRequest,
-		Message: err.Error(),
+		Message:    err.Error(),
 	}
 }
 
 func ErrUnauthorized(err error) render.Renderer {
 	return &AppError{
 		StatusCode: http.StatusUnauthorized,
-		Message: err.Error(),
+		Message:    err.Error(),
 	}
 }
 
 func ErrInternalServerError(err error) render.Renderer {
 	return &AppError{
 		StatusCode: http.StatusInternalServerError,
-		Message: err.Error(),
+		Message:    err.Error(),
+	}
+}
+
+func ErrForbidden(err error) render.Renderer {
+	return &AppError{
+		StatusCode: http.StatusForbidden,
+		Message:    err.Error(),
 	}
 }
