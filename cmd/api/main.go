@@ -61,7 +61,7 @@ func main() {
 	eventQuery := calendarQuery.NewEventQuery(eventRepository)
 	calendarCommand := calendarCommand.NewCalendarCommand(calendarRepository, optionRepository, imageRepository)
 	calendarQuery := calendarQuery.NewCalendarQuery(calendarRepository)
-	calendarHandler := calendarHandler.NewCalendarHttpHandler(eventCommand, calendarCommand, eventQuery, calendarQuery)
+	calendarHandler := calendarHandler.NewCalendarHttpHandler(eventCommand, eventQuery, calendarCommand, calendarQuery)
 
 	// Unprotected Routes
 	r.Group(func(r chi.Router) {

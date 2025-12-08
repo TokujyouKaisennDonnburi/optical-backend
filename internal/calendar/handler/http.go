@@ -9,7 +9,6 @@ type CalendarHttpHandler struct {
 	eventCommand    *command.EventCommand
 	eventQuery      *query.EventQuery
 	calendarCommand *command.CalendarCommand
-	eventQuery      *query.EventQuery
 	calendarQuery   *query.CalendarQuery
 }
 
@@ -17,7 +16,6 @@ func NewCalendarHttpHandler(
 	eventCommand *command.EventCommand,
 	eventQuery *query.EventQuery,
 	calendarCommand *command.CalendarCommand,
-	eventQuery *query.EventQuery,
 	calendarQuery *query.CalendarQuery,
 ) *CalendarHttpHandler {
 	if eventCommand == nil {
@@ -29,9 +27,6 @@ func NewCalendarHttpHandler(
 	if calendarCommand == nil {
 		panic("CalendarCommand is nil")
 	}
-	if eventQuery == nil {
-		panic("EventQuery is nil")
-	}
 	if calendarQuery == nil {
 		panic("CalendarQuery is nil")
 	}
@@ -39,7 +34,6 @@ func NewCalendarHttpHandler(
 		eventCommand:    eventCommand,
 		eventQuery:      eventQuery,
 		calendarCommand: calendarCommand,
-		eventQuery:      eventQuery,
 		calendarQuery:   calendarQuery,
 	}
 }
