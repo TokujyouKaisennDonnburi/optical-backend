@@ -84,7 +84,7 @@ func main() {
 		r.Post("/calendars/images", calendarHandler.UploadImage)
 		r.Get("/calendars", calendarHandler.GetCalendars)
 
-		// TODO Members
+		// Members
 		r.Post("/calendars/{calendarId}/members", calendarHandler.CreateMembers)
 		r.Put("/calendars/{calendarId}/members", calendarHandler.JoinMember)
 
