@@ -87,7 +87,7 @@ func (r *EventPsqlRepository) Update(
 				color = :color,
 				all_day = :allDay,
 				start_at = :startAt,
-				end_at = :endAt
+				end_at = :endAt,
 				updated_at = :updatedAt
 			WHERE 
 				id = :id AND deleted_at IS NULL
