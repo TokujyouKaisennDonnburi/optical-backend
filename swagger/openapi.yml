@@ -593,7 +593,9 @@ components:
         - email
       properties:
         email:
-          type: string
-          format: email
+          type: array
+          items:
+            type: string
+            format: email
           example: member@example.com
 
