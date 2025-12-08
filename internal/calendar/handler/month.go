@@ -30,7 +30,6 @@ type EventMonthResponseItem struct {
 	IsAllDay      bool      `json:"isAllDay"`
 }
 
-
 func (h *CalendarHttpHandler) GetByMonth(w http.ResponseWriter, r *http.Request) {
 	userId, err := handler.GetUserIdFromContext(r)
 	if err != nil {
@@ -49,7 +48,7 @@ func (h *CalendarHttpHandler) GetByMonth(w http.ResponseWriter, r *http.Request)
 	} else {
 		output, err = h.eventQuery.GetByMonth(r.Context(), query.EventMonthQueryInput{
 			UserId: userId,
-			Month: month,
+			Month:  month,
 		})
 	}
 	if err != nil {
