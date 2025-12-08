@@ -166,6 +166,10 @@ paths:
           description: Internal server error
     get:
       summary: Get events from a calendar
+      tags: 
+        - calendars
+      security:
+        - bearerAuth: []
       parameters:
         - name: calendarId
           in: path
