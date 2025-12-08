@@ -43,7 +43,7 @@ func (h *CalendarHttpHandler) CreateMembers(w http.ResponseWriter, r *http.Reque
 		_ = render.Render(w,r,apperr.ErrInvalidRequest(err))
 		return
 	}
-	// roop create
+	// loop create
 		err = h.calendarCommand.CreateMember(r.Context(), command.MemberCreateInput{
 			UserId:     userId,
 			CalendarId: calendarId,

@@ -598,4 +598,6 @@ components:
             type: string
             format: email
           example: member@example.com
-
+          example:
+            - member1@example.com
+            - member2@example.com
