@@ -12,7 +12,7 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
-type UserAuthMiddleware struct {}
+type UserAuthMiddleware struct{}
 
 func NewUserAuthMiddleware() *UserAuthMiddleware {
 	return &UserAuthMiddleware{}

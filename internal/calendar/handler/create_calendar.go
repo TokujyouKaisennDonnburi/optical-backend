@@ -16,6 +16,7 @@ type CalendarCreateRequest struct {
 	Name      string   `json:"name"`
 	Color     string   `json:"color"`
 	ImageId   string   `json:"imageId"`
+	Members   []string `json:"members"`
 	OptionIds []string `json:"optionIds"`
 }
 
@@ -30,24 +31,23 @@ func (h *CalendarHttpHandler) CreateCalendar(w http.ResponseWriter, r *http.Requ
 		_ = render.Render(w, r, apperr.ErrInternalServerError(err))
 		return
 	}
+	userName, err := auth.GetUserNameFromContext(r)
+	if err != nil {
+		_ = render.Render(w, r, apperr.ErrInternalServerError(err))
+		return
+	}
 	var request CalendarCreateRequest
 	// リクエストJSONをバインド
 	err = json.NewDecoder(r.Body).Decode(&request)
 	if err != nil {
-		err = render.Render(w, r, apperr.ErrInvalidRequest(err))
-		if err != nil {
-			_ = render.Render(w, r, apperr.ErrInternalServerError(err))
-		}
+		_ = render.Render(w, r, apperr.ErrInvalidRequest(err))
 		return
 	}
 	optionIds := []uuid.UUID{}
 	for _, id := range request.OptionIds {
 		optionId, err := uuid.Parse(id)
 		if err != nil {
-			err = render.Render(w, r, apperr.ErrInvalidRequest(err))
-			if err != nil {
-				_ = render.Render(w, r, apperr.ErrInternalServerError(err))
-			}
+			_ = render.Render(w, r, apperr.ErrInvalidRequest(err))
 			return
 		}
 		optionIds = append(optionIds, optionId)
@@ -56,18 +56,18 @@ func (h *CalendarHttpHandler) CreateCalendar(w http.ResponseWriter, r *http.Requ
 	if request.ImageId != "" {
 		imageId, err = uuid.Parse(request.ImageId)
 		if err != nil {
-			err = render.Render(w, r, apperr.ErrInvalidRequest(err))
-			if err != nil {
-				_ = render.Render(w, r, apperr.ErrInternalServerError(err))
-			}
+			_ = render.Render(w, r, apperr.ErrInvalidRequest(err))
+			return
 		}
 	}
 	// カレンダーを作成
 	output, err := h.calendarCommand.CreateCalendar(context.Background(), command.CalendarCreateInput{
 		UserId:        userId,
+		UserName:      userName,
 		ImageId:       imageId,
 		CalendarName:  request.Name,
 		CalendarColor: request.Color,
+		MemberEmails:  request.Members,
 		OptionIds:     optionIds,
 	})
 	if err != nil {
