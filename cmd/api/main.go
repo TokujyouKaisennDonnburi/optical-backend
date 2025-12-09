@@ -61,7 +61,7 @@ func main() {
 	eventQuery := calendarQuery.NewEventQuery(eventRepository)
 	calendarCommand := calendarCommand.NewCalendarCommand(calendarRepository, optionRepository, imageRepository)
 	calendarQuery := calendarQuery.NewCalendarQuery(calendarRepository)
-	calendarHandler := calendarHandler.NewCalendarHttpHandler(eventCommand, calendarCommand, eventQuery, calendarQuery)
+	calendarHandler := calendarHandler.NewCalendarHttpHandler(eventCommand, eventQuery, calendarCommand, calendarQuery)
 
 	// Unprotected Routes
 	r.Group(func(r chi.Router) {
@@ -86,6 +86,8 @@ func main() {
 		// Events
 		r.Post("/calendars/{calendarId}/events", calendarHandler.CreateEvent)
 		r.Get("/calendars/{calendarId}/events", calendarHandler.ListGetEvents)
+		r.Get("/events/todays", calendarHandler.GetToday)
+		r.Get("/events/months", calendarHandler.GetByMonth)
 	})
 
 	// Start Serving

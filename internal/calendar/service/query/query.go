@@ -4,7 +4,6 @@ import (
 	"github.com/TokujouKaisenDonburi/optical-backend/internal/calendar/repository"
 )
 
-// Event
 type EventQuery struct {
 	eventRepository repository.EventRepository
 }
@@ -27,3 +26,4 @@ func NewCalendarQuery(calendarRepository repository.CalendarRepository) *Calenda
 		calendarRepository: calendarRepository,
 	}
 }
+

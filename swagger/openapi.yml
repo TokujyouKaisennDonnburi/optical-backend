@@ -6,9 +6,9 @@ info:
   version: 1.0.0
   description: API for Optical Backend
 tags:
-  users:
+  - name: users
     description: Users and authorization
-  calendars:
+  - name: calendars
     description: Calendars and events
 paths:
   /register:
@@ -166,6 +166,10 @@ paths:
           description: Internal server error
     get:
       summary: Get events from a calendar
+      tags: 
+        - calendars
+      security:
+        - bearerAuth: []
       parameters:
         - name: calendarId
           in: path
@@ -191,7 +195,7 @@ paths:
   /calendars/images:
     post:
       summary: Upload an image
-      tags: 
+      tags:
         - calendars
       security:
         - bearerAuth: []
@@ -216,6 +220,53 @@ paths:
           description: Invalid request
         '500':
           description: Internal server error
+  /events/todays:
+    get:
+      summary: Get today's events
+      tags:
+        - calendars
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Today's events retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EventTodayResponse'
+        '500':
+          description: Internal server error
+        '400':
+          description: Invalid request
+        '401':
+          description: Unauthorized
+  /events/months:
+     get:
+       summary: Get events by month
+       tags:
+         - calendars
+       security:
+         - bearerAuth: []
+       parameters:
+         - name: month
+           in: query
+           required: false
+           schema:
+             type: string
+             example: "2025-12"
+       responses:
+         '200':
+           description: Events retrieved successfully
+           content:
+             application/json:
+               schema:
+                 $ref: '#/components/schemas/EventMonthResponse'
+         '500':
+           description: Internal server error
+         '400':
+           description: Invalid request
+         '401':
+           description: Unauthorized
 components:
   securitySchemes:
     bearerAuth:
@@ -433,9 +484,78 @@ components:
         id:
           type: string
           format: uuid
-securityDefinitions:
-  bearerAuth:
-    type: apiKey
-    in: header
-    name: Authorization
-    description: Enter your bearer token in the format **Bearer <token>**
+    EventTodayResponse:
+      type: object
+      properties:
+        date:
+          type: string
+          format: date
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/EventTodayResponseItem'
+    EventTodayResponseItem:
+      type: object
+      properties:
+        calendarId:
+          type: string
+        calendarName:
+          type: string
+        calendarColor:
+          type: string
+        id:
+          type: string
+        title:
+          type: string
+        color:
+          type: string
+        location:
+          type: string
+        memo:
+          type: string
+        startAt:
+          type: string
+          format: date-time
+        endAt:
+          type: string
+          format: date-time
+        isAllDay:
+          type: boolean
+    EventMonthResponse:
+      type: object
+      properties:
+        date:
+          type: string
+          format: date
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/EventMonthResponseItem'
+    EventMonthResponseItem:
+      type: object
+      properties:
+        calendarId:
+          type: string
+        calendarName:
+          type: string
+        calendarColor:
+          type: string
+        id:
+          type: string
+        title:
+          type: string
+        color:
+          type: string
+        location:
+          type: string
+        memo:
+          type: string
+        startAt:
+          type: string
+          format: date-time
+        endAt:
+          type: string
+          format: date-time
+        isAllDay:
+          type: boolean
+
