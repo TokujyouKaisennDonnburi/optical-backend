@@ -9,7 +9,11 @@ tags:
   - name: users
     description: Users and authorization
   - name: calendars
-    description: Calendars and events
+    description: Calendars
+  - name: members
+    description: Member management
+  - name: events
+    description: Events management
 paths:
   /register:
     post:
@@ -137,8 +141,8 @@ paths:
   /calendars/{calendarId}/events:
     post:
       summary: Create a new event
-      tags: 
-        - calendars
+      tags:
+        - events
       security:
         - bearerAuth: []
       parameters:
@@ -166,8 +170,8 @@ paths:
           description: Internal server error
     get:
       summary: Get events from a calendar
-      tags: 
-        - calendars
+      tags:
+        - events
       security:
         - bearerAuth: []
       parameters:
@@ -224,7 +228,7 @@ paths:
     get:
       summary: Get today's events
       tags:
-        - calendars
+        - events
       security:
         - bearerAuth: []
       responses:
@@ -244,7 +248,7 @@ paths:
      get:
        summary: Get events by month
        tags:
-         - calendars
+         - events
        security:
          - bearerAuth: []
        parameters:
@@ -271,7 +275,7 @@ paths:
     post:
       summary: Add a member to a calendar
       tags:
-        - calendars
+        - members
       security:
         - bearerAuth: []
       parameters:
@@ -298,7 +302,7 @@ paths:
       summary: Join a calendar as an invited member
       description: Allows an invited user to join a calendar. The user must have been previously invited.
       tags:
-        - calendars
+        - members
       security:
         - bearerAuth: []
       parameters:
@@ -317,7 +321,7 @@ paths:
       summary: Reject a calendar invitation
       description: Allows an invited user to reject a calendar invitation. Only pending invitations (not yet joined) can be rejected.
       tags:
-        - calendars
+        - members
       security:
         - bearerAuth: []
       parameters:
