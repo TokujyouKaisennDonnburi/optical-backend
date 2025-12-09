@@ -482,7 +482,7 @@ components:
           example: memo-example
         color:
           type: string
-          example: 112233
+          example: ""
         location:
           type: string
           example: location-example
