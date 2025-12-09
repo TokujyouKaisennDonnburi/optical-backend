@@ -36,15 +36,6 @@ func (h *CalendarHttpHandler) CreateMembers(w http.ResponseWriter, r *http.Reque
 		_ = render.Render(w, r, apperr.ErrInvalidRequest(err))
 		return
 	}
-	err = h.calendarCommand.CreateMember(r.Context(), command.MemberCreateInput{
-		UserId:     userId,
-		CalendarId: calendarId,
-		Emails:     request.Email,
-	})
-	if err != nil {
-		_ = render.Render(w, r, apperr.ErrInvalidRequest(err))
-		return
-	}
 	// input
 	err = h.calendarCommand.CreateMember(r.Context(), command.MemberCreateInput{
 		UserId:     userId,
