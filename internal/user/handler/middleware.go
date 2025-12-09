@@ -51,9 +51,20 @@ func (m *UserAuthMiddleware) JWTAuthorization(next http.Handler) http.Handler {
 				_ = render.Render(w, r, apperr.ErrInternalServerError(err))
 			}
 		}
+		// ユーザーIDを取得
+		name, ok := claims["name"]
+		if !ok {
+			_ = render.Render(w, r, apperr.ErrUnauthorized(errors.New("name not found")))
+			return
+		}
+		userName, ok := name.(string)
+		if !ok {
+			_ = render.Render(w, r, apperr.ErrUnauthorized(errors.New("name is invalid")))
+			return
+		}
 		// コンテキストに含めてエンドポイントに渡す
 		ctx := context.WithValue(r.Context(), auth.USER_ID_CONTEXT_KEY, userId)
+		ctx = context.WithValue(ctx, auth.USER_NAME_CONTEXT_KEY, userName)
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }
-

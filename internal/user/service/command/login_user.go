@@ -35,7 +35,7 @@ func (c *UserCommand) LoginUser(ctx context.Context, input UserLoginInput) (*Use
 		return nil, errors.New("password is incorrect")
 	}
 	// アクセストークン発行
-	accessToken, err := user.NewAccessToken(loginUser.Id)
+	accessToken, err := user.NewAccessToken(loginUser.Id, loginUser.Name)
 	if err != nil {
 		return nil, err
 	}

@@ -33,7 +33,7 @@ func (u UserCommand) Refresh(ctx context.Context, input TokenRefreshInput) (*Tok
 		return nil, err
 	}
 	// アクセストークン発行
-	accessToken, err := user.NewAccessToken(refreshToken.UserId)
+	accessToken, err := user.NewAccessToken(refreshToken.UserId, refreshToken.UserName)
 	if err != nil {
 		return nil, err
 	}

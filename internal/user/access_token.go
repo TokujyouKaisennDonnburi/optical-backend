@@ -20,11 +20,12 @@ type AccessToken struct {
 	ExpiresIn time.Time
 }
 
-func NewAccessToken(userId uuid.UUID) (*AccessToken, error) {
+func NewAccessToken(userId uuid.UUID, userName string) (*AccessToken, error) {
 	exp := time.Now().Add(time.Second * time.Duration(ACCESS_TOKEN_EXPIRE))
 	claims := jwt.MapClaims{
-		"sub": userId.String(),
-		"exp": exp.Unix(),
+		"sub":  userId.String(),
+		"name": userName,
+		"exp":  exp.Unix(),
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	signedStr, err := token.SignedString(getJwtSecretKey())
@@ -45,6 +46,7 @@ func (at *AccessToken) IsExpired() bool {
 type RefreshToken struct {
 	Id        uuid.UUID
 	UserId    uuid.UUID
+	UserName  string
 	Token     string
 	ExpiresIn time.Time
 }
@@ -53,9 +55,10 @@ func NewRefreshToken(user *User) (*RefreshToken, error) {
 	tokenId := uuid.New()
 	exp := time.Now().Add(time.Second * time.Duration(REFRESH_TOKEN_EXPIRE))
 	claims := jwt.MapClaims{
-		"sub": user.Id.String(),
-		"tid": tokenId.String(),
-		"exp": exp.Unix(),
+		"sub":  user.Id.String(),
+		"name": user.Name,
+		"tid":  tokenId.String(),
+		"exp":  exp.Unix(),
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	signedStr, err := token.SignedString(getJwtSecretKey())
@@ -65,6 +68,7 @@ func NewRefreshToken(user *User) (*RefreshToken, error) {
 	return &RefreshToken{
 		Id:        tokenId,
 		UserId:    user.Id,
+		UserName:  user.Name,
 		Token:     signedStr,
 		ExpiresIn: exp,
 	}, nil
@@ -91,6 +95,14 @@ func DecodeRefreshToken(refreshToken string) (*RefreshToken, error) {
 	if err != nil {
 		return nil, err
 	}
+	name, ok := claims["name"]
+	if !ok {
+		return nil, errors.New("tid does not exist.")
+	}
+	userName, ok := name.(string)
+	if !ok {
+		return nil, errors.New("invalid userName.")
+	}
 	tid, ok := claims["tid"]
 	if !ok {
 		return nil, errors.New("tid does not exist.")
@@ -108,9 +120,10 @@ func DecodeRefreshToken(refreshToken string) (*RefreshToken, error) {
 		return nil, err
 	}
 	return &RefreshToken{
-		Id: tidUuid,
-		UserId: userId,
-		Token: refreshToken,
+		Id:        tidUuid,
+		UserId:    userId,
+		UserName:  userName,
+		Token:     refreshToken,
 		ExpiresIn: exp.Time,
 	}, nil
 }

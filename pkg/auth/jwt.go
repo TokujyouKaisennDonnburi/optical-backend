@@ -10,6 +10,7 @@ import (
 
 const (
 	USER_ID_CONTEXT_KEY = "userId"
+	USER_NAME_CONTEXT_KEY = "userName"
 )
 
 func GetUserIdFromContext(r *http.Request) (uuid.UUID, error) {
@@ -20,6 +21,16 @@ func GetUserIdFromContext(r *http.Request) (uuid.UUID, error) {
 		return uuid.Nil, errors.New("invalid jwt context")
 	}
 	return uuid.Parse(uidStr)
+}
+
+func GetUserNameFromContext(r *http.Request) (string, error) {
+	// IDを取得
+ 	name := r.Context().Value(USER_NAME_CONTEXT_KEY)
+	nameStr, ok := name.(string)
+	if !ok {
+		return "", errors.New("invalid jwt context")
+	}
+	return nameStr, nil
 }
 
 // JWTの暗号化鍵
