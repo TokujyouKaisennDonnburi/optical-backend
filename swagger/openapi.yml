@@ -329,6 +329,9 @@ components:
           type: string
         color:
           type: string
+        imageUrl:
+          type: string
+          nullable: true
     EventCreateRequest:
       type: object
       required:
