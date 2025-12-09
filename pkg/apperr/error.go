@@ -49,3 +49,11 @@ func ForbiddenError(message string) error {
 		Message:    message,
 	}
 }
+
+func NotFoundError(message string) error {
+	return &AppError{
+		StatusCode: http.StatusNotFound,
+		Message:    message,
+	}
+}
+

@@ -5,6 +5,7 @@ import (
 	"errors"
 
 	"github.com/TokujouKaisenDonburi/optical-backend/internal/user"
+	"github.com/TokujouKaisenDonburi/optical-backend/pkg/apperr"
 	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
 	"github.com/lib/pq"
@@ -48,13 +49,35 @@ func (r *MemberPsqlRepository) Create(ctx context.Context, userId, calendarId uu
 	if err != nil {
 		return err
 	}
-	// 実行できている行数をとってくる
+	// 実行できている行数
 	rows, err := result.RowsAffected()
 	if err != nil {
 		return err
 	}
 	if rows == 0 {
 		return errors.New("already member or not member for me")
+	}
+	return nil
+}
+
+func (r *MemberPsqlRepository) Join(ctx context.Context, userId, calendarId uuid.UUID) error {
+	query := `
+	UPDATE calendar_members
+	SET joined_at = NOW()
+	WHERE user_id = $1
+	AND calendar_id = $2
+	AND joined_at IS NULL
+	`
+	result, err := r.db.ExecContext(ctx, query, userId, calendarId)
+	if err != nil {
+		return err
+	}
+	rows, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+	if rows == 0 {
+		return apperr.NotFoundError("not invited or already joined")
 	}
 	return nil
 }

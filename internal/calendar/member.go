@@ -28,3 +28,4 @@ func NewMember(userId uuid.UUID, name string) (*Member, error) {
 	}, nil
 }
 
+
