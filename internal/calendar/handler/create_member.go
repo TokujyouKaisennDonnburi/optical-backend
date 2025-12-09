@@ -42,7 +42,7 @@ func (h *CalendarHttpHandler) CreateMembers(w http.ResponseWriter, r *http.Reque
 		Emails:     request.Email,
 	})
 	if err != nil {
-		_ = render.Render(w, r, apperr.ErrInternalServerError(err))
+		_ = render.Render(w, r, apperr.ErrInvalidRequest(err))
 		return
 	}
 	// input
