@@ -9,5 +9,6 @@ import (
 type MemberRepository interface {
 	Create(ctx context.Context, userId, calendarId uuid.UUID, emails []user.Email)error
 	Join(ctx context.Context, userId, calendarId uuid.UUID)error
+	Reject(ctx context.Context, userId, calendarId uuid.UUID)error
 }
 

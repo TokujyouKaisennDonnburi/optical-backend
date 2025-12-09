@@ -82,3 +82,24 @@ func (r *MemberPsqlRepository) Join(ctx context.Context, userId, calendarId uuid
 	return nil
 }
 
+func (r *MemberPsqlRepository) Reject(ctx context.Context, userId, calendarId uuid.UUID) error {
+	query := `
+	DELETE FROM calendar_members
+	WHERE calendar_members.user_id = $1
+	AND calendar_members.calendar_id = $2
+	AND calendar_members.joined_at IS NULL
+	`
+	result, err := r.db.ExecContext(ctx, query, userId, calendarId)
+	if err != nil {
+		return err
+	}
+	rows, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+	if rows == 0 {
+		return errors.New("user or calendar or joined not found")
+	}
+	return nil
+}
+
