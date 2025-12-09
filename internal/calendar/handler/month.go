@@ -6,8 +6,8 @@ import (
 
 	"github.com/TokujouKaisenDonburi/optical-backend/internal/calendar/service/query"
 	"github.com/TokujouKaisenDonburi/optical-backend/internal/calendar/service/query/output"
-	"github.com/TokujouKaisenDonburi/optical-backend/internal/user/handler"
 	"github.com/TokujouKaisenDonburi/optical-backend/pkg/apperr"
+	"github.com/TokujouKaisenDonburi/optical-backend/pkg/auth"
 	"github.com/go-chi/render"
 )
 
@@ -31,7 +31,7 @@ type EventMonthResponseItem struct {
 }
 
 func (h *CalendarHttpHandler) GetByMonth(w http.ResponseWriter, r *http.Request) {
-	userId, err := handler.GetUserIdFromContext(r)
+	userId, err := auth.GetUserIdFromContext(r)
 	if err != nil {
 		err = render.Render(w, r, apperr.ErrInternalServerError(err))
 		if err != nil {

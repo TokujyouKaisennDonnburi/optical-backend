@@ -6,8 +6,8 @@ import (
 	"net/http"
 
 	"github.com/TokujouKaisenDonburi/optical-backend/internal/calendar/service/query"
-	"github.com/TokujouKaisenDonburi/optical-backend/internal/user/handler"
 	"github.com/TokujouKaisenDonburi/optical-backend/pkg/apperr"
+	"github.com/TokujouKaisenDonburi/optical-backend/pkg/auth"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
 	"github.com/google/uuid"
@@ -29,7 +29,7 @@ type ListGetEventResponse struct {
 // GET /calendars/{calendarId}/events
 func (h *CalendarHttpHandler) ListGetEvents(w http.ResponseWriter, r *http.Request) {
 	// 1. JWTからuserIDを取得
-	userId, err := handler.GetUserIdFromContext(r)
+	userId, err := auth.GetUserIdFromContext(r)
 	if err != nil {
 		_ = render.Render(w, r, apperr.ErrInternalServerError(err))
 		return
