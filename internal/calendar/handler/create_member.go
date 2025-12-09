@@ -14,36 +14,34 @@ import (
 )
 
 type MemberCreateRequest struct {
-	Email      []string    `json:"email"`
+	Email []string `json:"email"`
 }
-
 
 func (h *CalendarHttpHandler) CreateMembers(w http.ResponseWriter, r *http.Request) {
 	// UserId
 	userId, err := handler.GetUserIdFromContext(r)
 	if err != nil {
-		_ = render.Render(w,r,apperr.ErrInternalServerError(err))
+		_ = render.Render(w, r, apperr.ErrInternalServerError(err))
 		return
 	}
 	// CalendarId
-	calendarId, err := uuid.Parse(chi.URLParam(r,"calendarId"))
+	calendarId, err := uuid.Parse(chi.URLParam(r, "calendarId"))
 	if err != nil {
-		_ = render.Render(w,r,apperr.ErrInternalServerError(err))
+		_ = render.Render(w, r, apperr.ErrInvalidRequest(err))
 		return
 	}
 	// Email
 	var request MemberCreateRequest
 	err = json.NewDecoder(r.Body).Decode(&request)
 	if err != nil {
-		_ = render.Render(w,r,apperr.ErrInvalidRequest(err))
+		_ = render.Render(w, r, apperr.ErrInvalidRequest(err))
 		return
 	}
 	emails, err := user.NewEmails(request.Email)
 	if err != nil {
-		_ = render.Render(w,r,apperr.ErrInvalidRequest(err))
+		_ = render.Render(w, r, apperr.ErrInvalidRequest(err))
 		return
 	}
-	// loop create
 		err = h.calendarCommand.CreateMember(r.Context(), command.MemberCreateInput{
 			UserId:     userId,
 			CalendarId: calendarId,
@@ -53,5 +51,15 @@ func (h *CalendarHttpHandler) CreateMembers(w http.ResponseWriter, r *http.Reque
 			_ = render.Render(w,r,apperr.ErrInternalServerError(err))
 			return
 		}
+	// input
+	err = h.calendarCommand.CreateMember(r.Context(), command.MemberCreateInput{
+		UserId:     userId,
+		CalendarId: calendarId,
+		Emails:     emails,
+	})
+	if err != nil {
+		_ = render.Render(w, r, apperr.ErrInternalServerError(err))
+		return
+	}
 	w.WriteHeader(http.StatusNoContent)
 }
