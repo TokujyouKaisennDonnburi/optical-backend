@@ -5,7 +5,6 @@ import (
 	"net/http"
 
 	"github.com/TokujouKaisenDonburi/optical-backend/internal/calendar/service/command"
-	"github.com/TokujouKaisenDonburi/optical-backend/internal/user"
 	"github.com/TokujouKaisenDonburi/optical-backend/internal/user/handler"
 	"github.com/TokujouKaisenDonburi/optical-backend/pkg/apperr"
 	"github.com/go-chi/chi/v5"
@@ -50,7 +49,7 @@ func (h *CalendarHttpHandler) CreateMembers(w http.ResponseWriter, r *http.Reque
 	err = h.calendarCommand.CreateMember(r.Context(), command.MemberCreateInput{
 		UserId:     userId,
 		CalendarId: calendarId,
-		Emails:     emails,
+		Emails:     request.Email,
 	})
 	if err != nil {
 		_ = render.Render(w, r, apperr.ErrInternalServerError(err))
