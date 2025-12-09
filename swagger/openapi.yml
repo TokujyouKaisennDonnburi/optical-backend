@@ -313,6 +313,27 @@ paths:
           description: Successfully joined the calendar
         '500':
           description: Not invited or already joined
+    delete:
+      summary: Reject a calendar invitation
+      description: Allows an invited user to reject a calendar invitation. Only pending invitations (not yet joined) can be rejected.
+      tags:
+        - calendars
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: calendarId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Successfully rejected the invitation
+        '400':
+          description: Invalid calendarId format
+        '500':
+          description: Internal server error
 components:
   securitySchemes:
     bearerAuth:
