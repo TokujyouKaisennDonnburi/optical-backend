@@ -295,7 +295,7 @@ paths:
           description: Invalid request
         '500':
           description: Internal server error
-    put:
+    patch:
       summary: Join a calendar as an invited member
       description: Allows an invited user to join a calendar. The user must have been previously invited.
       tags:

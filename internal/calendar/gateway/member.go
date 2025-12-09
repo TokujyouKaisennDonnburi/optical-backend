@@ -2,6 +2,7 @@ package gateway
 
 import (
 	"context"
+	"database/sql"
 	"errors"
 
 	"github.com/TokujouKaisenDonburi/optical-backend/internal/user"

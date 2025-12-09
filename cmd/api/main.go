@@ -34,7 +34,7 @@ func main() {
 	r.Use(middleware.Logger)
 	r.Use(cors.Handler(cors.Options{
 		AllowedOrigins:   []string{"http://localhost:3000", "https://tokujyoukaisenndonnburi.github.io" },
-		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowedMethods:   []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
 		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
 		AllowCredentials: false,
 		MaxAge:           300,
@@ -86,7 +86,7 @@ func main() {
 
 		// Members
 		r.Post("/calendars/{calendarId}/members", calendarHandler.CreateMembers)
-		r.Put("/calendars/{calendarId}/members", calendarHandler.JoinMember)
+		r.Patch("/calendars/{calendarId}/members", calendarHandler.JoinMember)
 
 		// Events
 		r.Post("/calendars/{calendarId}/events", calendarHandler.CreateEvent)
