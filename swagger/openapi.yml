@@ -601,7 +601,6 @@ components:
           items:
             type: string
             format: email
-          example: member@example.com
           example:
             - optical-user1@example.com
             - optical-user2@example.com
