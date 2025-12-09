@@ -91,7 +91,10 @@ func (r *CalendarPsqlRepository) Create(
 			calendarMemberMaps = append(calendarMemberMaps, map[string]any{
 				"calendarId": calendar.Id,
 				"userId":     member.UserId,
-				"joinedAt":   member.JoinedAt,
+				"joinedAt": sql.NullTime{
+					Time:  member.JoinedAt,
+					Valid: !member.JoinedAt.IsZero(),
+				},
 			})
 		}
 		_, err = tx.NamedExecContext(ctx, query, calendarMemberMaps)
