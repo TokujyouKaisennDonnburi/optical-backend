@@ -511,6 +511,9 @@ components:
         id:
           type: string
           format: uuid
+        url:
+          type: string
+          format: url
     EventTodayResponse:
       type: object
       properties:

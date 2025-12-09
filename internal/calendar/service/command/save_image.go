@@ -9,10 +9,11 @@ import (
 	"github.com/google/uuid"
 
 	"github.com/TokujouKaisenDonburi/optical-backend/internal/calendar"
+	"github.com/TokujouKaisenDonburi/optical-backend/pkg/storage"
 )
 
 const (
-	MAX_IMAGE_SIZE = 20_000_000 // 20MB
+	MAX_IMAGE_SIZE  = 20_000_000 // 20MB
 	VALID_IMAGE_EXT = "png,jpg,jpeg"
 )
 
@@ -22,7 +23,8 @@ type SaveImageCommandInput struct {
 }
 
 type SaveImageCommandOutput struct {
-	Id uuid.UUID
+	Id  uuid.UUID
+	Url string
 }
 
 // 画像をアップロードしてURLを保存する
@@ -31,7 +33,7 @@ func (c *CalendarCommand) SaveImage(ctx context.Context, input SaveImageCommandI
 		return nil, errors.New("Image size is invalid")
 	}
 	found := false
-	for ext := range strings.SplitSeq(VALID_IMAGE_EXT, ","){
+	for ext := range strings.SplitSeq(VALID_IMAGE_EXT, ",") {
 		if strings.HasSuffix(input.Header.Filename, ext) {
 			found = true
 			break
@@ -45,7 +47,7 @@ func (c *CalendarCommand) SaveImage(ctx context.Context, input SaveImageCommandI
 	if err != nil {
 		return nil, err
 	}
-	input.Header.Filename = image.Id.String()+".png"
+	input.Header.Filename = image.Id.String() + ".png"
 	// 画像をアップロードする
 	url, err := c.imageRepository.Upload(ctx, input.File, input.Header)
 	if err != nil {
@@ -59,6 +61,7 @@ func (c *CalendarCommand) SaveImage(ctx context.Context, input SaveImageCommandI
 		return nil, err
 	}
 	return &SaveImageCommandOutput{
-		Id: image.Id,
+		Id:  image.Id,
+		Url: storage.GetImageStorageBaseUrl() + "/" + image.Url,
 	}, nil
 }

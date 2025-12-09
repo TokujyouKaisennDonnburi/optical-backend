@@ -10,7 +10,8 @@ import (
 )
 
 type SaveImageResponse struct {
-	Id uuid.UUID `json:"id"`
+	Id  uuid.UUID `json:"id"`
+	Url string    `json:"url"`
 }
 
 func (h *CalendarHttpHandler) UploadImage(w http.ResponseWriter, r *http.Request) {
@@ -32,6 +33,7 @@ func (h *CalendarHttpHandler) UploadImage(w http.ResponseWriter, r *http.Request
 		return
 	}
 	render.JSON(w, r, SaveImageResponse{
-		Id: output.Id,
+		Id:  output.Id,
+		Url: output.Url,
 	})
 }
