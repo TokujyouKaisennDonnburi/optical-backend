@@ -5,6 +5,7 @@ import (
 	"unicode/utf8"
 
 	"github.com/TokujouKaisenDonburi/optical-backend/internal/option"
+	"github.com/TokujouKaisenDonburi/optical-backend/pkg/apperr"
 	"github.com/google/uuid"
 )
 
@@ -16,13 +17,13 @@ const (
 type Calendar struct {
 	Id      uuid.UUID
 	Name    string
-	Color   string
+	Color   Color
 	Image   Image
 	Members []Member
 	Options []option.Option
 }
 
-func NewCalendar(name, color string, image Image, members []Member, options []option.Option) (*Calendar, error) {
+func NewCalendar(name string, color Color, image Image, members []Member, options []option.Option) (*Calendar, error) {
 	id, err := uuid.NewV7()
 	if err != nil {
 		return nil, err
@@ -31,8 +32,8 @@ func NewCalendar(name, color string, image Image, members []Member, options []op
 	if nameLength < MIN_CALENDAR_NAME_LEN || nameLength > MAX_CALENDAR_NAME_LEN {
 		return nil, errors.New("Calendar `name` is invalid")
 	}
-	if utf8.RuneCountInString(color) != 6 {
-		return nil, errors.New("Calendar `color` is invalid")
+	if len(members) == 0 {
+		return nil, apperr.ValidationError("Calendar `members` is empty")
 	}
 	return &Calendar{
 		Id:      id,
