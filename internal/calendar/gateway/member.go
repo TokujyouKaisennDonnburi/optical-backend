@@ -5,6 +5,7 @@ import (
 	"errors"
 
 	"github.com/TokujouKaisenDonburi/optical-backend/internal/user"
+	"github.com/TokujouKaisenDonburi/optical-backend/pkg/apperr"
 	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
 	"github.com/lib/pq"
@@ -76,7 +77,7 @@ func (r *MemberPsqlRepository) Join(ctx context.Context, userId, calendarId uuid
 		return err
 	}
 	if rows == 0 {
-		return errors.New("not invited or already joined")
+		return apperr.NotFoundError("not invited or already joined")
 	}
 	return nil
 }
