@@ -3,7 +3,6 @@ package gateway
 import (
 	"context"
 	"database/sql"
-	"fmt"
 
 	"github.com/TokujouKaisenDonburi/optical-backend/internal/calendar"
 	"github.com/TokujouKaisenDonburi/optical-backend/internal/calendar/service/query/output"
@@ -46,8 +45,6 @@ func (r *CalendarPsqlRepository) Create(
 		if err != nil {
 			return err
 		}
-		fmt.Println("members")
-		fmt.Println(users)
 		// メンバーリスト作成
 		members := make([]calendar.Member, len(users))
 		for i, user := range users {
