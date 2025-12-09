@@ -220,7 +220,6 @@ paths:
           description: Invalid request
         '500':
           description: Internal server error
-<<<<<<< HEAD
   /events/todays:
     get:
       summary: Get today's events
