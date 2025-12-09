@@ -192,6 +192,32 @@ paths:
           description: Forbidden - Calendar does not belong to user
         '500':
           description: Internal server error
+  /calendars/{calendarId}/events/{eventId}:
+    patch:
+      summary: Update an event
+      tags: 
+        - calendars
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: eventId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EventUpdateRequest'
+      responses:
+        '204':
+          description: Event updated successfully
+        '400':
+          description: Invalid request
+        '500':
+          description: Internal server error
   /calendars/images:
     post:
       summary: Upload an image
@@ -442,12 +468,16 @@ components:
       properties:
         title:
           type: string
+          example: title-example
         memo:
           type: string
+          example: memo-example
         color:
           type: string
+          example: 112233
         location:
           type: string
+          example: location-example
         startTime:
           type: string
           format: date-time
@@ -556,16 +586,33 @@ components:
           type: string
         title:
           type: string
-        color:
+    EventUpdateRequest:
+      type: object
+      required:
+        - title
+        - memo
+        - color
+        - location
+        - startTime
+        - endTime
+        - isAllDay
+      properties:
+        title:
           type: string
-        location:
-          type: string
+          example: title-example
         memo:
           type: string
-        startAt:
+          example: memo-example
+        color:
+          type: string
+          example: 112233
+        location:
+          type: string
+          example: location-example
+        startTime:
           type: string
           format: date-time
-        endAt:
+        endTime:
           type: string
           format: date-time
         isAllDay:
@@ -607,12 +654,6 @@ components:
           format: date-time
         isAllDay:
           type: boolean
-    securityDefinitions:
-      bearerAuth:
-        type: apiKey
-        in: header
-        name: Authorization
-        description: Enter your bearer token in the format **Bearer <token>**
     MemberCreateRequest:
       type: object
       required:
@@ -626,4 +667,3 @@ components:
           example:
             - optical-user1@example.com
             - optical-user2@example.com
-
