@@ -29,10 +29,10 @@ func NewCalendarPsqlRepository(db *sqlx.DB) *CalendarPsqlRepository {
 // スケジュールを新規作成する
 func (r *CalendarPsqlRepository) Create(
 	ctx context.Context,
-	imageId uuid.UUID,
+	userId, imageId uuid.UUID,
 	memberEmails []string,
-	optionIds []uuid.UUID,
 	createFn func(image *calendar.Image, members []calendar.Member, options []option.Option) (*calendar.Calendar, error),
+	optionIds []int,
 ) error {
 	return db.RunInTx(r.db, func(tx *sqlx.Tx) error {
 		// オプション取得

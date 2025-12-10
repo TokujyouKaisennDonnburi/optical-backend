@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"net/http"
+	"strconv"
 
 	"github.com/TokujouKaisenDonburi/optical-backend/internal/calendar/service/command"
 	"github.com/TokujouKaisenDonburi/optical-backend/pkg/apperr"
@@ -43,9 +44,9 @@ func (h *CalendarHttpHandler) CreateCalendar(w http.ResponseWriter, r *http.Requ
 		_ = render.Render(w, r, apperr.ErrInvalidRequest(err))
 		return
 	}
-	optionIds := []uuid.UUID{}
+	optionIds := []int{}
 	for _, id := range request.OptionIds {
-		optionId, err := uuid.Parse(id)
+		optionId, err := strconv.Atoi(id)
 		if err != nil {
 			_ = render.Render(w, r, apperr.ErrInvalidRequest(err))
 			return

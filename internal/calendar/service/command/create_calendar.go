@@ -16,7 +16,7 @@ type CalendarCreateInput struct {
 	CalendarColor string
 	MemberEmails  []string
 	ImageId       uuid.UUID
-	OptionIds     []uuid.UUID
+	OptionIds     []int
 }
 
 type CalendarCreateOutput struct {
