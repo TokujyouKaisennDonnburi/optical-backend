@@ -98,7 +98,7 @@ func (r *MemberPsqlRepository) Reject(ctx context.Context, userId, calendarId uu
 		return err
 	}
 	if rows == 0 {
-		return errors.New("user or calendar or joined not found")
+		return apperr.NotFoundError("user or calendar or joined not found")
 	}
 	return nil
 }

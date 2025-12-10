@@ -30,7 +30,7 @@ func (h *CalendarHttpHandler) RejectMember(w http.ResponseWriter, r *http.Reques
 		CalendarId: calendarId,
 	})
 	if err != nil {
-		_ = render.Render(w, r, apperr.ErrInternalServerError(err))
+		apperr.HandleAppError(w,r,err)
 		return
 	}
 	w.WriteHeader(http.StatusNoContent)
