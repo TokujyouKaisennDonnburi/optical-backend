@@ -31,7 +31,8 @@ func (h *UserHttpHandler) GetMe(w http.ResponseWriter, r *http.Request) {
 		UserId: userId,
 	})
 	if err != nil {
-		_ = render.Render(w, r, apperr.ErrInternalServerError(err))
+		apperr.HandleAppError(w,r,err)
+		return
 	}
 	render.JSON(w, r, UserResponse{
 		Id: output.Id.String(),

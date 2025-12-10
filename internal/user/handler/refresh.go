@@ -25,10 +25,7 @@ func (h UserHttpHandler) Refresh(w http.ResponseWriter, r *http.Request) {
 	// リクエスト取得
 	err := json.NewDecoder(r.Body).Decode(&request)
 	if err != nil {
-		err = render.Render(w, r, apperr.ErrInvalidRequest(err))
-		if err != nil {
-			_ = render.Render(w, r, apperr.ErrInternalServerError(err))
-		}
+		_ = render.Render(w, r, apperr.ErrInvalidRequest(err))
 		return
 	}
 	// トークンをリフレッシュ

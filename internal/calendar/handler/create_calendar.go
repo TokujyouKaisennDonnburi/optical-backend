@@ -62,7 +62,7 @@ func (h *CalendarHttpHandler) CreateCalendar(w http.ResponseWriter, r *http.Requ
 		OptionIds:     request.OptionIds,
 	})
 	if err != nil {
-		_ = render.Render(w, r, apperr.ErrInternalServerError(err))
+		apperr.HandleAppError(w,r,err)
 		return
 	}
 	// レスポンスに変換

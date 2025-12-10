@@ -34,10 +34,7 @@ func (h *UserHttpHandler) Create(w http.ResponseWriter, r *http.Request) {
 	// リクエスト取得
 	err := json.NewDecoder(r.Body).Decode(&request)
 	if err != nil {
-		err = render.Render(w, r, apperr.ErrInvalidRequest(err))
-		if err != nil {
-			_ = render.Render(w, r, apperr.ErrInternalServerError(err))
-		}
+		_ = render.Render(w, r, apperr.ErrInvalidRequest(err))
 		return
 	}
 	// ユーザー作成
@@ -47,7 +44,7 @@ func (h *UserHttpHandler) Create(w http.ResponseWriter, r *http.Request) {
 		Password: request.Password,
 	})
 	if err != nil {
-		_ = render.Render(w, r, apperr.ErrInternalServerError(err))
+		apperr.HandleAppError(w,r,err)
 		return
 	}
 	// レスポンス書き込み

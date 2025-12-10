@@ -35,20 +35,14 @@ func (h *CalendarHttpHandler) CreateEvent(w http.ResponseWriter, r *http.Request
 	}
 	calendarId, err := uuid.Parse(chi.URLParam(r, "calendarId"))
 	if err != nil {
-		err = render.Render(w, r, apperr.ErrInvalidRequest(err))
-		if err != nil {
-			_ = render.Render(w, r, apperr.ErrInternalServerError(err))
-		}
+		_ = render.Render(w, r, apperr.ErrInvalidRequest(err))
 		return
 	}
 	var request EventCreateRequest
 	// リクエストJSONをバインド
 	err = json.NewDecoder(r.Body).Decode(&request)
 	if err != nil {
-		err = render.Render(w, r, apperr.ErrInvalidRequest(err))
-		if err != nil {
-			_ = render.Render(w, r, apperr.ErrInternalServerError(err))
-		}
+		_ = render.Render(w, r, apperr.ErrInvalidRequest(err))
 		return
 	}
 	output, err := h.eventCommand.Create(r.Context(), command.EventCreateInput{
@@ -63,7 +57,7 @@ func (h *CalendarHttpHandler) CreateEvent(w http.ResponseWriter, r *http.Request
 		IsAllDay:   request.IsAllDay,
 	})
 	if err != nil {
-		_ = render.Render(w, r, apperr.ErrInternalServerError(err))
+		apperr.HandleAppError(w,r,err)
 		return
 	}
 	render.JSON(w, r, EventCreateResponse{

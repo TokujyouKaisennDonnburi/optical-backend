@@ -17,10 +17,7 @@ type SaveImageResponse struct {
 func (h *CalendarHttpHandler) UploadImage(w http.ResponseWriter, r *http.Request) {
 	file, header, err := r.FormFile("image")
 	if err != nil {
-		err = render.Render(w, r, apperr.ErrInvalidRequest(err))
-		if err != nil {
-			_ = render.Render(w, r, apperr.ErrInternalServerError(err))
-		}
+		_ = render.Render(w, r, apperr.ErrInvalidRequest(err))
 		return
 	}
 	defer file.Close()
