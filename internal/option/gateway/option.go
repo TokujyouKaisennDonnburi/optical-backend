@@ -6,7 +6,6 @@ import (
 	"github.com/TokujouKaisenDonburi/optical-backend/internal/option"
 	"github.com/TokujouKaisenDonburi/optical-backend/pkg/db"
 	"github.com/TokujouKaisenDonburi/optical-backend/pkg/psql"
-	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
 )
 
@@ -23,7 +22,7 @@ func NewOptionPsqlRepository(db *sqlx.DB) *OptionPsqlRepository {
 	}
 }
 
-func (r *OptionPsqlRepository) FindByIds(ctx context.Context, ids []uuid.UUID) ([]option.Option, error) {
+func (r *OptionPsqlRepository) FindByIds(ctx context.Context, ids []int) ([]option.Option, error) {
 	var err error
 	var options []option.Option
 	err = db.RunInTx(r.db, func(tx *sqlx.Tx) error {
