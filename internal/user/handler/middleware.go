@@ -24,7 +24,7 @@ func (m *UserAuthMiddleware) JWTAuthorization(next http.Handler) http.Handler {
 		// ヘッダーからトークンを取得
 		authorizationHeader := r.Header.Get("Authorization")
 		if !strings.HasPrefix(authorizationHeader, "Bearer ") {
-			render.Render(w, r, apperr.ErrUnauthorized(errors.New("Authorization header is invalid")))
+			_ = render.Render(w, r, apperr.ErrUnauthorized(errors.New("Authorization header is invalid")))
 			return
 		}
 		authorizationHeader = strings.TrimPrefix(authorizationHeader, "Bearer ")
@@ -41,6 +41,7 @@ func (m *UserAuthMiddleware) JWTAuthorization(next http.Handler) http.Handler {
 		userId, err := claims.GetSubject()
 		if err != nil {
 			_  = render.Render(w, r, apperr.ErrUnauthorized(err))
+			return
 		}
 		// ユーザーIDを取得
 		name, ok := claims["name"]
