@@ -87,6 +87,7 @@ func main() {
 		// Members
 		r.Post("/calendars/{calendarId}/members", calendarHandler.CreateMembers)
 		r.Patch("/calendars/{calendarId}/members", calendarHandler.JoinMember)
+		r.Delete("/calendars/{calendarId}/members", calendarHandler.RejectMember)
 
 		// Events
 		r.Post("/calendars/{calendarId}/events", calendarHandler.CreateEvent)
