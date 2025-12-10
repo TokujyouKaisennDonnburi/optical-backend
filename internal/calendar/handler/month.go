@@ -22,7 +22,6 @@ type EventMonthResponseItem struct {
 	CalendarColor string    `json:"calendarColor"`
 	Id            string    `json:"id"`
 	Title         string    `json:"title"`
-	Color         string    `json:"color"`
 	Location      string    `json:"location"`
 	Memo          string    `json:"memo"`
 	StartAt       time.Time `json:"startAt"`
@@ -63,7 +62,6 @@ func (h *CalendarHttpHandler) GetByMonth(w http.ResponseWriter, r *http.Request)
 			CalendarColor: item.CalendarColor,
 			Id:            item.Id.String(),
 			Title:         item.Title,
-			Color:         item.Color,
 			Location:      item.Location,
 			Memo:          item.Memo,
 			StartAt:       item.StartAt,

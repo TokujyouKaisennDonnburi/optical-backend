@@ -29,9 +29,10 @@ func (r *EventPsqlRepository) ListEventsByCalendarId(
 	calendarId uuid.UUID,
 ) ([]output.EventQueryOutput, error) {
 	query := `
-		SELECT e.id, e.calendar_id, e.title, e.memo, e.color, COALESCE(el.location, '') as location, e.all_day, e.start_at, e.end_at, e.created_at
+		SELECT e.id, e.calendar_id, e.title, e.memo, c.color, COALESCE(el.location, '') as location, e.all_day, e.start_at, e.end_at, e.created_at
 		FROM events e
-		LEFT JOIN event_locations el ON e.id = el.event_id
+		JOIN event_locations el ON e.id = el.event_id
+		JOIN calendars c ON e.calendar_id = c.id
 		WHERE e.calendar_id = $1
 			AND e.deleted_at IS NULL -- 論理削除されていないもののみ取得
 		ORDER BY e.start_at ASC
@@ -96,7 +97,6 @@ type EventTodayQueryModel struct {
 	CalendarColor string    `db:"calendar_color"`
 	EventId       uuid.UUID `db:"event_id"`
 	EventTitle    string    `db:"event_title"`
-	EventColor    string    `db:"event_color"`
 	Location      string    `db:"location"`
 	Memo          string    `db:"memo"`
 	StartAt       time.Time `db:"start_at"`
@@ -112,7 +112,7 @@ func (r *EventPsqlRepository) GetEventsByDate(
 	query := `
 		SELECT 
 			calendars.id AS calendar_id, calendars.name AS calendar_name, calendars.color AS calendar_color,
-			events.id AS event_id, events.title AS event_title, events.color AS event_color, location, memo, start_at, end_at, all_day
+			events.id AS event_id, events.title AS event_title, location, memo, start_at, end_at, all_day
 		FROM events
 		JOIN event_locations
 			ON events.id = event_locations.event_id
@@ -144,7 +144,6 @@ func (r *EventPsqlRepository) GetEventsByDate(
 			CalendarColor: model.CalendarColor,
 			Id:            model.EventId,
 			Title:         model.EventTitle,
-			Color:         model.EventColor,
 			Location:      model.Location,
 			Memo:          model.Memo,
 			StartAt:       model.StartAt,
@@ -164,7 +163,7 @@ func (r *EventPsqlRepository) GetEventsByMonth(
 	query := `
 		SELECT 
 			calendars.id AS calendar_id, calendars.name AS calendar_name, calendars.color AS calendar_color,
-			events.id AS event_id, events.title AS event_title, events.color AS event_color, location, memo, start_at, end_at, all_day
+			events.id AS event_id, events.title AS event_title, location, memo, start_at, end_at, all_day
 		FROM events
 		JOIN event_locations
 			ON events.id = event_locations.event_id
@@ -198,7 +197,6 @@ func (r *EventPsqlRepository) GetEventsByMonth(
 			CalendarColor: model.CalendarColor,
 			Id:            model.EventId,
 			Title:         model.EventTitle,
-			Color:         model.EventColor,
 			Location:      model.Location,
 			Memo:          model.Memo,
 			StartAt:       model.StartAt,

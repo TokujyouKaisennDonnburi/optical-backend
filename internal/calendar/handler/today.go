@@ -53,7 +53,6 @@ func (h *CalendarHttpHandler) GetToday(w http.ResponseWriter, r *http.Request) {
 			CalendarColor: item.CalendarColor,
 			Id:            item.Id.String(),
 			Title:         item.Title,
-			Color:         item.Color,
 			Location:      item.Location,
 			Memo:          item.Memo,
 			StartAt:       item.StartAt,
