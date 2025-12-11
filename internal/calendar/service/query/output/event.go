@@ -31,7 +31,6 @@ type EventTodayQueryOutputItem struct {
 	CalendarColor string
 	Id            uuid.UUID
 	Title         string
-	Color         string
 	Location      string
 	Memo          string
 	StartAt       time.Time

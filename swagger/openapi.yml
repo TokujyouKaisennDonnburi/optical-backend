@@ -533,11 +533,11 @@ components:
         calendarId:
           type: string
           format: uuid
+        calendarColor:
+          type: string
         title:
           type: string
         memo:
-          type: string
-        color:
           type: string
         location:
           type: string
@@ -611,14 +611,28 @@ components:
       properties:
         calendarId:
           type: string
+          format: uuid
         calendarName:
           type: string
         calendarColor:
           type: string
         id:
           type: string
+          format: uuid
         title:
           type: string
+        location:
+          type: string
+        memo:
+          type: string
+        startAt:
+          type: string
+          format: date-time
+        endAt:
+          type: string
+          format: date-time
+        isAllDay:
+          type: boolean
     EventUpdateRequest:
       type: object
       required:
@@ -672,8 +686,6 @@ components:
         id:
           type: string
         title:
-          type: string
-        color:
           type: string
         location:
           type: string
