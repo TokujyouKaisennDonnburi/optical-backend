@@ -12,7 +12,7 @@ type ListQueryInput struct {
 }
 
 // option 一覧取得
-func (q *OptionQuery) ListGetEvents(ctx context.Context, input ListQueryInput) ([]option.Option, error) {
+func (q *OptionQuery) GetListOption(ctx context.Context, input ListQueryInput) ([]option.Option, error) {
 	outputs, err := q.optionRepository.List(ctx, input.UserId)
 	if err != nil {
 		return nil, err
