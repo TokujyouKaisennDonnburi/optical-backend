@@ -8,6 +8,7 @@ import (
 	"github.com/TokujouKaisenDonburi/optical-backend/internal/user"
 	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
+	"github.com/lib/pq"
 )
 
 type UserModel struct {
@@ -53,7 +54,7 @@ func FindUserByEmail(ctx context.Context, tx *sqlx.Tx, email string) (*user.User
 			users.email = $1
 	`
 	userModel := UserModel{}
-	err := tx.Get(&userModel, query, email)
+	err := tx.GetContext(ctx, &userModel, query, email)
 	if err != nil {
 		return nil, err
 	}
@@ -66,4 +67,32 @@ func FindUserByEmail(ctx context.Context, tx *sqlx.Tx, email string) (*user.User
 		UpdatedAt: userModel.UpdatedAt,
 		DeletedAt: userModel.DeletedAt.Time,
 	}, nil
+}
+
+func FindUsersByEmails(ctx context.Context, tx *sqlx.Tx, emails []string) ([]user.User, error) {
+	query := `
+		SELECT 
+			id, name, email, password_hash, created_at, updated_at, deleted_at
+		FROM users
+		WHERE 
+			users.email = ANY($1)
+	`
+	userModels := []UserModel{}
+	err := tx.SelectContext(ctx, &userModels, query, pq.Array(emails))
+	if err != nil {
+		return nil, err
+	}
+	users := make([]user.User, len(userModels))
+	for i, userModel := range userModels {
+		users[i] = user.User{
+			Id:        userModel.Id,
+			Name:      userModel.Name,
+			Email:     userModel.Email,
+			Password:  userModel.Password,
+			CreatedAt: userModel.CreatedAt,
+			UpdatedAt: userModel.UpdatedAt,
+			DeletedAt: userModel.DeletedAt.Time,
+		}
+	}
+	return users, nil
 }

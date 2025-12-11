@@ -77,6 +77,10 @@ func (e *Event) SetTitle(title string) error {
 }
 
 func (e *Event) SetColor(color string) error {
+	if color == "" {
+		e.Color = ""
+		return nil
+	}
 	colorLen := utf8.RuneCountInString(color)
 	if colorLen != 6 {
 		return errors.New("Color length is invalid")

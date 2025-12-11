@@ -31,7 +31,7 @@ func (c *UserCommand) CreateUser(ctx context.Context, input UserCreateInput) (*U
 		return nil, err
 	}
 	// アクセストークン発行
-	accessToken, err := user.NewAccessToken(newUser.Id)
+	accessToken, err := user.NewAccessToken(newUser.Id, newUser.Name)
 	if err != nil {
 		return nil, err
 	}

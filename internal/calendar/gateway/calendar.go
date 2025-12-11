@@ -7,7 +7,6 @@ import (
 	"github.com/TokujouKaisenDonburi/optical-backend/internal/calendar"
 	"github.com/TokujouKaisenDonburi/optical-backend/internal/calendar/service/query/output"
 	"github.com/TokujouKaisenDonburi/optical-backend/internal/option"
-	"github.com/TokujouKaisenDonburi/optical-backend/internal/user"
 	"github.com/TokujouKaisenDonburi/optical-backend/pkg/db"
 	"github.com/TokujouKaisenDonburi/optical-backend/pkg/psql"
 	"github.com/google/uuid"
@@ -30,9 +29,10 @@ func NewCalendarPsqlRepository(db *sqlx.DB) *CalendarPsqlRepository {
 // スケジュールを新規作成する
 func (r *CalendarPsqlRepository) Create(
 	ctx context.Context,
-	userId, imageId uuid.UUID,
+	imageId uuid.UUID,
+	memberEmails []string,
 	optionIds []uuid.UUID,
-	createFn func(user *user.User, image *calendar.Image, options []option.Option) (*calendar.Calendar, error),
+	createFn func(image *calendar.Image, members []calendar.Member, options []option.Option) (*calendar.Calendar, error),
 ) error {
 	return db.RunInTx(r.db, func(tx *sqlx.Tx) error {
 		// オプション取得
@@ -41,9 +41,18 @@ func (r *CalendarPsqlRepository) Create(
 			return err
 		}
 		// ユーザー取得
-		user, err := psql.FindUserById(ctx, tx, userId)
+		users, err := psql.FindUsersByEmails(ctx, tx, memberEmails)
 		if err != nil {
 			return err
+		}
+		// メンバーリスト作成
+		members := make([]calendar.Member, len(users))
+		for i, user := range users {
+			member, err := calendar.NewMember(user.Id, user.Name)
+			if err != nil {
+				continue
+			}
+			members[i] = *member
 		}
 		// 画像を取得
 		image, err := psql.FindImageById(ctx, tx, imageId)
@@ -51,7 +60,7 @@ func (r *CalendarPsqlRepository) Create(
 			return err
 		}
 		// スケジュール作成関数を実行
-		calendar, err := createFn(user, image, options)
+		calendar, err := createFn(image, members, options)
 		if err != nil {
 			return err
 		}
@@ -82,7 +91,10 @@ func (r *CalendarPsqlRepository) Create(
 			calendarMemberMaps = append(calendarMemberMaps, map[string]any{
 				"calendarId": calendar.Id,
 				"userId":     member.UserId,
-				"joinedAt":   member.JoinedAt,
+				"joinedAt": sql.NullTime{
+					Time:  member.JoinedAt,
+					Valid: !member.JoinedAt.IsZero(),
+				},
 			})
 		}
 		_, err = tx.NamedExecContext(ctx, query, calendarMemberMaps)
