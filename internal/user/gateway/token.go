@@ -41,3 +41,4 @@ func (r *TokenRedisRepository) IsWhitelisted(tokenId uuid.UUID) error {
 	}
 	return nil
 }
+
