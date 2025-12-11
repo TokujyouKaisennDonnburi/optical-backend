@@ -10,6 +10,9 @@ import (
 	calendarHandler "github.com/TokujouKaisenDonburi/optical-backend/internal/calendar/handler"
 	calendarCommand "github.com/TokujouKaisenDonburi/optical-backend/internal/calendar/service/command"
 	calendarQuery "github.com/TokujouKaisenDonburi/optical-backend/internal/calendar/service/query"
+	githubGateway "github.com/TokujouKaisenDonburi/optical-backend/internal/github/gateway"
+	githubHandler "github.com/TokujouKaisenDonburi/optical-backend/internal/github/handler"
+	githubCommand "github.com/TokujouKaisenDonburi/optical-backend/internal/github/service/command"
 	optionGateway "github.com/TokujouKaisenDonburi/optical-backend/internal/option/gateway"
 	optionHandler "github.com/TokujouKaisenDonburi/optical-backend/internal/option/handler"
 	optionQuery "github.com/TokujouKaisenDonburi/optical-backend/internal/option/service/query"
@@ -52,6 +55,9 @@ func main() {
 
 	userRepository := userGateway.NewUserPsqlRepository(db)
 	tokenRepository := userGateway.NewTokenRedisRepository(redisClient)
+	githubRepository := githubGateway.NewGithubApiRepository(db, redisClient)
+	githubCommand := githubCommand.NewGithubCommand(githubRepository)
+	githubHandler := githubHandler.NewGithubHandler(githubCommand)
 	userQuery := userQuery.NewUserQuery(userRepository)
 	userCommand := userCommand.NewUserCommand(userRepository, tokenRepository)
 	userHandler := userHandler.NewUserHttpHandler(userQuery, userCommand)
@@ -74,6 +80,10 @@ func main() {
 		r.Post("/register", userHandler.Create)
 		r.Post("/login", userHandler.Login)
 		r.Post("/refresh", userHandler.Refresh)
+
+		// Github
+		r.Post("/auth/github/install", githubHandler.InstallToCalendar)
+		r.Post("/auth/github/link", githubHandler.LinkUser)
 	})
 
 	// Protected Routes
@@ -82,6 +92,9 @@ func main() {
 
 		// Users
 		r.Get("/users/@me", userHandler.GetMe)
+
+		// Github
+		r.Post("/auth/github/state", githubHandler.CreateState)
 
 		// Calendars
 		r.Post("/calendars", calendarHandler.CreateCalendar)
