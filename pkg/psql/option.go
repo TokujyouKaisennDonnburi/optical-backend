@@ -8,7 +8,7 @@ import (
 )
 
 type OptionModel struct {
-	id   int
+	id   int32
 	name string
 }
 

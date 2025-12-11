@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/TokujouKaisenDonburi/optical-backend/internal/option/service/query"
@@ -33,7 +34,7 @@ func (h *OptionHttpHandler) GetList(w http.ResponseWriter, r *http.Request) {
 	options := make([]OptionResponse, len(output))
 	for i, opt := range output {
 		options[i] = OptionResponse{
-			Id:         opt.Id,
+			OptionId:   fmt.Sprintf("%d", opt.Id),
 			Name:       opt.Name,
 			Deprecated: opt.Deprecated,
 		}
