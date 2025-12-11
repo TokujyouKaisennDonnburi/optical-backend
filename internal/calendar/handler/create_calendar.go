@@ -44,14 +44,14 @@ func (h *CalendarHttpHandler) CreateCalendar(w http.ResponseWriter, r *http.Requ
 		_ = render.Render(w, r, apperr.ErrInvalidRequest(err))
 		return
 	}
-	optionIds := []int{}
+	optionIds := []int32{}
 	for _, id := range request.OptionIds {
 		optionId, err := strconv.Atoi(id)
 		if err != nil {
 			_ = render.Render(w, r, apperr.ErrInvalidRequest(err))
 			return
 		}
-		optionIds = append(optionIds, optionId)
+		optionIds = append(optionIds, int32(optionId))
 	}
 	var imageId uuid.UUID
 	if request.ImageId != "" {

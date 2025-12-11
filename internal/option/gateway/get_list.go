@@ -17,8 +17,7 @@ func (r *OptionPsqlRepository) GetList(ctx context.Context, userId uuid.UUID) ([
 	query := `
 	SELECT options.id, options.name, options.deprecated
 	FROM options
-	LEFT JOIN users
-	ON users.id = $1
+	WHERE EXISTS (SELECT 1 FROM users WHERE users.id = $1)
 	`
 	var rows []OptionListQueryModel
 	err := r.db.SelectContext(ctx, &rows, query, userId)

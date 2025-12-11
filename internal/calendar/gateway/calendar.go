@@ -32,7 +32,7 @@ func (r *CalendarPsqlRepository) Create(
 	memberEmails []string,
 	createFn func(image *calendar.Image, members []calendar.Member, options []option.Option) (*calendar.Calendar, error),
 	userId, imageId uuid.UUID,
-	optionIds []int,
+	optionIds []int32,
 ) error {
 	return db.RunInTx(r.db, func(tx *sqlx.Tx) error {
 		// オプション取得

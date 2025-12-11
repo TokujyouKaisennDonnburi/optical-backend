@@ -22,7 +22,7 @@ func NewOptionPsqlRepository(db *sqlx.DB) *OptionPsqlRepository {
 	}
 }
 
-func (r *OptionPsqlRepository) FindByIds(ctx context.Context, ids []int) ([]option.Option, error) {
+func (r *OptionPsqlRepository) FindByIds(ctx context.Context, ids []int32) ([]option.Option, error) {
 	var err error
 	var options []option.Option
 	err = db.RunInTx(r.db, func(tx *sqlx.Tx) error {

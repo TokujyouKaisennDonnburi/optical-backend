@@ -12,7 +12,7 @@ type OptionModel struct {
 	name string
 }
 
-func FindOptionsByIds(ctx context.Context, tx *sqlx.Tx, ids []int) ([]option.Option, error) {
+func FindOptionsByIds(ctx context.Context, tx *sqlx.Tx, ids []int32) ([]option.Option, error) {
 	if len(ids) == 0 {
 		return []option.Option{}, nil
 	}
