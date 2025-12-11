@@ -11,6 +11,8 @@ import (
 	calendarCommand "github.com/TokujouKaisenDonburi/optical-backend/internal/calendar/service/command"
 	calendarQuery "github.com/TokujouKaisenDonburi/optical-backend/internal/calendar/service/query"
 	optionGateway "github.com/TokujouKaisenDonburi/optical-backend/internal/option/gateway"
+	optionHandler "github.com/TokujouKaisenDonburi/optical-backend/internal/option/handler"
+	optionQuery "github.com/TokujouKaisenDonburi/optical-backend/internal/option/service/query"
 	userGateway "github.com/TokujouKaisenDonburi/optical-backend/internal/user/gateway"
 	userHandler "github.com/TokujouKaisenDonburi/optical-backend/internal/user/handler"
 	userCommand "github.com/TokujouKaisenDonburi/optical-backend/internal/user/service/command"
@@ -54,6 +56,8 @@ func main() {
 	userCommand := userCommand.NewUserCommand(userRepository, tokenRepository)
 	userHandler := userHandler.NewUserHttpHandler(userQuery, userCommand)
 	optionRepository := optionGateway.NewOptionPsqlRepository(db)
+	optionQuery := optionQuery.NewOptionQuery(optionRepository)
+	optionHandler := optionHandler.NewOptionHttpHandler(optionQuery)
 	eventRepository := calendarGateway.NewEventPsqlRepository(db)
 	calendarRepository := calendarGateway.NewCalendarPsqlRepository(db)
 	imageRepository := calendarGateway.NewImagePsqlAndMinioRepository(db, minioClient, getBucketName())
@@ -95,6 +99,9 @@ func main() {
 		r.Get("/calendars/{calendarId}/events", calendarHandler.ListGetEvents)
 		r.Get("/events/todays", calendarHandler.GetToday)
 		r.Get("/events/months", calendarHandler.GetByMonth)
+
+		// Options
+		r.Get("/options", optionHandler.GetList)
 	})
 
 	// Start Serving

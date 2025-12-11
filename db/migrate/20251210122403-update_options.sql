@@ -19,7 +19,7 @@ CREATE TABLE calendar_options(
 COMMENT ON COLUMN calendar_options.calendar_id IS 'カレンダーID';
 COMMENT ON COLUMN calendar_options.option_id IS 'オプションID';
 
-INSERT INTO options(id,name,deprecate)VALUES
+INSERT INTO options(id,name,deprecated)VALUES
 (1, 'pr_review_pending_count', FALSE),
 (2, 'review_load_status', FALSE);
 
