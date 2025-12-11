@@ -15,7 +15,7 @@ import (
 type CalendarModel struct {
 	CalendarId         uuid.UUID      `db:"id"`
 	CalendarName       string         `db:"name"`
-	CalendarOptionId   sql.NullInt64  `db:"option_id"`
+	CalendarOptionId   sql.NullInt32  `db:"option_id"`
 	CalendarOptionName sql.NullString `db:"option_name"`
 }
 
@@ -79,7 +79,7 @@ func modelsToCalendar(calendarModels []CalendarModel, memberModels []MemberModel
 			continue
 		}
 		options = append(options, option.Option{
-			Id:   int(calendarModel.CalendarOptionId.Int64),
+			Id:   calendarModel.CalendarOptionId.Int32,
 			Name: calendarModel.CalendarOptionName.String,
 		})
 	}

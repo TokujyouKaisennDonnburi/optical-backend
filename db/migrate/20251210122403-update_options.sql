@@ -9,6 +9,7 @@ CREATE TABLE options(
 );
 COMMENT ON COLUMN options.id IS 'オプションID';
 COMMENT ON COLUMN options.name IS 'オプション名';
+COMMENT ON COLUMN options.deprecated IS 'オプション'
 
 CREATE TABLE calendar_options(
     calendar_id UUID REFERENCES calendars(id) ON DELETE CASCADE,
@@ -17,6 +18,8 @@ CREATE TABLE calendar_options(
 );
 COMMENT ON COLUMN calendar_options.calendar_id IS 'カレンダーID';
 COMMENT ON COLUMN calendar_options.option_id IS 'オプションID';
+
+
 
 -- +migrate Down
 
