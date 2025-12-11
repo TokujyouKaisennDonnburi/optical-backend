@@ -29,9 +29,7 @@ func (s *CalendarCommand) CreateCalendar(ctx context.Context, input CalendarCrea
 	var newCalendar *calendar.Calendar
 	// カレンダーをリポジトリで作成
 	err := s.calendarRepository.Create(ctx,
-		input.ImageId,
 		input.MemberEmails,
-		input.OptionIds,
 		func(image *calendar.Image, members []calendar.Member, options []option.Option) (*calendar.Calendar, error) {
 			// オプションIDが全て正しいか確認
 			if len(options) != len(input.OptionIds) {
@@ -56,7 +54,11 @@ func (s *CalendarCommand) CreateCalendar(ctx context.Context, input CalendarCrea
 				return nil, err
 			}
 			return newCalendar, nil
-		})
+		},
+		input.UserId,
+		input.ImageId,
+		input.OptionIds,
+	)
 	if err != nil {
 		return nil, err
 	}
