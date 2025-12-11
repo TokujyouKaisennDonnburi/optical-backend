@@ -30,11 +30,14 @@ func (h *OptionHttpHandler) GetList(w http.ResponseWriter, r *http.Request) {
 		_ = render.Render(w, r, apperr.ErrInternalServerError(err))
 		return
 	}
-
-	render.JSON(w, r, OptionResponse{
-		Id:         output.Id,
-		Name:       output.Name,
-		Deprecated: output.Deprecated,
-	})
+	options := make([]OptionResponse, len(output))
+	for i, opt := range output {
+		options[i] = OptionResponse{
+			Id:         opt.Id,
+			Name:       opt.Name,
+			Deprecated: opt.Deprecated,
+		}
+	}
+	render.JSON(w, r, options)
 }
 
