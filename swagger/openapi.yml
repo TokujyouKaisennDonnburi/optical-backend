@@ -737,7 +737,7 @@ components:
     OptionResponse:
       type: object
       properties:
-        optionId:
+        id:
           type: integer
           format: int32
           example: "1"
