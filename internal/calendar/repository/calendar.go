@@ -18,5 +18,5 @@ type CalendarRepository interface {
 		createFn func(*calendar.Image, []calendar.Member, []option.Option) (*calendar.Calendar, error),
 	) error
 	FindByUserId(ctx context.Context, userId uuid.UUID) ([]output.CalendarListQueryOutput, error)
-	FindById(ctx context.Context,Id uuid.UUID)(*calendar.Calendar, error)
+	FindById(ctx context.Context,id ,calendarId uuid.UUID)(*calendar.Calendar, error)
 }
