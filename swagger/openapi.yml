@@ -272,26 +272,6 @@ paths:
            description: Invalid request
          '401':
            description: Unauthorized
-  /options:
-    get:
-      summary: Get list of options
-      tags:
-        - options
-      security:
-        - bearerAuth: []
-      responses:
-        '200':
-          description: Options retrieved successfully
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/OptionResponse'
-        '401':
-          description: Unauthorized
-        '500':
-          description: Internal server error
   /calendars/{calendarId}/members:
     post:
       summary: Add a member to a calendar
@@ -359,11 +339,56 @@ paths:
           description: Invalid calendarId format
         '500':
           description: Internal server error
-  /auth/github/state:
+  /options:
+    get:
+      summary: Get list of options
+      tags:
+        - options
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Options retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/OptionResponse'
+        '401':
+          description: Unauthorized
+        '500':
+          description: Internal server error
+  /github/apps/state:
     post:
-      summary: Create GitHub OAuth state or Link user
-      description: Creates an OAuth state URL for GitHub authentication. If authenticated, can also link the user with code and state.
-      tags: 
+      summary: Create GitHub App state
+      description: Creates a state URL for GitHub App installation to a calendar.
+      tags:
+        - github
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GithubAppStateRequest'
+      responses:
+        '200':
+          description: App state created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GithubStateResponse'
+        '400':
+          description: Invalid request
+        '500':
+          description: Internal server error
+  /github/oauth/state:
+    post:
+      summary: Create GitHub OAuth state
+      description: Creates an OAuth state URL for GitHub user authentication.
+      tags:
         - github
       security:
         - bearerAuth: []
@@ -374,13 +399,9 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/GithubStateResponse'
-        '204':
-          description: User linked successfully
-        '400':
-          description: Invalid request
         '500':
           description: Internal server error
-  /auth/github/install:
+  /github/apps/install:
     post:
       summary: Install GitHub to calendar
       tags: [github]
@@ -397,7 +418,7 @@ paths:
           description: Invalid request
         '500':
           description: Internal server error
-  /auth/github/link:
+  /github/oauth/link:
     post:
       summary: Link user with GitHub
       tags: [github]
@@ -776,11 +797,19 @@ components:
           type: boolean
           example: false
     GithubStateResponse:
-      type: object
-      properties:
-        url:
-          type: string
-          format: url
+       type: object
+       properties:
+         url:
+           type: string
+           format: url
+    GithubAppStateRequest:
+       type: object
+       required:
+         - calendarId
+       properties:
+         calendarId:
+           type: string
+           format: uuid
     GithubUserLinkRequest:
       type: object
       required:
@@ -794,11 +823,10 @@ components:
     GithubCalendarInstallRequest:
       type: object
       required:
-        - calendarId
+        - state
         - installationId
       properties:
-        calendarId:
+        state:
           type: string
-          format: uuid
         installationId:
           type: string
