@@ -118,7 +118,7 @@ func (r *CalendarPsqlRepository) FindByUserId(ctx context.Context, userId uuid.U
 		WHERE 
 			m.user_id = $1
 			AND c.deleted_at IS NULL
-		ORDER BY c.id
+		ORDER BY c.id DESC
 	`
 	var rows []CalendarListQueryModel
 	err := r.db.SelectContext(ctx, &rows, query, userId)
@@ -143,36 +143,47 @@ func (r *CalendarPsqlRepository) FindByUserId(ctx context.Context, userId uuid.U
 }
 
 type CalendarQueryModel struct {
-	Id      uuid.UUID         `db:"id"`
-	Name    string            `db:"name"`
-	Color   calendar.Color    `db:"color"`
-	Image   calendar.Image    `db:"image"`
-	Members []calendar.Member `db:"member"`
-	Options []option.Option   `db:"option"`
+	Id       uuid.UUID         `db:"id"`
+	Name     string            `db:"name"`
+	Color    calendar.Color    `db:"color"`
+	ImageId  uuid.NullUUID     `db:"imageId"`
+	ImageUrl sql.NullString    `db:"imageUrl"`
+	Members  []calendar.Member `db:"member"`
+	Options  []option.Option   `db:"option"`
 }
 
 // calendarの単体取得
-func (r *CalendarPsqlRepository) FindById(ctx context.Context, id uuid.UUID) (*calendar.Calendar, error) {
+func (r *CalendarPsqlRepository) FindById(ctx context.Context, id, calendarId uuid.UUID) (*calendar.Calendar, error) {
 	query := `
-        SELECT c.id, c.name, c.color, i.id AS image_id, i.url, m.user_id, o.option_id
-        FROM calendars c
-		LEFT JOIN calendar_images i ON i.id = c.image_id
-		INNER JOIN calendar_options o ON o.calendar_id = c.id
-		INNER JOIN calendar_members m ON m.calendar_id = c.id
-        WHERE c.id = $1
-		ORDER BY c.id
+        SELECT calendars.id, calendars.name, calendars.color,
+		calendar_images.id, calendar_images.url,
+		calendar_members.user_id,
+		calendar_options.option_id
+        FROM calendars
+		INNER JOIN calendar_options ON calendar_options.calendar_id = calendars.id
+		INNER JOIN calendar_members ON calendar_members.calendar_id = calendars.id
+		LEFT JOIN calendar_images ON i.id = calendars.image_id
+		WHERE calendar_members.user_id = $1
+		AND calendars.id = $2
     `
 	model := CalendarQueryModel{}
-	err := r.db.SelectContext(ctx, &model, query, id)
+	err := r.db.SelectContext(ctx, &model, query, id, calendarId)
 	if err != nil {
 		return nil, err
 	}
+
+
+
 	return &calendar.Calendar{
-		Id:      model.Id,
-		Name:    model.Name,
-		Color:   model.Color,
-		Image:   model.Image,
-		Members: model.Members,
+		Id:    model.Id,
+		Name:  model.Name,
+		Color: model.Color,
+		Image: calendar.Image{
+			Id:    model.ImageId.UUID,
+			Url:   model.ImageUrl.String,
+			Valid: model.ImageUrl.Valid,
+		},
+		Members: 
 		Options: model.Options,
 	}, nil
 }
