@@ -5,11 +5,7 @@ import (
 
 	"github.com/TokujouKaisenDonburi/optical-backend/internal/calendar"
 	"github.com/TokujouKaisenDonburi/optical-backend/internal/option"
-<<<<<<< HEAD
 	"github.com/TokujouKaisenDonburi/optical-backend/pkg/apperr"
-=======
-	"github.com/TokujouKaisenDonburi/optical-backend/internal/user"
->>>>>>> b3180b4 (feat:importの削除 #127)
 	"github.com/google/uuid"
 )
 
