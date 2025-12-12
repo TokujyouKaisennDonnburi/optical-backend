@@ -12,10 +12,10 @@ import (
 type CalendarRepository interface {
 	Create(
 		ctx context.Context,
+		imageId uuid.UUID,
 		memberEmails []string,
-		createFn func(*calendar.Image, []calendar.Member, []option.Option) (*calendar.Calendar, error),
-		userId, imageId uuid.UUID,
 		optionIds []int32,
+		createFn func(*calendar.Image, []calendar.Member, []option.Option) (*calendar.Calendar, error),
 	) error
 	FindByUserId(ctx context.Context, userId uuid.UUID) ([]output.CalendarQueryOutput, error)
 }
