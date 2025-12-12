@@ -32,10 +32,7 @@ type EventMonthResponseItem struct {
 func (h *CalendarHttpHandler) GetByMonth(w http.ResponseWriter, r *http.Request) {
 	userId, err := auth.GetUserIdFromContext(r)
 	if err != nil {
-		err = render.Render(w, r, apperr.ErrInternalServerError(err))
-		if err != nil {
-			_ = render.Render(w, r, apperr.ErrInternalServerError(err))
-		}
+		_ = render.Render(w, r, apperr.ErrInternalServerError(err))
 		return
 	}
 	var output *output.EventMonthQueryOutput

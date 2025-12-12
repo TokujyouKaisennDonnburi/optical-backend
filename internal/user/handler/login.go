@@ -32,10 +32,7 @@ func (h *UserHttpHandler) Login(w http.ResponseWriter, r *http.Request) {
 	// リクエストを取得
 	err := json.NewDecoder(r.Body).Decode(&request)
 	if err != nil {
-		err = render.Render(w, r, apperr.ErrInvalidRequest(err))
-		if err != nil {
-			_ = render.Render(w, r, apperr.ErrInternalServerError(err))
-		}
+		_ = render.Render(w, r, apperr.ErrInvalidRequest(err))
 		return
 	}
 	output, err := h.userCommand.LoginUser(r.Context(), command.UserLoginInput{
@@ -43,10 +40,7 @@ func (h *UserHttpHandler) Login(w http.ResponseWriter, r *http.Request) {
 		Password: request.Password,
 	})
 	if err != nil {
-		err = render.Render(w, r, apperr.ErrUnauthorized(err))
-		if err != nil {
-			_ = render.Render(w, r, apperr.ErrInternalServerError(err))
-		}
+		_ = render.Render(w, r, apperr.ErrUnauthorized(err))
 		return
 	}
 	render.JSON(w, r, UserLoginResponse{

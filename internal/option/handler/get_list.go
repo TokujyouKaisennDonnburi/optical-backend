@@ -22,12 +22,11 @@ func (h *OptionHttpHandler) GetList(w http.ResponseWriter, r *http.Request) {
 		_ = render.Render(w, r, apperr.ErrInternalServerError(err))
 		return
 	}
-
 	output, err := h.optionQuery.GetListOption(r.Context(), query.OptionListQueryInput{
 		UserId: userId,
 	})
 	if err != nil {
-		_ = render.Render(w, r, apperr.ErrInternalServerError(err))
+		apperr.HandleAppError(w, r, err)
 		return
 	}
 	options := make([]OptionResponse, len(output))

@@ -32,10 +32,7 @@ type EventTodayResponseItem struct {
 func (h *CalendarHttpHandler) GetToday(w http.ResponseWriter, r *http.Request) {
 	userId, err := auth.GetUserIdFromContext(r)
 	if err != nil {
-		err = render.Render(w, r, apperr.ErrInternalServerError(err))
-		if err != nil {
-			_ = render.Render(w, r, apperr.ErrInternalServerError(err))
-		}
+		_ = render.Render(w, r, apperr.ErrInvalidRequest(err))
 		return
 	}
 	output, err := h.eventQuery.GetToday(r.Context(), query.EventTodayQueryInput{
