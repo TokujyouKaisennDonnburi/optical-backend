@@ -49,7 +49,7 @@ func (c *GithubCommand) CreateOauthState(
 	ctx context.Context,
 	input GithubOauthStateInput,
 ) (*GithubOauthStateOutput, error) {
-	scopes := "read:user,real:email"
+	scopes := "read:user,user:email"
 	state, err := GenerateRandomString(32)
 	if err != nil {
 		return nil, err
