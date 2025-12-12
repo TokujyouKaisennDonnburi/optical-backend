@@ -8,8 +8,8 @@ import (
 )
 
 type OptionModel struct {
-	id   int32
-	name string
+	Id   int32  `db:"id"`
+	Name string `db:"name"`
 }
 
 func FindOptionsByIds(ctx context.Context, tx *sqlx.Tx, ids []int32) ([]option.Option, error) {
@@ -35,8 +35,8 @@ func FindOptionsByIds(ctx context.Context, tx *sqlx.Tx, ids []int32) ([]option.O
 	options := []option.Option{}
 	for _, optionModel := range optionModels {
 		options = append(options, option.Option{
-			Id:   optionModel.id,
-			Name: optionModel.name,
+			Id:   optionModel.Id,
+			Name: optionModel.Name,
 		})
 	}
 	return options, nil
