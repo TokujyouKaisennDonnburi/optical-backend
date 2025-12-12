@@ -1,4 +1,4 @@
-package gateway
+package api
 
 import (
 	"crypto/x509"
@@ -13,12 +13,13 @@ import (
 )
 
 const (
-	GITHUB_PRIVATE_KEY_PEM_PATH = "optical-github.2025-12-04.private-key.pem"
+	GITHUB_PRIVATE_KEY_PEM_PATH = "optical-github.private-key.pem"
 	GITHUB_API_VERSION = "2022-11-28"
+	GITHUB_BASE_URL = "https://api.github.com"
 )
 
-func setRequestHeader(r *http.Request) error {
-	token, err := getGithubAppBearerToken()
+func SetRequestHeader(r *http.Request) error {
+	token, err := GetGithubAppBearerToken()
 	if err != nil {
 		return err
 	}
@@ -28,7 +29,7 @@ func setRequestHeader(r *http.Request) error {
 	return nil
 }
 
-func getGithubAppBearerToken() (string, error) {
+func GetGithubAppBearerToken() (string, error) {
 	file, err := os.ReadFile(GITHUB_PRIVATE_KEY_PEM_PATH)
 	if err != nil {
 		return "", err

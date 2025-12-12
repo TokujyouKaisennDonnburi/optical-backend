@@ -6,18 +6,9 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/TokujouKaisenDonburi/optical-backend/pkg/api"
 	"github.com/google/uuid"
 )
-
-type InstallationGetResponse struct {
-	Id      int                            `json:"id"`
-	Account InstallationGetResponseAccount `json:"account"`
-}
-
-type InstallationGetResponseAccount struct {
-	Id    int    `json:"id"`
-	Login string `json:"login"`
-}
 
 func (r *GithubApiRepository) InstallToCalendar(
 	ctx context.Context,
@@ -28,13 +19,13 @@ func (r *GithubApiRepository) InstallToCalendar(
 	req, err := http.NewRequestWithContext(
 		ctx,
 		"GET",
-		GITHUB_BASE_URL+"/app/installations/"+installationId,
+		api.GITHUB_BASE_URL+"/app/installations/"+installationId,
 		nil,
 	)
 	if err != nil {
 		return err
 	}
-	err = setRequestHeader(req)
+	err = api.SetRequestHeader(req)
 	if err != nil {
 		return err
 	}
@@ -43,7 +34,7 @@ func (r *GithubApiRepository) InstallToCalendar(
 		return err
 	}
 	defer resp.Body.Close()
-	var response InstallationGetResponse
+	var response api.InstallationGetResponse
 	if err = json.NewDecoder(resp.Body).Decode(&response); err != nil {
 		return err
 	}
