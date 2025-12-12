@@ -9,6 +9,34 @@ import (
 	"github.com/google/uuid"
 )
 
+type GithubAppStateInput struct {
+	UserId     uuid.UUID
+	CalendarId uuid.UUID
+}
+
+type GithubAppStateOutput struct {
+	Url string
+}
+
+func (c *GithubCommand) CreateAppState(
+	ctx context.Context,
+	input GithubAppStateInput,
+) (*GithubAppStateOutput, error) {
+	state, err := GenerateRandomString(32)
+	if err != nil {
+		return nil, err
+	}
+	err = c.stateRepository.SaveAppState(ctx, input.UserId, input.CalendarId, state)
+	if err != nil {
+		return nil, err
+	}
+	url := "https://github.com/apps/optical-github/installations/new"
+	url += "?state=" + state
+	return &GithubAppStateOutput{
+		Url: url,
+	}, nil
+}
+
 type GithubOauthStateInput struct {
 	UserId uuid.UUID
 }
@@ -26,7 +54,7 @@ func (c *GithubCommand) CreateOauthState(
 	if err != nil {
 		return nil, err
 	}
-	err = c.githubRepository.SaveOauthState(ctx, input.UserId, state)
+	err = c.stateRepository.SaveOauthState(ctx, input.UserId, state)
 	if err != nil {
 		return nil, err
 	}

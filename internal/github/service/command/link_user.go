@@ -18,5 +18,9 @@ func (c *GithubCommand) LinkUser(ctx context.Context, input GithubLinkUserInput)
 	if input.State == "" {
 		return apperr.ValidationError("invalid state")
 	}
-	return c.githubRepository.LinkUser(ctx, input.Code, input.State)
+	userId, err := c.stateRepository.GetOauthState(ctx, input.State)
+	if err != nil {
+		return apperr.ForbiddenError("invalid state")
+	}
+	return c.githubRepository.LinkUser(ctx, userId, input.Code)
 }
