@@ -31,20 +31,14 @@ func (h *CalendarHttpHandler) UpdateEvent(w http.ResponseWriter, r *http.Request
 	}
 	eventId, err := uuid.Parse(chi.URLParam(r, "eventId"))
 	if err != nil {
-		err = render.Render(w, r, apperr.ErrInvalidRequest(err))
-		if err != nil {
-			_ = render.Render(w, r, apperr.ErrInternalServerError(err))
-		}
+		_ = render.Render(w, r, apperr.ErrInvalidRequest(err))
 		return
 	}
 	var request EventUpdateRequest
 	// リクエストJSONをバインド
 	err = json.NewDecoder(r.Body).Decode(&request)
 	if err != nil {
-		err = render.Render(w, r, apperr.ErrInvalidRequest(err))
-		if err != nil {
-			_ = render.Render(w, r, apperr.ErrInternalServerError(err))
-		}
+		_ = render.Render(w, r, apperr.ErrInvalidRequest(err))
 		return
 	}
 	err = h.eventCommand.UpdateEvent(r.Context(), command.EventUpdateInput{
