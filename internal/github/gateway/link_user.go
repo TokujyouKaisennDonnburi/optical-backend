@@ -9,16 +9,9 @@ import (
 
 func (r *GithubApiRepository) LinkUser(
 	ctx context.Context,
-	code, state string,
+	userId uuid.UUID,
+	code string,
 ) error {
-	result, err := r.redisClient.GetDel(ctx, getOauthStateKey(state)).Result()
-	if err != nil {
-		return err
-	}
-	userId, err := uuid.Parse(result)
-	if err != nil {
-		return err
-	}
 	accessToken, err := postOauthAccessToken(code)
 	if err != nil {
 		return err

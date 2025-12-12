@@ -7,7 +7,22 @@ import (
 	"github.com/google/uuid"
 )
 
-func (r *GithubApiRepository) SaveOauthState(
+func (r *StateRedisRepository) GetOauthState(
+	ctx context.Context,
+	state string,
+) (uuid.UUID, error) {
+	result, err := r.redisClient.GetDel(ctx, getOauthStateKey(state)).Result()
+	if err != nil {
+		return uuid.Nil, err
+	}
+	userId, err := uuid.Parse(result)
+	if err != nil {
+		return uuid.Nil, err
+	}
+	return userId, nil
+}
+
+func (r *StateRedisRepository) SaveOauthState(
 	ctx context.Context,
 	userId uuid.UUID,
 	state string,

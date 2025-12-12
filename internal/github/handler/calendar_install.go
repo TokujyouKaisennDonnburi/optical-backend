@@ -10,7 +10,7 @@ import (
 )
 
 type GithubCalendarInstallRequest struct {
-	CalendarId     string `json:"calendarId"`
+	State          string `json:"state"`
 	InstallationId string `json:"installationId"`
 }
 
@@ -21,7 +21,7 @@ func (h *GithubHandler) InstallToCalendar(w http.ResponseWriter, r *http.Request
 		return
 	}
 	err := h.githubCommand.InstallToCalendar(r.Context(), command.GithubCalendarInstallInput{
-		CalendarId:     request.CalendarId,
+		State:          request.State,
 		InstallationId: request.InstallationId,
 	})
 	if err != nil {

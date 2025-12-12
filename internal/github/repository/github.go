@@ -12,13 +12,9 @@ type GithubRepository interface {
 		calendarId uuid.UUID,
 		installationId string,
 	) error
-	SaveOauthState(
-		ctx context.Context,
-		userId uuid.UUID,
-		state string,
-	) error
 	LinkUser(
 		ctx context.Context,
-		code, state string,
+		userId uuid.UUID,
+		code string,
 	) error
 }

@@ -38,7 +38,7 @@ func main() {
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
 	r.Use(cors.Handler(cors.Options{
-		AllowedOrigins:   []string{"http://localhost:3000", "https://tokujyoukaisenndonnburi.github.io" },
+		AllowedOrigins:   []string{"http://localhost:3000", "https://tokujyoukaisenndonnburi.github.io"},
 		AllowedMethods:   []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
 		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
 		AllowCredentials: false,
@@ -55,8 +55,9 @@ func main() {
 
 	userRepository := userGateway.NewUserPsqlRepository(db)
 	tokenRepository := userGateway.NewTokenRedisRepository(redisClient)
-	githubRepository := githubGateway.NewGithubApiRepository(db, redisClient)
-	githubCommand := githubCommand.NewGithubCommand(githubRepository)
+	stateRepository := githubGateway.NewStateRedisRepository(db, redisClient)
+	githubRepository := githubGateway.NewGithubApiRepository(db)
+	githubCommand := githubCommand.NewGithubCommand(stateRepository, githubRepository)
 	githubHandler := githubHandler.NewGithubHandler(githubCommand)
 	userQuery := userQuery.NewUserQuery(userRepository)
 	userCommand := userCommand.NewUserCommand(userRepository, tokenRepository)
@@ -82,8 +83,8 @@ func main() {
 		r.Post("/refresh", userHandler.Refresh)
 
 		// Github
-		r.Post("/auth/github/install", githubHandler.InstallToCalendar)
-		r.Post("/auth/github/link", githubHandler.LinkUser)
+		r.Post("/github/apps/install", githubHandler.InstallToCalendar)
+		r.Post("/github/oauth/link", githubHandler.LinkUser)
 	})
 
 	// Protected Routes
@@ -94,7 +95,8 @@ func main() {
 		r.Get("/users/@me", userHandler.GetMe)
 
 		// Github
-		r.Post("/auth/github/state", githubHandler.CreateState)
+		r.Post("/github/apps/state", githubHandler.CreateAppState)
+		r.Post("/github/oauth/state", githubHandler.CreateOauthState)
 
 		// Calendars
 		r.Post("/calendars", calendarHandler.CreateCalendar)
