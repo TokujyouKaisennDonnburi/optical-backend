@@ -28,6 +28,7 @@ func FindOptionsByIds(ctx context.Context, tx *sqlx.Tx, ids []int32) ([]option.O
 	if err != nil {
 		return nil, err
 	}
+	query = tx.Rebind(query)
 	err = tx.SelectContext(ctx, &optionModels, query, args...)
 	if err != nil {
 		return nil, err
