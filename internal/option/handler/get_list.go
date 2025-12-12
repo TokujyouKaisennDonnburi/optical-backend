@@ -1,17 +1,16 @@
 package handler
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/TokujouKaisenDonburi/optical-backend/internal/option/service/query"
-	"github.com/TokujouKaisenDonburi/optical-backend/pkg/auth"
 	"github.com/TokujouKaisenDonburi/optical-backend/pkg/apperr"
+	"github.com/TokujouKaisenDonburi/optical-backend/pkg/auth"
 	"github.com/go-chi/render"
 )
 
 type OptionResponse struct {
-	OptionId   string `json:"optionId"`
+	Id         int32  `json:"id"`
 	Name       string `json:"name"`
 	Deprecated bool   `json:"deprecated"`
 }
@@ -24,7 +23,7 @@ func (h *OptionHttpHandler) GetList(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	output, err := h.optionQuery.GetListOption(r.Context(), query.ListQueryInput{
+	output, err := h.optionQuery.GetListOption(r.Context(), query.OptionListQueryInput{
 		UserId: userId,
 	})
 	if err != nil {
@@ -34,11 +33,10 @@ func (h *OptionHttpHandler) GetList(w http.ResponseWriter, r *http.Request) {
 	options := make([]OptionResponse, len(output))
 	for i, opt := range output {
 		options[i] = OptionResponse{
-			OptionId:   fmt.Sprintf("%d", opt.Id),
+			Id:         opt.Id,
 			Name:       opt.Name,
 			Deprecated: opt.Deprecated,
 		}
 	}
 	render.JSON(w, r, options)
 }
-
