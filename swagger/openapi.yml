@@ -738,7 +738,8 @@ components:
       type: object
       properties:
         optionId:
-          type: string
+          type: integer
+          format: int32
           example: "1"
         name:
           type: string

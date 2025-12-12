@@ -35,9 +35,9 @@ INSERT INTO options(id,name,deprecated)VALUES
 
   CREATE TABLE calendar_options(
       calendar_id UUID REFERENCES calendars(id) ON
-   DELETE CASCADE,
+      DELETE CASCADE,
       option_id UUID REFERENCES options(id) ON
-  DELETE CASCADE,
+      DELETE CASCADE,
       PRIMARY KEY (calendar_id, option_id)
   );
 
