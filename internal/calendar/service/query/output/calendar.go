@@ -5,7 +5,7 @@ import (
 	"github.com/google/uuid"
 )
 
-type CalendarQueryOutput struct {
+type CalendarListQueryOutput struct {
 	Id    uuid.UUID
 	Name  string
 	Color string

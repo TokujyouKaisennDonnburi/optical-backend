@@ -26,7 +26,7 @@ func (h *CalendarHttpHandler) GetCalendars(w http.ResponseWriter, r *http.Reques
 		return
 	}
 	// カレンダー一覧を取得
-	output, err := h.calendarQuery.GetCalendars(r.Context(), query.GetCalendarListInput{
+	output, err := h.calendarQuery.GetCalendars(r.Context(), query.CalendarListQueryInput{
 		UserId: userId,
 	})
 	if err != nil {

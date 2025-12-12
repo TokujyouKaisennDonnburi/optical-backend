@@ -17,7 +17,7 @@ type GetCalendarInput struct {
 type CalendarQueryOutput struct {
 	Id      uuid.UUID
 	Name    string
-	Color   string
+	Color   calendar.Color
 	Image   calendar.Image
 	Members []calendar.Member
 	Options []option.Option

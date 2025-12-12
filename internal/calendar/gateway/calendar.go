@@ -132,7 +132,7 @@ type CalendarListQueryModel struct {
 }
 
 // ユーザーが所属するカレンダー一覧を取得する
-func (r *CalendarPsqlRepository) FindByUserId(ctx context.Context, userId uuid.UUID) ([]output.CalendarQueryOutput, error) {
+func (r *CalendarPsqlRepository) FindByUserId(ctx context.Context, userId uuid.UUID) ([]output.CalendarListQueryOutput, error) {
 	query := `
 		SELECT 
 			c.id, c.name, c.color, c.image_id, ci.url AS image_url
@@ -152,9 +152,9 @@ func (r *CalendarPsqlRepository) FindByUserId(ctx context.Context, userId uuid.U
 		return nil, err
 	}
 
-	calendars := make([]output.CalendarQueryOutput, len(rows))
+	calendars := make([]output.CalendarListQueryOutput, len(rows))
 	for i, row := range rows {
-		calendars[i] = output.CalendarQueryOutput{
+		calendars[i] = output.CalendarListQueryOutput{
 			Id:    row.Id,
 			Name:  row.Name,
 			Color: row.Color,
@@ -169,9 +169,9 @@ func (r *CalendarPsqlRepository) FindByUserId(ctx context.Context, userId uuid.U
 }
 
 type CalendarQueryModel struct {
-	Id      uuid.UUID  `db:"id"`
-	Name    string     `db:"name"`
-	Color   string     `db:"color"`
+	Id      uuid.UUID         `db:"id"`
+	Name    string            `db:"name"`
+	Color   calendar.Color    `db:"color"`
 	Image   calendar.Image    `db:"image"`
 	Members []calendar.Member `db:"member"`
 	Options []option.Option   `db:"option"`
@@ -200,6 +200,6 @@ func (r *CalendarPsqlRepository) FindById(ctx context.Context, id uuid.UUID) (*c
 		Image:   model.Image,
 		Members: model.Members,
 		Options: model.Options,
-	},nil
+	}, nil
 }
 

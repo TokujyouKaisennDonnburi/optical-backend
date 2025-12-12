@@ -6,8 +6,8 @@ import (
 	"github.com/TokujouKaisenDonburi/optical-backend/internal/calendar"
 	"github.com/TokujouKaisenDonburi/optical-backend/internal/calendar/service/query"
 	"github.com/TokujouKaisenDonburi/optical-backend/internal/option"
-	"github.com/TokujouKaisenDonburi/optical-backend/internal/user/handler"
 	"github.com/TokujouKaisenDonburi/optical-backend/pkg/apperr"
+	"github.com/TokujouKaisenDonburi/optical-backend/pkg/auth"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
 
@@ -17,7 +17,7 @@ import (
 type CalendarResponse struct {
 	Id		string `json:"id"`
 	Name    string `json:"name"`
-	Color   string `json:"color"`
+	Color   calendar.Color `json:"color"`
 	Image   string `json:"image"`
 	Members []calendar.Member `json:"member"`
 	Options []option.Option   `json:"option"`
@@ -25,7 +25,7 @@ type CalendarResponse struct {
 
 func (h *CalendarHttpHandler) GetCalendar(w http.ResponseWriter, r *http.Request) {
 	// get userId
-	userId, err := handler.GetUserIdFromContext(r)
+	userId, err := auth.GetUserIdFromContext(r)
 	if err != nil {
 		_ = render.Render(w, r, apperr.ErrInternalServerError(err))
 		return
