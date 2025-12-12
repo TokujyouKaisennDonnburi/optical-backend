@@ -15,7 +15,7 @@ type StateRepository interface {
 	GetAppState(
 		ctx context.Context,
 		state string,
-	) (uuid.UUID, error)
+	) (uuid.UUID, uuid.UUID, error)
 	SaveOauthState(
 		ctx context.Context,
 		userId uuid.UUID,

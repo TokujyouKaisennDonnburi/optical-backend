@@ -13,7 +13,7 @@ import (
 )
 
 const (
-	GITHUB_PRIVATE_KEY_PEM_PATH = "optical-github.2025-12-04.private-key.pem"
+	GITHUB_PRIVATE_KEY_PEM_PATH = "optical-github.private-key.pem"
 	GITHUB_API_VERSION = "2022-11-28"
 )
 

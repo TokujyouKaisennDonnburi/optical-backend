@@ -2,6 +2,7 @@ package gateway
 
 import (
 	"context"
+	"encoding/json"
 	"time"
 
 	"github.com/TokujouKaisenDonburi/optical-backend/pkg/apperr"
@@ -10,19 +11,24 @@ import (
 	"github.com/jmoiron/sqlx"
 )
 
+type AppStateModel struct {
+	UserId     uuid.UUID `json:"userId"`
+	CalendarId uuid.UUID `json:"calendarId"`
+}
+
 func (r *StateRedisRepository) GetAppState(
 	ctx context.Context,
 	state string,
-) (uuid.UUID, error) {
+) (uuid.UUID, uuid.UUID, error) {
 	result, err := r.redisClient.GetDel(ctx, getAppStateKey(state)).Result()
 	if err != nil {
-		return uuid.Nil, err
+		return uuid.Nil, uuid.Nil, err
 	}
-	userId, err := uuid.Parse(result)
-	if err != nil {
-		return uuid.Nil, err
+	var model AppStateModel
+	if err := json.Unmarshal([]byte(result), &model); err != nil {
+		return uuid.Nil, uuid.Nil, err
 	}
-	return userId, nil
+	return model.UserId, model.CalendarId, nil
 }
 
 func (r *StateRedisRepository) SaveAppState(
@@ -43,10 +49,18 @@ func (r *StateRedisRepository) SaveAppState(
 			return err
 		}
 		if !isMember {
-			return apperr.ForbiddenError("")
+			return apperr.ForbiddenError("invalid member")
 		}
 		exp := time.Duration(time.Minute * 10)
-		status := r.redisClient.SetEx(ctx, getAppStateKey(state), calendarId.String(), exp)
+		model := AppStateModel{
+			UserId:     userId,
+			CalendarId: calendarId,
+		}
+		json, err := json.Marshal(&model)
+		if err != nil {
+			return err
+		}
+		status := r.redisClient.SetEx(ctx, getAppStateKey(state), string(json), exp)
 		return status.Err()
 	})
 }

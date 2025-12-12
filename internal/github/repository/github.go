@@ -9,8 +9,8 @@ import (
 type GithubRepository interface {
 	InstallToCalendar(
 		ctx context.Context,
-		calendarId uuid.UUID,
-		installationId string,
+		userId, calendarId uuid.UUID,
+		code, installationId string,
 	) error
 	LinkUser(
 		ctx context.Context,
