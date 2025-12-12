@@ -14,6 +14,8 @@ tags:
     description: Member management
   - name: events
     description: Events management
+  - name: options
+    description: Options management
 paths:
   /register:
     post:
@@ -297,6 +299,26 @@ paths:
            description: Invalid request
          '401':
            description: Unauthorized
+  /options:
+    get:
+      summary: Get list of options
+      tags:
+        - options
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Options retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/OptionResponse'
+        '401':
+          description: Unauthorized
+        '500':
+          description: Internal server error
   /calendars/{calendarId}/members:
     post:
       summary: Add a member to a calendar
@@ -712,3 +734,16 @@ components:
           example:
             - optical-user1@example.com
             - optical-user2@example.com
+    OptionResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+          example: "1"
+        name:
+          type: string
+          example: "option-name"
+        deprecated:
+          type: boolean
+          example: false

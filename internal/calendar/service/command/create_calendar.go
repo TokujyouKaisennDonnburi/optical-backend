@@ -16,7 +16,7 @@ type CalendarCreateInput struct {
 	CalendarColor string
 	MemberEmails  []string
 	ImageId       uuid.UUID
-	OptionIds     []uuid.UUID
+	OptionIds     []int32
 }
 
 type CalendarCreateOutput struct {
@@ -56,7 +56,8 @@ func (s *CalendarCommand) CreateCalendar(ctx context.Context, input CalendarCrea
 				return nil, err
 			}
 			return newCalendar, nil
-		})
+		},
+	)
 	if err != nil {
 		return nil, err
 	}

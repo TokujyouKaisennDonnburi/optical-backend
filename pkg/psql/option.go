@@ -4,16 +4,15 @@ import (
 	"context"
 
 	"github.com/TokujouKaisenDonburi/optical-backend/internal/option"
-	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
 )
 
 type OptionModel struct {
-	id   uuid.UUID
-	name string
+	Id   int32  `db:"id"`
+	Name string `db:"name"`
 }
 
-func FindOptionsByIds(ctx context.Context, tx *sqlx.Tx, ids []uuid.UUID) ([]option.Option, error) {
+func FindOptionsByIds(ctx context.Context, tx *sqlx.Tx, ids []int32) ([]option.Option, error) {
 	if len(ids) == 0 {
 		return []option.Option{}, nil
 	}
@@ -22,21 +21,23 @@ func FindOptionsByIds(ctx context.Context, tx *sqlx.Tx, ids []uuid.UUID) ([]opti
 			FROM options
 		WHERE 
 			id in (?)
+		AND deprecated = FALSE
 	`
 	optionModels := []OptionModel{}
 	query, args, err := sqlx.In(query, ids)
 	if err != nil {
 		return nil, err
 	}
-	err = tx.SelectContext(ctx, optionModels, query, args...)
+	query = tx.Rebind(query)
+	err = tx.SelectContext(ctx, &optionModels, query, args...)
 	if err != nil {
 		return nil, err
 	}
 	options := []option.Option{}
 	for _, optionModel := range optionModels {
 		options = append(options, option.Option{
-			Id:   optionModel.id,
-			Name: optionModel.name,
+			Id:   optionModel.Id,
+			Name: optionModel.Name,
 		})
 	}
 	return options, nil

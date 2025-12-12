@@ -17,7 +17,7 @@ type CalendarCreateRequest struct {
 	Color     string   `json:"color"`
 	ImageId   string   `json:"imageId"`
 	Members   []string `json:"members"`
-	OptionIds []string `json:"optionIds"`
+	OptionIds []int32  `json:"optionIds"`
 }
 
 type CalendarCreateResponse struct {
@@ -43,15 +43,6 @@ func (h *CalendarHttpHandler) CreateCalendar(w http.ResponseWriter, r *http.Requ
 		_ = render.Render(w, r, apperr.ErrInvalidRequest(err))
 		return
 	}
-	optionIds := []uuid.UUID{}
-	for _, id := range request.OptionIds {
-		optionId, err := uuid.Parse(id)
-		if err != nil {
-			_ = render.Render(w, r, apperr.ErrInvalidRequest(err))
-			return
-		}
-		optionIds = append(optionIds, optionId)
-	}
 	var imageId uuid.UUID
 	if request.ImageId != "" {
 		imageId, err = uuid.Parse(request.ImageId)
@@ -68,7 +59,7 @@ func (h *CalendarHttpHandler) CreateCalendar(w http.ResponseWriter, r *http.Requ
 		CalendarName:  request.Name,
 		CalendarColor: request.Color,
 		MemberEmails:  request.Members,
-		OptionIds:     optionIds,
+		OptionIds:     request.OptionIds,
 	})
 	if err != nil {
 		_ = render.Render(w, r, apperr.ErrInternalServerError(err))

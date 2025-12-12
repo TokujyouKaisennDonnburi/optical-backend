@@ -31,7 +31,7 @@ func (r *CalendarPsqlRepository) Create(
 	ctx context.Context,
 	imageId uuid.UUID,
 	memberEmails []string,
-	optionIds []uuid.UUID,
+	optionIds []int32,
 	createFn func(image *calendar.Image, members []calendar.Member, options []option.Option) (*calendar.Calendar, error),
 ) error {
 	return db.RunInTx(r.db, func(tx *sqlx.Tx) error {
