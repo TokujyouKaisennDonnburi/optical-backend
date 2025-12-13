@@ -39,10 +39,11 @@ func (r *StateRedisRepository) SaveAppState(
 	return db.RunInTx(r.db, func(tx *sqlx.Tx) error {
 		var isMember bool
 		query := `
-			SELECT 1 FROM calendar_members
+			SELECT 1 
+				FROM calendar_members
 			WHERE calendar_members.calendar_id = $2
-			AND calendar_members.user_id = $1
-			AND calendar_members.joined_at IS NOT NULL
+				AND calendar_members.user_id = $1
+				AND calendar_members.joined_at IS NOT NULL
 		`
 		err := tx.GetContext(ctx, &isMember, query, userId, calendarId)
 		if err != nil {

@@ -48,9 +48,9 @@ func (r *GithubApiRepository) CreateUser(
 
 func createGithubUser(ctx context.Context, tx *sqlx.Tx, newUser *user.User, githubUser *github.User) error {
 	query := `
-			INSERT INTO users(id, name, email, password_hash, created_at, updated_at)
-			VALUES(:id, :name, :email, :password, :createdAt, :updatedAt)
-		`
+		INSERT INTO users(id, name, email, password_hash, created_at, updated_at)
+		VALUES(:id, :name, :email, :password, :createdAt, :updatedAt)
+	`
 	_, err := tx.NamedExecContext(ctx, query, map[string]any{
 		"id":        newUser.Id,
 		"name":      newUser.Name,
@@ -74,9 +74,9 @@ func createGithubUser(ctx context.Context, tx *sqlx.Tx, newUser *user.User, gith
 		return err
 	}
 	query = `
-			INSERT INTO user_githubs(user_id, github_id, github_name, github_email, sso_login, created_at, updated_at)
-			VALUES(:userId, :githubId, :githubName, :githubEmail, true, :createdAt, :updatedAt)
-		`
+		INSERT INTO user_githubs(user_id, github_id, github_name, github_email, sso_login, created_at, updated_at)
+		VALUES(:userId, :githubId, :githubName, :githubEmail, true, :createdAt, :updatedAt)
+	`
 	_, err = tx.NamedExecContext(ctx, query, map[string]any{
 		"userId":     newUser.Id,
 		"githubId":   githubUser.Id,
@@ -91,7 +91,7 @@ func createGithubUser(ctx context.Context, tx *sqlx.Tx, newUser *user.User, gith
 func updateGithubUser(ctx context.Context, tx *sqlx.Tx, userId uuid.UUID, githubUser *github.User) error {
 	query := `
 		INSERT INTO user_githubs(user_id, github_id, github_name, github_email, created_at, updated_at)
-		VALUES(:userId, :githubId, :githubName, :githubEmail, :createdAt, :updatedAt)
+			VALUES(:userId, :githubId, :githubName, :githubEmail, :createdAt, :updatedAt)
 		ON CONFLICT(user_id) 
 		DO UPDATE SET
 			github_id = :githubId,

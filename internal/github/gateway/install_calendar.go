@@ -21,14 +21,14 @@ func (r *GithubApiRepository) InstallToCalendar(
 			return err
 		}
 		query := `
-		INSERT INTO calendar_githubs(calendar_id, github_id, github_name, installation_id, created_at, updated_at)
-		VALUES(:calendarId, :githubId, :githubName, :installationId, :createdAt, :updatedAt)
-		ON CONFLICT(calendar_id) 
-		DO UPDATE SET
-			github_id = :githubId,
-			github_name = :githubName,
-			installation_id = :installationId,
-			updated_at = :updatedAt
+			INSERT INTO calendar_githubs(calendar_id, github_id, github_name, installation_id, created_at, updated_at)
+				VALUES(:calendarId, :githubId, :githubName, :installationId, :createdAt, :updatedAt)
+			ON CONFLICT(calendar_id) 
+			DO UPDATE SET
+				github_id = :githubId,
+				github_name = :githubName,
+				installation_id = :installationId,
+				updated_at = :updatedAt
 		`
 		_, err = tx.NamedExecContext(ctx, query, map[string]any{
 			"calendarId":     calendarId,

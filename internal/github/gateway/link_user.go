@@ -23,7 +23,7 @@ func (r *GithubApiRepository) LinkUser(
 	}
 	query := `
 		INSERT INTO user_githubs(user_id, github_id, github_name, github_email, sso_login, created_at, updated_at)
-			VALUES(:userId, :githubId, :githubName, :githubEmail, sso_login, :createdAt, :updatedAt)
+			VALUES(:userId, :githubId, :githubName, :githubEmail, false, :createdAt, :updatedAt)
 		ON CONFLICT(user_id) 
 		DO UPDATE SET
 			github_id = :githubId,
