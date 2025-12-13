@@ -6,10 +6,10 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/TokujouKaisenDonburi/optical-backend/internal/user"
 	"github.com/TokujouKaisenDonburi/optical-backend/pkg/apperr"
 	"github.com/TokujouKaisenDonburi/optical-backend/pkg/auth"
 	"github.com/go-chi/render"
-	"github.com/golang-jwt/jwt/v5"
 )
 
 type UserAuthMiddleware struct{}
@@ -29,34 +29,18 @@ func (m *UserAuthMiddleware) JWTAuthorization(next http.Handler) http.Handler {
 		}
 		authorizationHeader = strings.TrimPrefix(authorizationHeader, "Bearer ")
 		// トークンデコード
-		claims := jwt.MapClaims{}
-		_, err := jwt.ParseWithClaims(authorizationHeader, claims, func(t *jwt.Token) (any, error) {
-			return auth.GetJwtSecretKey(), nil
-		})
+		accesToken, err := user.DecodeAccessToken(authorizationHeader)
 		if err != nil {
 			_ = render.Render(w, r, apperr.ErrUnauthorized(err))
 			return
 		}
-		// ユーザーIDを取得
-		userId, err := claims.GetSubject()
-		if err != nil {
-			_  = render.Render(w, r, apperr.ErrUnauthorized(err))
-			return
-		}
-		// ユーザーIDを取得
-		name, ok := claims["name"]
-		if !ok {
-			_ = render.Render(w, r, apperr.ErrUnauthorized(errors.New("name not found")))
-			return
-		}
-		userName, ok := name.(string)
-		if !ok {
-			_ = render.Render(w, r, apperr.ErrUnauthorized(errors.New("name is invalid")))
+		if accesToken.IsExpired() {
+			_ = render.Render(w, r, apperr.ErrUnauthorized(errors.New("accessToken is expired")))
 			return
 		}
 		// コンテキストに含めてエンドポイントに渡す
-		ctx := context.WithValue(r.Context(), auth.USER_ID_CONTEXT_KEY, userId)
-		ctx = context.WithValue(ctx, auth.USER_NAME_CONTEXT_KEY, userName)
+		ctx := context.WithValue(r.Context(), auth.USER_ID_CONTEXT_KEY, accesToken.UserId.String())
+		ctx = context.WithValue(ctx, auth.USER_NAME_CONTEXT_KEY, accesToken.UserName)
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }

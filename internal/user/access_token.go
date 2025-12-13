@@ -10,12 +10,13 @@ import (
 )
 
 const (
-	ACCESS_TOKEN_EXPIRE  = 60 * 60 * 1        // 1時間
+	ACCESS_TOKEN_EXPIRE  = 60 * 30            // 0.5時間
 	REFRESH_TOKEN_EXPIRE = 60 * 60 * 24 * 180 // 180時間
 )
 
 type AccessToken struct {
 	UserId    uuid.UUID
+	UserName  string
 	Token     string
 	ExpiresIn time.Time
 }
@@ -34,13 +35,51 @@ func NewAccessToken(userId uuid.UUID, userName string) (*AccessToken, error) {
 	}
 	return &AccessToken{
 		UserId:    userId,
+		UserName:  userName,
 		Token:     signedStr,
 		ExpiresIn: exp,
 	}, nil
 }
 
 func (at *AccessToken) IsExpired() bool {
-	return at.ExpiresIn.Before(time.Now())
+	return at.ExpiresIn.Before(time.Now().UTC())
+}
+
+// トークンをデコードして情報を取得する
+func DecodeAccessToken(accessToken string) (*AccessToken, error) {
+	claims := jwt.MapClaims{}
+	_, err := jwt.ParseWithClaims(accessToken, claims, func(t *jwt.Token) (any, error) {
+		return []byte(getJwtSecretKey()), nil
+	})
+	if err != nil {
+		return nil, err
+	}
+	sub, err := claims.GetSubject()
+	if err != nil {
+		return nil, err
+	}
+	userId, err := uuid.Parse(sub)
+	if err != nil {
+		return nil, err
+	}
+	userName, ok := claims["name"]
+	if !ok {
+		return nil, errors.New("token name is not set")
+	}
+	userNameStr, ok := userName.(string)
+	if !ok {
+		return nil, errors.New("token name format is invalid")
+	}
+	exp, err := claims.GetExpirationTime()
+	if err != nil {
+		return nil, err
+	}
+	return &AccessToken{
+		UserId:    userId,
+		UserName:  userNameStr,
+		Token:     accessToken,
+		ExpiresIn: time.Unix(exp.Unix(), 0),
+	}, nil
 }
 
 type RefreshToken struct {
@@ -53,7 +92,7 @@ type RefreshToken struct {
 
 func NewRefreshToken(user *User) (*RefreshToken, error) {
 	tokenId := uuid.New()
-	exp := time.Now().Add(time.Second * time.Duration(REFRESH_TOKEN_EXPIRE))
+	exp := time.Now().Add(time.Second * REFRESH_TOKEN_EXPIRE)
 	claims := jwt.MapClaims{
 		"sub":  user.Id.String(),
 		"name": user.Name,
