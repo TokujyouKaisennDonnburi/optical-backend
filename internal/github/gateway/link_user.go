@@ -17,11 +17,7 @@ func (r *GithubApiRepository) LinkUser(
 	if err != nil {
 		return err
 	}
-	githubResp, err := api.GetGithubUser(accessToken)
-	if err != nil {
-		return err
-	}
-	githubEmail, err := api.GetGithubPrimaryEmail(accessToken)
+	githubUser, err := api.GetGithubUser(accessToken)
 	if err != nil {
 		return err
 	}
@@ -37,9 +33,9 @@ func (r *GithubApiRepository) LinkUser(
 	`
 	_, err = r.db.NamedExecContext(ctx, query, map[string]any{
 		"userId":      userId,
-		"githubId":    githubResp.Id,
-		"githubName":  githubResp.Login,
-		"githubEmail": githubEmail,
+		"githubId":    githubUser.Id,
+		"githubName":  githubUser.Name,
+		"githubEmail": githubUser.Email,
 		"createdAt":   time.Now(),
 		"updatedAt":   time.Now(),
 	})

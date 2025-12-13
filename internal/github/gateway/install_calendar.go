@@ -45,11 +45,7 @@ func (r *GithubApiRepository) InstallToCalendar(
 		if err != nil {
 			return err
 		}
-		githubResp, err := api.GetGithubUser(accessToken)
-		if err != nil {
-			return err
-		}
-		githubEmail, err := api.GetGithubPrimaryEmail(accessToken)
+		githubUser, err := api.GetGithubUser(accessToken)
 		if err != nil {
 			return err
 		}
@@ -64,12 +60,12 @@ func (r *GithubApiRepository) InstallToCalendar(
 				updated_at = :updatedAt
 		`
 		_, err = tx.NamedExecContext(ctx, query, map[string]any{
-			"userId":     userId,
-			"githubId":   githubResp.Id,
-			"githubName": githubResp.Login,
-			"githubEmail": githubEmail,
-			"createdAt":  time.Now(),
-			"updatedAt":  time.Now(),
+			"userId":      userId,
+			"githubId":    githubUser.Id,
+			"githubName":  githubUser.Name,
+			"githubEmail": githubUser.Email,
+			"createdAt":   time.Now(),
+			"updatedAt":   time.Now(),
 		})
 		return err
 	})

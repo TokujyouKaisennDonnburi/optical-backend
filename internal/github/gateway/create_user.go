@@ -22,11 +22,7 @@ func (r *GithubApiRepository) CreateUser(
 	if err != nil {
 		return nil, err
 	}
-	githubResp, err := api.GetGithubUser(accessToken)
-	if err != nil {
-		return nil, err
-	}
-	email, err := api.GetGithubPrimaryEmail(accessToken)
+	githubUser, err := api.GetGithubUser(accessToken)
 	if err != nil {
 		return nil, err
 	}
@@ -34,20 +30,13 @@ func (r *GithubApiRepository) CreateUser(
 	if err != nil {
 		return nil, err
 	}
-	githubUser := &github.User{
-		Id:        githubResp.Id,
-		Login:     githubResp.Login,
-		Email:     email,
-		Url:       githubResp.Url,
-		AvatarUrl: githubResp.AvatarUrl,
-	}
 	var newUser *user.User
 	err = db.RunInTx(r.db, func(tx *sqlx.Tx) error {
 		newUser, err = psql.FindUserByGithubSSO(ctx, tx, githubUser.Id)
 		if err == nil {
 			return updateGithubUser(ctx, tx, newUser.Id, githubUser)
 		} else {
-			newUser, err = user.NewUser(githubUser.Login, githubUser.Email, password)
+			newUser, err = user.NewUser(githubUser.Name, githubUser.Email, password)
 			if err != nil {
 				return err
 			}
@@ -91,7 +80,7 @@ func createGithubUser(ctx context.Context, tx *sqlx.Tx, newUser *user.User, gith
 	_, err = tx.NamedExecContext(ctx, query, map[string]any{
 		"userId":     newUser.Id,
 		"githubId":   githubUser.Id,
-		"githubName": githubUser.Login,
+		"githubName": githubUser.Name,
 		"githubEmail": githubUser.Email,
 		"createdAt":  time.Now(),
 		"updatedAt":  time.Now(),
@@ -113,7 +102,7 @@ func updateGithubUser(ctx context.Context, tx *sqlx.Tx, userId uuid.UUID, github
 	_, err := tx.NamedExecContext(ctx, query, map[string]any{
 		"userId":     userId,
 		"githubId":   githubUser.Id,
-		"githubName": githubUser.Login,
+		"githubName": githubUser.Name,
 		"githubEmail": githubUser.Email,
 		"createdAt":  time.Now(),
 		"updatedAt":  time.Now(),

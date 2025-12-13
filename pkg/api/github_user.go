@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+
+	"github.com/TokujouKaisenDonburi/optical-backend/internal/github"
 )
 
 type GithubUserResponse struct {
@@ -14,7 +16,7 @@ type GithubUserResponse struct {
 	AvatarUrl string `json:"avatar_url"`
 }
 
-func GetGithubUser(accessToken string) (*GithubUserResponse, error) {
+func GetGithubUser(accessToken string) (*github.User, error) {
 	client := http.Client{}
 	req, err := http.NewRequest(
 		"GET",
@@ -39,5 +41,15 @@ func GetGithubUser(accessToken string) (*GithubUserResponse, error) {
 	if err := json.NewDecoder(resp.Body).Decode(&respBody); err != nil {
 		return nil, err
 	}
-	return &respBody, nil
+	email, err := GetGithubPrimaryEmail(accessToken)
+	if err != nil {
+		return nil, err
+	}
+	return &github.User{
+		Id:        respBody.Id,
+		Name:      respBody.Name,
+		Email:     email,
+		Url:       respBody.Url,
+		AvatarUrl: respBody.AvatarUrl,
+	}, nil
 }
