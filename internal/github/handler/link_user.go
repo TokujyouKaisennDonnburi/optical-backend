@@ -16,7 +16,7 @@ type GithubUserLinkRequest struct {
 
 type GithubUserLinkResponse struct {
 	UserId       string `json:"userId"`
-	AcceessToken string `json:"accessToken"`
+	AccessToken string `json:"accessToken"`
 	RefreshToken string `json:"refreshToken"`
 }
 
@@ -41,7 +41,7 @@ func (h *GithubHandler) LinkUser(w http.ResponseWriter, r *http.Request) {
 	} else {
 		render.JSON(w, r, GithubUserLinkResponse{
 			UserId:       output.UserId.String(),
-			AcceessToken: output.AccessToken,
+			AccessToken: output.AccessToken,
 			RefreshToken: output.RefreshToken,
 		})
 	}
