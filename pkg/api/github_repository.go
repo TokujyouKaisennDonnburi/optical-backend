@@ -57,6 +57,5 @@ func GetInstalledRepositories(ctx context.Context, accessToken string) ([]github
 			FullName: repository.FullName,
 		})
 	}
-	fmt.Println("Repositories", repositories)
 	return repositories, nil
 }
