@@ -152,39 +152,57 @@ type CalendarQueryModel struct {
 	Options  []option.Option   `db:"option"`
 }
 
-// calendarの単体取得
-func (r *CalendarPsqlRepository) FindById(ctx context.Context, id, calendarId uuid.UUID) (*calendar.Calendar, error) {
+// calendar単体取得
+func (r *CalendarPsqlRepository) FindByUserCalendarId(ctx context.Context, userId, calendarId uuid.UUID) (*calendar.Calendar, error) {
+	// calendar & image
 	query := `
-        SELECT calendars.id, calendars.name, calendars.color,
-		calendar_images.id, calendar_images.url,
-		calendar_members.user_id,
-		calendar_options.option_id
-        FROM calendars
-		INNER JOIN calendar_options ON calendar_options.calendar_id = calendars.id
-		INNER JOIN calendar_members ON calendar_members.calendar_id = calendars.id
-		LEFT JOIN calendar_images ON i.id = calendars.image_id
-		WHERE calendar_members.user_id = $1
-		AND calendars.id = $2
-    `
-	model := CalendarQueryModel{}
-	err := r.db.SelectContext(ctx, &model, query, id, calendarId)
+	SELECT calendars.id, calendars.name, calendars.color, calendar_images.id, calendar_images.url
+	FROM calendars
+	LEFT JOIN calendar_images ON calendar_images.id = calendars.image_id
+	WHERE calendars.id = $1
+	AND deleted_at = NULL
+	`
+	var calimage struct {
+		Id       uuid.UUID      `db:"id"`
+		Name     string         `db:"name"`
+		Color    calendar.Color `db:"color"`
+		ImageId  uuid.NullUUID  `db:"image_id"`
+		ImageUrl sql.NullString `db:"image_url"`
+	}
+	err := r.db.GetContext(ctx, &calimage, query, calendarId)
 	if err != nil {
 		return nil, err
 	}
 
-
-
+	queryy := `
+	SELECT calendar_members.calendarId, calendar_members.user_id
+	FROM calendar_members
+	WHERE calendar_members.calendar_id = $2
+	AND calendar_members.user_id = $1
+	`
+	var members []calendar.Member
+	err = r.db.SelectContext(ctx, &members, queryy, userId, calendarId)
+	if err != nil {
+		return nil, err
+	}
+	queryyy := `
+	SELECT calendar_options.id, calendar_options.name
+	FROM calendar_options
+	LEFT JOIN options ON options.id = calendar_options.option_id
+	WHERE calendar_options.calendar_id = $1
+	`
+	var options []option.Option
+	err = r.db.SelectContext(ctx, &options, queryyy, calendarId)
+	if err != nil {
+		return nil, err
+	}
 	return &calendar.Calendar{
-		Id:    model.Id,
-		Name:  model.Name,
-		Color: model.Color,
-		Image: calendar.Image{
-			Id:    model.ImageId.UUID,
-			Url:   model.ImageUrl.String,
-			Valid: model.ImageUrl.Valid,
-		},
-		Members: 
-		Options: model.Options,
+		Id:    calimage,
+		Name:  calimage,
+		Color: calimage,
+		Image: calimage,
+		Members: members,
+		Options: options,
 	}, nil
 }
 
