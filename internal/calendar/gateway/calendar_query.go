@@ -7,6 +7,7 @@ import (
 	"fmt"
 
 	"github.com/TokujouKaisenDonburi/optical-backend/internal/calendar"
+	"github.com/TokujouKaisenDonburi/optical-backend/internal/calendar/service/query/output"
 	"github.com/TokujouKaisenDonburi/optical-backend/internal/option"
 	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
@@ -97,3 +98,115 @@ func modelsToCalendar(calendarModels []CalendarModel, memberModels []MemberModel
 		Options: options,
 	}, nil
 }
+
+type CalendarListQueryModel struct {
+	Id       uuid.UUID      `db:"id"`
+	Name     string         `db:"name"`
+	Color    string         `db:"color"`
+	ImageId  uuid.NullUUID  `db:"image_id"`
+	ImageUrl sql.NullString `db:"image_url"`
+}
+
+// ユーザーが所属するカレンダー一覧を取得する
+func (r *CalendarPsqlRepository) FindByUserId(ctx context.Context, userId uuid.UUID) ([]output.CalendarListQueryOutput, error) {
+	query := `
+		SELECT 
+			c.id, c.name, c.color, c.image_id, ci.url AS image_url
+		FROM calendars c
+		INNER JOIN calendar_members m 
+			ON c.id = m.calendar_id
+		LEFT JOIN calendar_images ci
+			ON c.image_id = ci.id
+		WHERE 
+			m.user_id = $1
+			AND c.deleted_at IS NULL
+		ORDER BY c.id DESC
+	`
+	var rows []CalendarListQueryModel
+	err := r.db.SelectContext(ctx, &rows, query, userId)
+	if err != nil {
+		return nil, err
+	}
+
+	calendars := make([]output.CalendarListQueryOutput, len(rows))
+	for i, row := range rows {
+		calendars[i] = output.CalendarListQueryOutput{
+			Id:    row.Id,
+			Name:  row.Name,
+			Color: row.Color,
+			Image: calendar.Image{
+				Id:    row.ImageId.UUID,
+				Url:   row.ImageUrl.String,
+				Valid: row.ImageId.Valid && row.ImageUrl.Valid,
+			},
+		}
+	}
+	return calendars, nil
+}
+
+type CalendarQueryModel struct {
+	Id       uuid.UUID         `db:"id"`
+	Name     string            `db:"name"`
+	Color    calendar.Color    `db:"color"`
+	ImageId  uuid.NullUUID     `db:"imageId"`
+	ImageUrl sql.NullString    `db:"imageUrl"`
+	Members  []calendar.Member `db:"member"`
+	Options  []option.Option   `db:"option"`
+}
+
+// calendar単体取得
+func (r *CalendarPsqlRepository) FindByUserCalendarId(ctx context.Context, userId, calendarId uuid.UUID) (*calendar.Calendar, error) {
+	// calendar & image
+	query := `
+	SELECT calendars.id, calendars.name, calendars.color, calendar_images.id, calendar_images.url
+	FROM calendars
+	LEFT JOIN calendar_images ON calendar_images.id = calendars.image_id
+	WHERE calendars.id = $1
+	`
+	var calimage struct {
+		Id       uuid.UUID      `db:"id"`
+		Name     string         `db:"name"`
+		Color    calendar.Color `db:"color"`
+		ImageId  uuid.NullUUID  `db:"image_id"`
+		ImageUrl sql.NullString `db:"image_url"`
+	}
+	err := r.db.GetContext(ctx, &calimage, query, calendarId)
+	if err != nil {
+		return nil, err
+	}
+
+	queryy := `
+	SELECT calendar_members.calendarId, calendar_members.user_id
+	FROM calendar_members
+	WHERE calendar_members.calendar_id = $2
+	AND calendar_members.user_id = $1
+	`
+	var members []calendar.Member
+	err = r.db.SelectContext(ctx, &members, queryy, userId, calendarId)
+	if err != nil {
+		return nil, err
+	}
+	queryyy := `
+	SELECT calendar_options.id
+	FROM calendar_options
+	LEFT JOIN options ON options.id = calendar_options.option_id
+	WHERE calendar_options.calendar_id = $1
+	`
+	var options []option.Option
+	err = r.db.SelectContext(ctx, &options, queryyy, calendarId)
+	if err != nil {
+		return nil, err
+	}
+	return &calendar.Calendar{
+		Id:    calimage.Id,
+		Name:  calimage.Name,
+		Color: calimage.Color,
+		Image: calendar.Image{
+			Id:  calimage.ImageId.UUID,
+			Url: calimage.ImageUrl.String,
+		},
+		Members: members,
+		Options: options,
+	}, nil
+}
+

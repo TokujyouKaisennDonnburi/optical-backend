@@ -5,7 +5,6 @@ import (
 	"database/sql"
 
 	"github.com/TokujouKaisenDonburi/optical-backend/internal/calendar"
-	"github.com/TokujouKaisenDonburi/optical-backend/internal/calendar/service/query/output"
 	"github.com/TokujouKaisenDonburi/optical-backend/internal/option"
 	"github.com/TokujouKaisenDonburi/optical-backend/pkg/db"
 	"github.com/TokujouKaisenDonburi/optical-backend/pkg/psql"
@@ -123,47 +122,3 @@ func (r *CalendarPsqlRepository) Create(
 	})
 }
 
-type CalendarListQueryModel struct {
-	Id       uuid.UUID      `db:"id"`
-	Name     string         `db:"name"`
-	Color    string         `db:"color"`
-	ImageId  uuid.NullUUID  `db:"image_id"`
-	ImageUrl sql.NullString `db:"image_url"`
-}
-
-// ユーザーが所属するカレンダー一覧を取得する
-func (r *CalendarPsqlRepository) FindByUserId(ctx context.Context, userId uuid.UUID) ([]output.CalendarQueryOutput, error) {
-	query := `
-		SELECT 
-			c.id, c.name, c.color, c.image_id, ci.url AS image_url
-		FROM calendars c
-		INNER JOIN calendar_members m 
-			ON c.id = m.calendar_id
-		LEFT JOIN calendar_images ci
-			ON c.image_id = ci.id
-		WHERE 
-			m.user_id = $1
-			AND c.deleted_at IS NULL
-		ORDER BY c.id
-	`
-	var rows []CalendarListQueryModel
-	err := r.db.SelectContext(ctx, &rows, query, userId)
-	if err != nil {
-		return nil, err
-	}
-
-	calendars := make([]output.CalendarQueryOutput, len(rows))
-	for i, row := range rows {
-		calendars[i] = output.CalendarQueryOutput{
-			Id:    row.Id,
-			Name:  row.Name,
-			Color: row.Color,
-			Image: calendar.Image{
-				Id:    row.ImageId.UUID,
-				Url:   row.ImageUrl.String,
-				Valid: row.ImageId.Valid && row.ImageUrl.Valid,
-			},
-		}
-	}
-	return calendars, nil
-}
