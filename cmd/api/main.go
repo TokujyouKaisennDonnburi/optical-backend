@@ -13,6 +13,7 @@ import (
 	githubGateway "github.com/TokujouKaisenDonburi/optical-backend/internal/github/gateway"
 	githubHandler "github.com/TokujouKaisenDonburi/optical-backend/internal/github/handler"
 	githubCommand "github.com/TokujouKaisenDonburi/optical-backend/internal/github/service/command"
+	githubQuery "github.com/TokujouKaisenDonburi/optical-backend/internal/github/service/query"
 	optionGateway "github.com/TokujouKaisenDonburi/optical-backend/internal/option/gateway"
 	optionHandler "github.com/TokujouKaisenDonburi/optical-backend/internal/option/handler"
 	optionQuery "github.com/TokujouKaisenDonburi/optical-backend/internal/option/service/query"
@@ -56,13 +57,14 @@ func main() {
 	userRepository := userGateway.NewUserPsqlRepository(db)
 	tokenRepository := userGateway.NewTokenRedisRepository(redisClient)
 	stateRepository := githubGateway.NewStateRedisRepository(db, redisClient)
+	optionRepository := optionGateway.NewOptionPsqlRepository(db)
 	githubRepository := githubGateway.NewGithubApiRepository(db)
+	githubQuery := githubQuery.NewGithubQuery(stateRepository, optionRepository, githubRepository)
 	githubCommand := githubCommand.NewGithubCommand(tokenRepository, stateRepository, githubRepository)
-	githubHandler := githubHandler.NewGithubHandler(githubCommand)
+	githubHandler := githubHandler.NewGithubHandler(githubQuery, githubCommand)
 	userQuery := userQuery.NewUserQuery(userRepository)
 	userCommand := userCommand.NewUserCommand(userRepository, tokenRepository)
 	userHandler := userHandler.NewUserHttpHandler(userQuery, userCommand)
-	optionRepository := optionGateway.NewOptionPsqlRepository(db)
 	optionQuery := optionQuery.NewOptionQuery(optionRepository)
 	optionHandler := optionHandler.NewOptionHttpHandler(optionQuery)
 	eventRepository := calendarGateway.NewEventPsqlRepository(db)
@@ -98,6 +100,7 @@ func main() {
 		// Github
 		r.Post("/github/apps/state", githubHandler.CreateAppState)
 		r.Post("/github/oauth/state", githubHandler.CreateOauthState)
+		r.Post("/github/calendars/{calendarId}/review-requests", githubHandler.GetReviewRequests)
 
 		// Calendars
 		r.Post("/calendars", calendarHandler.CreateCalendar)
