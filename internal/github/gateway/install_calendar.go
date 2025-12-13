@@ -49,19 +49,20 @@ func (r *GithubApiRepository) InstallToCalendar(
 		if err != nil {
 			return err
 		}
+		githubEmail, err := api.GetGithubPrimaryEmail(accessToken)
+		if err != nil {
+			return err
+		}
 		query = `
-			INSERT INTO user_githubs(user_id, github_id, github_name, created_at, updated_at)
-				VALUES(:userId, :githubId, :githubName, :createdAt, :updatedAt)
-			ON CONFLICT(user_id) 
-			DO UPDATE SET
-				github_id = :githubId,
-				github_name = :githubName,
-				updated_at = :updatedAt
+			INSERT INTO user_githubs(user_id, github_id, github_name, github_email, created_at, updated_at)
+				VALUES(:userId, :githubId, :githubName, :githubEmail, :createdAt, :updatedAt)
+			ON CONFLICT DO NOTHING
 		`
 		_, err = tx.NamedExecContext(ctx, query, map[string]any{
 			"userId":     userId,
 			"githubId":   githubResp.Id,
 			"githubName": githubResp.Login,
+			"githubEmail": githubEmail,
 			"createdAt":  time.Now(),
 			"updatedAt":  time.Now(),
 		})
