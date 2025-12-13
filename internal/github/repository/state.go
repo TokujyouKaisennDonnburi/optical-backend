@@ -2,7 +2,9 @@ package repository
 
 import (
 	"context"
+	"time"
 
+	"github.com/TokujouKaisenDonburi/optical-backend/internal/github"
 	"github.com/google/uuid"
 )
 
@@ -25,4 +27,13 @@ type StateRepository interface {
 		ctx context.Context,
 		state string,
 	) (uuid.UUID, error)
+	GetOrganization(
+		ctx context.Context,
+		installationId string,
+	) (*github.Organization, error)
+	SaveOrganization(
+		ctx context.Context,
+		organization *github.Organization,
+		expiration time.Duration,
+	) error
 }
