@@ -160,7 +160,6 @@ func (r *CalendarPsqlRepository) FindByUserCalendarId(ctx context.Context, userI
 	FROM calendars
 	LEFT JOIN calendar_images ON calendar_images.id = calendars.image_id
 	WHERE calendars.id = $1
-	AND deleted_at = NULL
 	`
 	var calimage struct {
 		Id       uuid.UUID      `db:"id"`
@@ -186,7 +185,7 @@ func (r *CalendarPsqlRepository) FindByUserCalendarId(ctx context.Context, userI
 		return nil, err
 	}
 	queryyy := `
-	SELECT calendar_options.id, calendar_options.name
+	SELECT calendar_options.id
 	FROM calendar_options
 	LEFT JOIN options ON options.id = calendar_options.option_id
 	WHERE calendar_options.calendar_id = $1
@@ -197,10 +196,13 @@ func (r *CalendarPsqlRepository) FindByUserCalendarId(ctx context.Context, userI
 		return nil, err
 	}
 	return &calendar.Calendar{
-		Id:    calimage,
-		Name:  calimage,
-		Color: calimage,
-		Image: calimage,
+		Id:    calimage.Id,
+		Name:  calimage.Name,
+		Color: calimage.Color,
+		Image: calendar.Image{
+			Id:  calimage.ImageId.UUID,
+			Url: calimage.ImageUrl.String,
+		},
 		Members: members,
 		Options: options,
 	}, nil

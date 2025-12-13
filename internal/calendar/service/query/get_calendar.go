@@ -25,7 +25,7 @@ type CalendarQueryOutput struct {
 
 // カレンダー情報を取得
 func (q *CalendarQuery) GetCalendar(ctx context.Context, input GetCalendarInput)(*CalendarQueryOutput, error) {
-	calendar, err := q.calendarRepository.FindByUserIdCalendarId(ctx, input.UserId, input.CalendarId)
+	calendar, err := q.calendarRepository.FindByUserCalendarId(ctx, input.UserId, input.CalendarId)
 	if err != nil {
 		return nil, err
 	}
