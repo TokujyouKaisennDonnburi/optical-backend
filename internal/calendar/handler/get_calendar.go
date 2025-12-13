@@ -24,13 +24,13 @@ type CalendarResponse struct {
 }
 
 func (h *CalendarHttpHandler) GetCalendar(w http.ResponseWriter, r *http.Request) {
-	// get userId
+	// userId
 	userId, err := auth.GetUserIdFromContext(r)
 	if err != nil {
 		_ = render.Render(w, r, apperr.ErrInternalServerError(err))
 		return
 	}
-	// get calendarId
+	// calendarId
 	calendarId, err := uuid.Parse(chi.URLParam(r, "calendarId"))
 	if err != nil {
 		_ = render.Render(w, r, apperr.ErrInternalServerError(err))
@@ -56,3 +56,4 @@ func (h *CalendarHttpHandler) GetCalendar(w http.ResponseWriter, r *http.Request
 	}
 	render.JSON(w,r,response)
 }
+
