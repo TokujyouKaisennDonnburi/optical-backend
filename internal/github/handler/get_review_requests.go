@@ -16,7 +16,7 @@ type GithubReviewRequestListResponse struct {
 	Url       string                                `json:"url"`
 	Title     string                                `json:"title"`
 	Number    int                                   `json:"number"`
-	Assigness []GithubReviewRequestListResponseUser `json:"assigness"`
+	Assignees []GithubReviewRequestListResponseUser `json:"assignees"`
 }
 
 type GithubReviewRequestListResponseUser struct {
@@ -61,7 +61,7 @@ func (h *GithubHandler) GetReviewRequests(w http.ResponseWriter, r *http.Request
 			Url:       pullRequest.Url,
 			Title:     pullRequest.Title,
 			Number:    pullRequest.Number,
-			Assigness: assigness,
+			Assignees: assigness,
 		}
 	}
 	render.JSON(w, r, responseList)

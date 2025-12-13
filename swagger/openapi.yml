@@ -870,7 +870,7 @@ components:
           type: string
         number:
           type: integer
-        assigness:
+        assignees:
           type: array
           items:
             $ref: '#/components/schemas/GithubReviewRequestListResponseUser'
