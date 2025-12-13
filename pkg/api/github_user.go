@@ -47,7 +47,7 @@ func GetGithubUser(accessToken string) (*github.User, error) {
 	}
 	return &github.User{
 		Id:        respBody.Id,
-		Name:      respBody.Name,
+		Name:      respBody.Login,
 		Email:     email,
 		Url:       respBody.Url,
 		AvatarUrl: respBody.AvatarUrl,
