@@ -44,10 +44,6 @@ func (q *GithubQuery) GetReviewRequests(ctx context.Context, input GithubReviewR
 			if pullRequest.ReviewComments != 0 {
 				continue
 			}
-			// クローズしているものはスキップ
-			if pullRequest.State == github.PULL_REQUEST_STATE_CLOSE {
-				continue
-			}
 			for _, reviewer := range pullRequest.Reviewers {
 				if reviewer.Id != output.GithubId {
 					continue
