@@ -36,7 +36,13 @@ func (r *GithubApiRepository) GetPullRequests(
 		}
 		for _, repos := range organization.Repositories {
 			// APIからそれぞれのリポジトリのプルリクエストを取得
-			prList, err := api.GetPullRequests(ctx, organization.AccessToken, organization.Login, repos.Name)
+			prList, err := api.GetPullRequests(
+				ctx,
+				organization.AccessToken,
+				organization.Login,
+				repos.Name,
+				github.PULL_REQUEST_STATE_OPEN,
+			)
 			if err != nil {
 				fmt.Printf("repository error: %s\n", err.Error())
 				continue

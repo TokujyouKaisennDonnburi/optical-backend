@@ -9,10 +9,11 @@ import (
 	"github.com/TokujouKaisenDonburi/optical-backend/internal/github"
 )
 
-func GetPullRequests(ctx context.Context, accessToken, owner, repos string) ([]github.PullRequest, error) {
+func GetPullRequests(ctx context.Context, accessToken, owner, repos, state string) ([]github.PullRequest, error) {
 	client := http.Client{}
 	requestUrl := GITHUB_BASE_URL+"/repos/"+owner+"/"+repos+"/pulls"
 	requestUrl += "?per_page=100"
+	requestUrl += "&state=" + state
 	// インストール済みアプリ取得リクエスト
 	req, err := http.NewRequestWithContext(
 		ctx,
