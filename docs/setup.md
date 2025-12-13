@@ -30,6 +30,12 @@ sudo mv mc /usr/local/bin
 cp .env.example .env
 ```
 
+### Github
+
+- `GITHUB_APP_ID`及び、`GITHUB_CLIENT_ID`には[アプリ設定ページ](https://github.com/organizations/TokujyouKaisennDonnburi/settings/apps/optical-github)から`Client ID`をコピーして設定する
+- `GITHUB_CLIENT_SECRET`には`Client secrets`を生成して設定する
+- 設定ページの`Private keys`タブからプライベートキーを作成し、`optical-github.private-key.pem`に名前を変更しリポジトリのルートに配置する
+
 ## データベース立ち上げ
 ```bash
 docker compose up -d
