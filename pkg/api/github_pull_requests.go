@@ -33,6 +33,7 @@ func GetPullRequests(ctx context.Context, accessToken, owner, repos string) ([]g
 	if resp.StatusCode != http.StatusOK {
 		return nil, fmt.Errorf("failed to get github pullrequests: %d", resp.StatusCode)
 	}
+	defer resp.Body.Close()
 	// WARNING: ドメインから直接参照
 	var pullRequests []github.PullRequest
 	if err := json.NewDecoder(resp.Body).Decode(&pullRequests); err != nil {
