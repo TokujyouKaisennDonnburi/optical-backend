@@ -3,6 +3,7 @@ package api
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"net/http"
 
 	"github.com/TokujouKaisenDonburi/optical-backend/pkg/auth"
@@ -46,6 +47,9 @@ func PostOauthAccessToken(code string) (string, error) {
 	resp, err := client.Do(req)
 	if err != nil {
 		return "", err
+	}
+	if resp.StatusCode != http.StatusOK {
+		return "", fmt.Errorf("failed to get github oauth access_token: %d", resp.StatusCode)
 	}
 	defer resp.Body.Close()
 	var respBody GithubAccessTokenResponse

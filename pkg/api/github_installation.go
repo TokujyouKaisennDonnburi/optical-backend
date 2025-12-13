@@ -3,6 +3,7 @@ package api
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"net/http"
 )
 
@@ -34,6 +35,9 @@ func GetGithubInstallation(ctx context.Context, installationId string) (*Install
 	resp, err := client.Do(req)
 	if err != nil {
 		return nil, err
+	}
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("failed to get github app installations: %d", resp.StatusCode)
 	}
 	defer resp.Body.Close()
 	var response InstallationGetResponse

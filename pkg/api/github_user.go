@@ -2,6 +2,7 @@ package api
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 )
 
@@ -30,6 +31,9 @@ func GetGithubUser(accessToken string) (*GithubUserResponse, error) {
 	if err != nil {
 		return nil, err
 	}
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("failed to get github user: %d", resp.StatusCode)
+	}
 	defer resp.Body.Close()
 	var respBody GithubUserResponse
 	if err := json.NewDecoder(resp.Body).Decode(&respBody); err != nil {
@@ -37,4 +41,3 @@ func GetGithubUser(accessToken string) (*GithubUserResponse, error) {
 	}
 	return &respBody, nil
 }
-

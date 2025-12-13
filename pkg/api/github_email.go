@@ -3,6 +3,7 @@ package api
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"net/http"
 )
 
@@ -28,6 +29,9 @@ func GetGithubPrimaryEmail(accessToken string) (string, error) {
 	if err != nil {
 		return "", err
 	}
+	if resp.StatusCode != http.StatusOK {
+		return "", fmt.Errorf("failed to get github user emails: %d", resp.StatusCode)
+	}
 	defer resp.Body.Close()
 	var respBody []GithubEmailResponse
 	if err := json.NewDecoder(resp.Body).Decode(&respBody); err != nil {
@@ -40,4 +44,3 @@ func GetGithubPrimaryEmail(accessToken string) (string, error) {
 	}
 	return "", errors.New("primary email not found")
 }
-
