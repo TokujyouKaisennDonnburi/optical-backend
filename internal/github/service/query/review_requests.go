@@ -4,7 +4,9 @@ import (
 	"context"
 
 	"github.com/TokujouKaisenDonburi/optical-backend/internal/github"
+	"github.com/TokujouKaisenDonburi/optical-backend/internal/option"
 	"github.com/TokujouKaisenDonburi/optical-backend/pkg/api"
+	"github.com/TokujouKaisenDonburi/optical-backend/pkg/apperr"
 	"github.com/google/uuid"
 )
 
@@ -14,6 +16,21 @@ type GithubReviewRequestsQueryInput struct {
 }
 
 func (q *GithubQuery) GetReviewRequests(ctx context.Context, input GithubReviewRequestsQueryInput) ([]github.PullRequest, error) {
+	// オプションが設定されているかチェック
+	options, err := q.optionRepository.FindsByCalendarId(ctx, input.CalendarId)
+	if err != nil {
+		return nil, err
+	}
+	hasOption := false
+	for _, opt := range options {
+		if opt.Id == option.OPTION_PR_REVIEW_PENDING_COUNT {
+			hasOption = true
+			break
+		}
+	}
+	if !hasOption {
+		return nil, apperr.ForbiddenError("option not enabled")
+	}
 	// プルリクエストをGithubから取得
 	outputs, err := q.githubRepository.GetPullRequests(
 		ctx,
