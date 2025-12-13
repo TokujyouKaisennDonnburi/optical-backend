@@ -2,24 +2,13 @@ package gateway
 
 import (
 	"context"
-	"encoding/json"
-	"net/http"
 	"time"
 
+	"github.com/TokujouKaisenDonburi/optical-backend/pkg/api"
 	"github.com/TokujouKaisenDonburi/optical-backend/pkg/db"
 	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
 )
-
-type InstallationGetResponse struct {
-	Id      int                            `json:"id"`
-	Account InstallationGetResponseAccount `json:"account"`
-}
-
-type InstallationGetResponseAccount struct {
-	Id    int    `json:"id"`
-	Login string `json:"login"`
-}
 
 func (r *GithubApiRepository) InstallToCalendar(
 	ctx context.Context,
@@ -27,27 +16,8 @@ func (r *GithubApiRepository) InstallToCalendar(
 	code, installationId string,
 ) error {
 	return db.RunInTx(r.db, func(tx *sqlx.Tx) error {
-		client := http.Client{}
-		req, err := http.NewRequestWithContext(
-			ctx,
-			"GET",
-			GITHUB_BASE_URL+"/app/installations/"+installationId,
-			nil,
-		)
+		response, err := api.GetGithubInstallation(ctx, installationId)
 		if err != nil {
-			return err
-		}
-		err = setRequestHeader(req)
-		if err != nil {
-			return err
-		}
-		resp, err := client.Do(req)
-		if err != nil {
-			return err
-		}
-		defer resp.Body.Close()
-		var response InstallationGetResponse
-		if err = json.NewDecoder(resp.Body).Decode(&response); err != nil {
 			return err
 		}
 		query := `
@@ -71,11 +41,11 @@ func (r *GithubApiRepository) InstallToCalendar(
 		if err != nil {
 			return err
 		}
-		accessToken, err := postOauthAccessToken(code)
+		accessToken, err := api.PostOauthAccessToken(code)
 		if err != nil {
 			return err
 		}
-		githubResp, err := postGithubUser(accessToken)
+		githubResp, err := api.GetGithubUser(accessToken)
 		if err != nil {
 			return err
 		}

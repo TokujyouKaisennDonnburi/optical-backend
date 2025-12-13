@@ -4,6 +4,7 @@ import (
 	"context"
 	"time"
 
+	"github.com/TokujouKaisenDonburi/optical-backend/pkg/api"
 	"github.com/google/uuid"
 )
 
@@ -12,15 +13,15 @@ func (r *GithubApiRepository) LinkUser(
 	userId uuid.UUID,
 	code string,
 ) error {
-	accessToken, err := postOauthAccessToken(code)
+	accessToken, err := api.PostOauthAccessToken(code)
 	if err != nil {
 		return err
 	}
-	githubResp, err := postGithubUser(accessToken)
+	githubResp, err := api.GetGithubUser(accessToken)
 	if err != nil {
 		return err
 	}
-	githubEmail, err := getGithubPrimaryEmail(accessToken)
+	githubEmail, err := api.GetGithubPrimaryEmail(accessToken)
 	if err != nil {
 		return err
 	}

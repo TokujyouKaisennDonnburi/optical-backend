@@ -6,6 +6,7 @@ import (
 
 	"github.com/TokujouKaisenDonburi/optical-backend/internal/github"
 	"github.com/TokujouKaisenDonburi/optical-backend/internal/user"
+	"github.com/TokujouKaisenDonburi/optical-backend/pkg/api"
 	"github.com/TokujouKaisenDonburi/optical-backend/pkg/db"
 	"github.com/TokujouKaisenDonburi/optical-backend/pkg/psql"
 	"github.com/TokujouKaisenDonburi/optical-backend/pkg/security"
@@ -17,15 +18,15 @@ func (r *GithubApiRepository) CreateUser(
 	ctx context.Context,
 	code string,
 ) (*user.User, error) {
-	accessToken, err := postOauthAccessToken(code)
+	accessToken, err := api.PostOauthAccessToken(code)
 	if err != nil {
 		return nil, err
 	}
-	githubResp, err := postGithubUser(accessToken)
+	githubResp, err := api.GetGithubUser(accessToken)
 	if err != nil {
 		return nil, err
 	}
-	email, err := getGithubPrimaryEmail(accessToken)
+	email, err := api.GetGithubPrimaryEmail(accessToken)
 	if err != nil {
 		return nil, err
 	}

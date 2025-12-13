@@ -1,4 +1,4 @@
-package gateway
+package api
 
 import (
 	"crypto/x509"
@@ -15,6 +15,7 @@ import (
 const (
 	GITHUB_PRIVATE_KEY_PEM_PATH = "optical-github.private-key.pem"
 	GITHUB_API_VERSION = "2022-11-28"
+	GITHUB_BASE_URL = "https://api.github.com"
 )
 
 func setRequestHeader(r *http.Request) error {

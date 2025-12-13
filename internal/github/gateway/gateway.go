@@ -5,10 +5,6 @@ import (
 	"github.com/redis/go-redis/v9"
 )
 
-const (
-	GITHUB_BASE_URL = "https://api.github.com"
-)
-
 type GithubApiRepository struct {
 	db *sqlx.DB
 }
