@@ -1,0 +1,25 @@
+package repository
+
+import (
+	"context"
+
+	"github.com/TokujouKaisenDonburi/optical-backend/internal/user"
+	"github.com/google/uuid"
+)
+
+type GithubRepository interface {
+	InstallToCalendar(
+		ctx context.Context,
+		userId, calendarId uuid.UUID,
+		code, installationId string,
+	) error
+	CreateUser(
+		ctx context.Context,
+		code string,
+	) (*user.User, error)
+	LinkUser(
+		ctx context.Context,
+		userId uuid.UUID,
+		code string,
+	) error
+}

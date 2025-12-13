@@ -10,6 +10,9 @@ import (
 	calendarHandler "github.com/TokujouKaisenDonburi/optical-backend/internal/calendar/handler"
 	calendarCommand "github.com/TokujouKaisenDonburi/optical-backend/internal/calendar/service/command"
 	calendarQuery "github.com/TokujouKaisenDonburi/optical-backend/internal/calendar/service/query"
+	githubGateway "github.com/TokujouKaisenDonburi/optical-backend/internal/github/gateway"
+	githubHandler "github.com/TokujouKaisenDonburi/optical-backend/internal/github/handler"
+	githubCommand "github.com/TokujouKaisenDonburi/optical-backend/internal/github/service/command"
 	optionGateway "github.com/TokujouKaisenDonburi/optical-backend/internal/option/gateway"
 	optionHandler "github.com/TokujouKaisenDonburi/optical-backend/internal/option/handler"
 	optionQuery "github.com/TokujouKaisenDonburi/optical-backend/internal/option/service/query"
@@ -35,7 +38,7 @@ func main() {
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
 	r.Use(cors.Handler(cors.Options{
-		AllowedOrigins:   []string{"http://localhost:3000", "https://tokujyoukaisenndonnburi.github.io" },
+		AllowedOrigins:   []string{"http://localhost:3000", "https://tokujyoukaisenndonnburi.github.io"},
 		AllowedMethods:   []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
 		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
 		AllowCredentials: false,
@@ -52,6 +55,10 @@ func main() {
 
 	userRepository := userGateway.NewUserPsqlRepository(db)
 	tokenRepository := userGateway.NewTokenRedisRepository(redisClient)
+	stateRepository := githubGateway.NewStateRedisRepository(db, redisClient)
+	githubRepository := githubGateway.NewGithubApiRepository(db)
+	githubCommand := githubCommand.NewGithubCommand(tokenRepository, stateRepository, githubRepository)
+	githubHandler := githubHandler.NewGithubHandler(githubCommand)
 	userQuery := userQuery.NewUserQuery(userRepository)
 	userCommand := userCommand.NewUserCommand(userRepository, tokenRepository)
 	userHandler := userHandler.NewUserHttpHandler(userQuery, userCommand)
@@ -74,6 +81,11 @@ func main() {
 		r.Post("/register", userHandler.Create)
 		r.Post("/login", userHandler.Login)
 		r.Post("/refresh", userHandler.Refresh)
+
+		// Github
+		r.Post("/github/apps/install", githubHandler.InstallToCalendar)
+		r.Post("/github/oauth/link", githubHandler.LinkUser)
+		r.Post("/github/oauth/create", githubHandler.CreateNewUserOauthState)
 	})
 
 	// Protected Routes
@@ -82,6 +94,10 @@ func main() {
 
 		// Users
 		r.Get("/users/@me", userHandler.GetMe)
+
+		// Github
+		r.Post("/github/apps/state", githubHandler.CreateAppState)
+		r.Post("/github/oauth/state", githubHandler.CreateOauthState)
 
 		// Calendars
 		r.Post("/calendars", calendarHandler.CreateCalendar)

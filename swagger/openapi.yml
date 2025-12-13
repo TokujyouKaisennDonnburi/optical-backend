@@ -16,6 +16,8 @@ tags:
     description: Events management
   - name: options
     description: Options management
+  - name: github
+    description: GitHub integration
 paths:
   /register:
     post:
@@ -153,35 +155,6 @@ paths:
           required: true
           schema:
             type: string
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/EventCreateRequest'
-      responses:
-        '200':
-          description: Event created successfully
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/EventCreateResponse'
-        '400':
-          description: Invalid request
-        '500':
-          description: Internal server error
-    get:
-      summary: Get events from a calendar
-      tags:
-        - events
-      security:
-        - bearerAuth: []
-      parameters:
-        - name: calendarId
-          in: path
-          required: true
-          schema:
-            type: string
             format: uuid
       responses:
         '200':
@@ -299,26 +272,6 @@ paths:
            description: Invalid request
          '401':
            description: Unauthorized
-  /options:
-    get:
-      summary: Get list of options
-      tags:
-        - options
-      security:
-        - bearerAuth: []
-      responses:
-        '200':
-          description: Options retrieved successfully
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/OptionResponse'
-        '401':
-          description: Unauthorized
-        '500':
-          description: Internal server error
   /calendars/{calendarId}/members:
     post:
       summary: Add a member to a calendar
@@ -384,6 +337,102 @@ paths:
           description: Successfully rejected the invitation
         '400':
           description: Invalid calendarId format
+        '500':
+          description: Internal server error
+  /options:
+    get:
+      summary: Get list of options
+      tags:
+        - options
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Options retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/OptionResponse'
+        '401':
+          description: Unauthorized
+        '500':
+          description: Internal server error
+  /github/apps/state:
+    post:
+      summary: Create GitHub App state
+      description: Creates a state URL for GitHub App installation to a calendar.
+      tags:
+        - github
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GithubAppStateRequest'
+      responses:
+        '200':
+          description: App state created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GithubStateResponse'
+        '400':
+          description: Invalid request
+        '500':
+          description: Internal server error
+  /github/oauth/state:
+    post:
+      summary: Create GitHub OAuth state
+      description: Creates an OAuth state URL for GitHub user authentication.
+      tags:
+        - github
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: OAuth state created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GithubStateResponse'
+        '500':
+          description: Internal server error
+  /github/apps/install:
+    post:
+      summary: Install GitHub to calendar
+      tags: [github]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GithubCalendarInstallRequest'
+      responses:
+        '204':
+          description: Installed successfully
+        '400':
+          description: Invalid request
+        '500':
+          description: Internal server error
+  /github/oauth/link:
+    post:
+      summary: Link user with GitHub
+      tags: [github]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GithubUserLinkRequest'
+      responses:
+        '204':
+          description: User linked successfully
+        '400':
+          description: Invalid request
         '500':
           description: Internal server error
 components:
@@ -747,3 +796,37 @@ components:
         deprecated:
           type: boolean
           example: false
+    GithubStateResponse:
+       type: object
+       properties:
+         url:
+           type: string
+           format: url
+    GithubAppStateRequest:
+       type: object
+       required:
+         - calendarId
+       properties:
+         calendarId:
+           type: string
+           format: uuid
+    GithubUserLinkRequest:
+      type: object
+      required:
+        - code
+        - state
+      properties:
+        code:
+          type: string
+        state:
+          type: string
+    GithubCalendarInstallRequest:
+      type: object
+      required:
+        - state
+        - installationId
+      properties:
+        state:
+          type: string
+        installationId:
+          type: string
