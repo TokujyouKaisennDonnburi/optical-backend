@@ -69,7 +69,7 @@ func FindUserByEmail(ctx context.Context, tx *sqlx.Tx, email string) (*user.User
 	}, nil
 }
 
-func FindUserByGithubId(ctx context.Context, tx *sqlx.Tx, githubId int64) (*user.User, error) {
+func FindUserByGithubSSO(ctx context.Context, tx *sqlx.Tx, githubId int64) (*user.User, error) {
 	query := `
 		SELECT 
 			users.id, users.name, users.email, users.password_hash, users.created_at, users.updated_at, users.deleted_at
@@ -78,6 +78,7 @@ func FindUserByGithubId(ctx context.Context, tx *sqlx.Tx, githubId int64) (*user
 			ON users.id = user_githubs.user_id
 		WHERE 
 			user_githubs.github_id = $1
+			AND user_githubs.sso_login = true 
 	`
 	userModel := UserModel{}
 	err := tx.GetContext(ctx, &userModel, query, githubId)

@@ -4,9 +4,10 @@
 -- for GitHub SSO
 CREATE TABLE user_githubs(
     user_id UUID PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
-    github_id VARCHAR(255) NOT NULL UNIQUE,
+    github_id VARCHAR(255) NOT NULL,
     github_name VARCHAR(255) NOT NULL,
     github_email VARCHAR(255) NOT NULL,
+    sso_login BOOLEAN NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
