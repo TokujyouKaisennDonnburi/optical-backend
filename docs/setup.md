@@ -43,9 +43,6 @@ docker compose up -d
 
 ## マイグレーション
 
-※  Windowsの場合は`migrate.bat`を実行する
-
 ```bash
 ./migrate.sh
 ```
-
