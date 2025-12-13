@@ -26,5 +26,5 @@ func (c *GithubCommand) InstallToCalendar(ctx context.Context, input GithubCalen
 	if err != nil {
 		return err
 	}
-	return c.githubRepository.InstallToCalendar(ctx, userId, calendarId, input.State, input.InstallationId)
+	return c.githubRepository.InstallToCalendar(ctx, userId, calendarId, input.Code, input.InstallationId)
 }
