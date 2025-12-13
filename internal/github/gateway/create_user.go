@@ -44,15 +44,14 @@ func (r *GithubApiRepository) CreateUser(
 	err = db.RunInTx(r.db, func(tx *sqlx.Tx) error {
 		newUser, err = psql.FindUserByGithubId(ctx, tx, githubUser.Id)
 		if err == nil {
-			updateGithubUser(ctx, tx, newUser.Id, githubUser)
+			return updateGithubUser(ctx, tx, newUser.Id, githubUser)
 		} else {
 			newUser, err = user.NewUser(githubUser.Login, githubUser.Email, password)
 			if err != nil {
 				return err
 			}
-			createGithubUser(ctx, tx, newUser, githubUser)
+			return createGithubUser(ctx, tx, newUser, githubUser)
 		}
-		return err
 	})
 	return newUser, err
 }
@@ -85,13 +84,14 @@ func createGithubUser(ctx context.Context, tx *sqlx.Tx, newUser *user.User, gith
 		return err
 	}
 	query = `
-			INSERT INTO user_githubs(user_id, github_id, github_name, created_at, updated_at)
-			VALUES(:userId, :githubId, :githubName, :createdAt, :updatedAt)
+			INSERT INTO user_githubs(user_id, github_id, github_name, github_email, created_at, updated_at)
+			VALUES(:userId, :githubId, :githubName, :githubEmail, :createdAt, :updatedAt)
 		`
 	_, err = tx.NamedExecContext(ctx, query, map[string]any{
 		"userId":     newUser.Id,
 		"githubId":   githubUser.Id,
 		"githubName": githubUser.Login,
+		"githubEmail": githubUser.Email,
 		"createdAt":  time.Now(),
 		"updatedAt":  time.Now(),
 	})
@@ -100,18 +100,20 @@ func createGithubUser(ctx context.Context, tx *sqlx.Tx, newUser *user.User, gith
 
 func updateGithubUser(ctx context.Context, tx *sqlx.Tx, userId uuid.UUID, githubUser *github.User) error {
 	query := `
-			INSERT INTO user_githubs(user_id, github_id, github_name, created_at, updated_at)
-			VALUES(:userId, :githubId, :githubName, :createdAt, :updatedAt)
+			INSERT INTO user_githubs(user_id, github_id, github_name, github_email, created_at, updated_at)
+			VALUES(:userId, :githubId, :githubName, :githubEmail, :createdAt, :updatedAt)
 			ON CONFLICT(user_id) 
 			DO UPDATE SET
 				github_id = :githubId,
 				github_name = :githubName,
+				github_email = :githubEmail,
 				updated_at = :updatedAt
 		`
 	_, err := tx.NamedExecContext(ctx, query, map[string]any{
 		"userId":     userId,
 		"githubId":   githubUser.Id,
 		"githubName": githubUser.Login,
+		"githubEmail": githubUser.Email,
 		"createdAt":  time.Now(),
 		"updatedAt":  time.Now(),
 	})
