@@ -14,13 +14,19 @@ type GithubUserLinkRequest struct {
 	State string `json:"state"`
 }
 
+type GithubUserLinkResponse struct {
+	UserId       string `json:"userId"`
+	AcceessToken string `json:"accessToken"`
+	RefreshToken string `json:"refreshToken"`
+}
+
 func (h *GithubHandler) LinkUser(w http.ResponseWriter, r *http.Request) {
 	var request GithubUserLinkRequest
 	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
 		_ = render.Render(w, r, apperr.ErrInvalidRequest(err))
 		return
 	}
-	err := h.githubCommand.LinkUser(r.Context(), command.GithubLinkUserInput{
+	output, err := h.githubCommand.LinkUser(r.Context(), command.GithubLinkUserInput{
 		Code:  request.Code,
 		State: request.State,
 	})
@@ -28,5 +34,15 @@ func (h *GithubHandler) LinkUser(w http.ResponseWriter, r *http.Request) {
 		apperr.HandleAppError(w, r, err)
 		return
 	}
-	render.NoContent(w, r)
+	if output.AccessToken == "" || output.RefreshToken == "" {
+		render.JSON(w, r, GithubUserLinkResponse{
+			UserId: output.UserId.String(),
+		})
+	} else {
+		render.JSON(w, r, GithubUserLinkResponse{
+			UserId:       output.UserId.String(),
+			AcceessToken: output.AccessToken,
+			RefreshToken: output.RefreshToken,
+		})
+	}
 }

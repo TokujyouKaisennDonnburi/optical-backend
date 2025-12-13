@@ -57,7 +57,7 @@ func main() {
 	tokenRepository := userGateway.NewTokenRedisRepository(redisClient)
 	stateRepository := githubGateway.NewStateRedisRepository(db, redisClient)
 	githubRepository := githubGateway.NewGithubApiRepository(db)
-	githubCommand := githubCommand.NewGithubCommand(stateRepository, githubRepository)
+	githubCommand := githubCommand.NewGithubCommand(tokenRepository, stateRepository, githubRepository)
 	githubHandler := githubHandler.NewGithubHandler(githubCommand)
 	userQuery := userQuery.NewUserQuery(userRepository)
 	userCommand := userCommand.NewUserCommand(userRepository, tokenRepository)
@@ -85,6 +85,7 @@ func main() {
 		// Github
 		r.Post("/github/apps/install", githubHandler.InstallToCalendar)
 		r.Post("/github/oauth/link", githubHandler.LinkUser)
+		r.Post("/github/oauth/create", githubHandler.CreateNewUserOauthState)
 	})
 
 	// Protected Routes
