@@ -156,9 +156,15 @@ type CalendarQueryModel struct {
 func (r *CalendarPsqlRepository) FindByUserCalendarId(ctx context.Context, userId, calendarId uuid.UUID) (*calendar.Calendar, error) {
 	// calendar & image
 	query := `
-	SELECT calendars.id, calendars.name, calendars.color, calendar_images.id, calendar_images.url
+	SELECT
+	calendars.id,
+	calendars.name,
+	calendars.color,
+	calendars.image_id,
+	calendar_images.url AS image_url
 	FROM calendars
-	LEFT JOIN calendar_images ON calendar_images.id = calendars.image_id
+	LEFT JOIN calendar_images ON
+	calendar_images.id = calendars.image_id
 	WHERE calendars.id = $1
 	`
 	var calimage struct {
@@ -174,10 +180,16 @@ func (r *CalendarPsqlRepository) FindByUserCalendarId(ctx context.Context, userI
 	}
 
 	queryy := `
-	SELECT calendar_members.calendarId, calendar_members.user_id
+	SELECT
+	calendar_members.user_id,
+	users.name,
+	calendar_members.joined_at
 	FROM calendar_members
+	INNER JOIN users ON
+	users.id = calendar_members.user_id
 	WHERE calendar_members.calendar_id = $2
 	AND calendar_members.user_id = $1
+	AND calendar_members.joined_at IS NOT NULL
 	`
 	var members []calendar.Member
 	err = r.db.SelectContext(ctx, &members, queryy, userId, calendarId)
@@ -185,9 +197,13 @@ func (r *CalendarPsqlRepository) FindByUserCalendarId(ctx context.Context, userI
 		return nil, err
 	}
 	queryyy := `
-	SELECT calendar_options.id
+	SELECT
+	calendar_options.option_id AS id,
+	options.name,
+	options.deprecated
 	FROM calendar_options
-	LEFT JOIN options ON options.id = calendar_options.option_id
+	INNER JOIN options ON
+	options.id = calendar_options.option_id
 	WHERE calendar_options.calendar_id = $1
 	`
 	var options []option.Option
@@ -202,6 +218,7 @@ func (r *CalendarPsqlRepository) FindByUserCalendarId(ctx context.Context, userI
 		Image: calendar.Image{
 			Id:  calimage.ImageId.UUID,
 			Url: calimage.ImageUrl.String,
+			Valid: calimage.ImageId.Valid,
 		},
 		Members: members,
 		Options: options,
