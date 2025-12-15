@@ -48,7 +48,7 @@ func (c *UserCommand) UploadAvatar(ctx context.Context, input UploadAvatarInput)
 	if err != nil {
 		return nil, err
 	}
-	// URLを下にアバター作成
+	// URLを元にアバター作成
 	avatar, err := user.NewAvatar(url)
 	if err != nil {
 		return nil, err
