@@ -22,106 +22,106 @@ paths:
   /register:
     post:
       summary: Create a new user
-      tags: 
+      tags:
         - users
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UserCreateRequest'
+              $ref: "#/components/schemas/UserCreateRequest"
       responses:
-        '200':
+        "200":
           description: User created successfully
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UserCreateResponse'
-        '400':
+                $ref: "#/components/schemas/UserCreateResponse"
+        "400":
           description: Invalid request
-        '500':
+        "500":
           description: Internal server error
   /login:
     post:
       summary: Login a user
-      tags: 
+      tags:
         - users
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UserLoginRequest'
+              $ref: "#/components/schemas/UserLoginRequest"
       responses:
-        '200':
+        "200":
           description: User logged in successfully
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UserLoginResponse'
-        '400':
+                $ref: "#/components/schemas/UserLoginResponse"
+        "400":
           description: Invalid request
-        '401':
+        "401":
           description: Unauthorized
-        '500':
+        "500":
           description: Internal server error
   /refresh:
     post:
       summary: Refresh access token
-      tags: 
+      tags:
         - users
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/TokenRefreshRequest'
+              $ref: "#/components/schemas/TokenRefreshRequest"
       responses:
-        '200':
+        "200":
           description: Token refreshed successfully
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TokenRefreshResponse'
-        '400':
+                $ref: "#/components/schemas/TokenRefreshResponse"
+        "400":
           description: Invalid request
-        '401':
+        "401":
           description: Unauthorized
-        '500':
+        "500":
           description: Internal server error
   /users/@me:
     get:
       summary: Get current user information
-      tags: 
+      tags:
         - users
       security:
         - bearerAuth: []
       responses:
-        '200':
+        "200":
           description: User information retrieved successfully
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UserResponse'
+                $ref: "#/components/schemas/UserResponse"
   /calendars:
     get:
       summary: Get list of calendars
-      tags: 
+      tags:
         - calendars
       security:
         - bearerAuth: []
       responses:
-        '200':
+        "200":
           description: Calendar list retrieved successfully
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CalendarListResponse'
-        '500':
+                $ref: "#/components/schemas/CalendarListResponse"
+        "500":
           description: Internal server error
     post:
       summary: Create a new calendar
-      tags: 
+      tags:
         - calendars
       security:
         - bearerAuth: []
@@ -130,17 +130,17 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CalendarCreateRequest'
+              $ref: "#/components/schemas/CalendarCreateRequest"
       responses:
-        '200':
+        "200":
           description: Calendar created successfully
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CalendarCreateResponse'
-        '400':
+                $ref: "#/components/schemas/CalendarCreateResponse"
+        "400":
           description: Invalid request
-        '500':
+        "500":
           description: Internal server error
   /calendars/{calendarId}/events:
     post:
@@ -157,24 +157,24 @@ paths:
             type: string
             format: uuid
       responses:
-        '200':
+        "200":
           description: Events retrieved successfully
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/EventListResponse'
-        '400':
+                  $ref: "#/components/schemas/EventListResponse"
+        "400":
           description: Invalid request
-        '403':
+        "403":
           description: Forbidden - Calendar does not belong to user
-        '500':
+        "500":
           description: Internal server error
   /calendars/{calendarId}/events/{eventId}:
     patch:
       summary: Update an event
-      tags: 
+      tags:
         - calendars
       security:
         - bearerAuth: []
@@ -189,13 +189,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/EventUpdateRequest'
+              $ref: "#/components/schemas/EventUpdateRequest"
       responses:
-        '204':
+        "204":
           description: Event updated successfully
-        '400':
+        "400":
           description: Invalid request
-        '500':
+        "500":
           description: Internal server error
   /calendars/images:
     post:
@@ -215,15 +215,15 @@ paths:
                   type: string
                   format: binary
       responses:
-        '200':
+        "200":
           description: Image uploaded successfully
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ImageUploadResponse'
-        '400':
+                $ref: "#/components/schemas/ImageUploadResponse"
+        "400":
           description: Invalid request
-        '500':
+        "500":
           description: Internal server error
   /events/todays:
     get:
@@ -233,45 +233,45 @@ paths:
       security:
         - bearerAuth: []
       responses:
-        '200':
+        "200":
           description: Today's events retrieved successfully
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/EventTodayResponse'
-        '500':
+                $ref: "#/components/schemas/EventTodayResponse"
+        "500":
           description: Internal server error
-        '400':
+        "400":
           description: Invalid request
-        '401':
+        "401":
           description: Unauthorized
   /events/months:
-     get:
-       summary: Get events by month
-       tags:
-         - events
-       security:
-         - bearerAuth: []
-       parameters:
-         - name: month
-           in: query
-           required: false
-           schema:
-             type: string
-             example: "2025-12"
-       responses:
-         '200':
-           description: Events retrieved successfully
-           content:
-             application/json:
-               schema:
-                 $ref: '#/components/schemas/EventMonthResponse'
-         '500':
-           description: Internal server error
-         '400':
-           description: Invalid request
-         '401':
-           description: Unauthorized
+    get:
+      summary: Get events by month
+      tags:
+        - events
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: month
+          in: query
+          required: false
+          schema:
+            type: string
+            example: "2025-12"
+      responses:
+        "200":
+          description: Events retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EventMonthResponse"
+        "500":
+          description: Internal server error
+        "400":
+          description: Invalid request
+        "401":
+          description: Unauthorized
   /calendars/{calendarId}/members:
     post:
       summary: Add a member to a calendar
@@ -291,13 +291,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/MemberCreateRequest'
+              $ref: "#/components/schemas/MemberCreateRequest"
       responses:
-        '204':
+        "204":
           description: Member added successfully
-        '400':
+        "400":
           description: Invalid request
-        '500':
+        "500":
           description: Internal server error
     patch:
       summary: Join a calendar as an invited member
@@ -314,9 +314,9 @@ paths:
             type: string
             format: uuid
       responses:
-        '204':
+        "204":
           description: Successfully joined the calendar
-        '500':
+        "500":
           description: Not invited or already joined
     delete:
       summary: Reject a calendar invitation
@@ -333,11 +333,11 @@ paths:
             type: string
             format: uuid
       responses:
-        '204':
+        "204":
           description: Successfully rejected the invitation
-        '400':
+        "400":
           description: Invalid calendarId format
-        '500':
+        "500":
           description: Internal server error
   /options:
     get:
@@ -347,17 +347,17 @@ paths:
       security:
         - bearerAuth: []
       responses:
-        '200':
+        "200":
           description: Options retrieved successfully
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/OptionResponse'
-        '401':
+                  $ref: "#/components/schemas/OptionResponse"
+        "401":
           description: Unauthorized
-        '500':
+        "500":
           description: Internal server error
   /github/apps/state:
     post:
@@ -372,17 +372,17 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/GithubAppStateRequest'
+              $ref: "#/components/schemas/GithubAppStateRequest"
       responses:
-        '200':
+        "200":
           description: App state created
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/GithubStateResponse'
-        '400':
+                $ref: "#/components/schemas/GithubStateResponse"
+        "400":
           description: Invalid request
-        '500':
+        "500":
           description: Internal server error
   /github/oauth/state:
     post:
@@ -393,13 +393,13 @@ paths:
       security:
         - bearerAuth: []
       responses:
-        '200':
+        "200":
           description: OAuth state created
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/GithubStateResponse'
-        '500':
+                $ref: "#/components/schemas/GithubStateResponse"
+        "500":
           description: Internal server error
   /github/apps/install:
     post:
@@ -410,13 +410,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/GithubCalendarInstallRequest'
+              $ref: "#/components/schemas/GithubCalendarInstallRequest"
       responses:
-        '204':
+        "204":
           description: Installed successfully
-        '400':
+        "400":
           description: Invalid request
-        '500':
+        "500":
           description: Internal server error
   /github/oauth/link:
     post:
@@ -427,13 +427,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/GithubUserLinkRequest'
+              $ref: "#/components/schemas/GithubUserLinkRequest"
       responses:
-        '204':
+        "204":
           description: User linked successfully
-        '400':
+        "400":
           description: Invalid request
-        '500':
+        "500":
           description: Internal server error
 components:
   securitySchemes:
@@ -463,7 +463,7 @@ components:
       type: object
       properties:
         user:
-          $ref: '#/components/schemas/UserCreateResponseUser'
+          $ref: "#/components/schemas/UserCreateResponseUser"
         accessToken:
           type: string
         refreshToken:
@@ -478,6 +478,9 @@ components:
         email:
           type: string
           format: email
+        avatarUrl:
+          type: string
+          format: url
         createdAt:
           type: string
           format: date-time
@@ -505,7 +508,7 @@ components:
         refreshToken:
           type: string
         user:
-          $ref: '#/components/schemas/UserLoginResponseUser'
+          $ref: "#/components/schemas/UserLoginResponseUser"
     CalendarCreateRequest:
       type: object
       required:
@@ -546,7 +549,7 @@ components:
         calendars:
           type: array
           items:
-            $ref: '#/components/schemas/CalendarResponse'
+            $ref: "#/components/schemas/CalendarResponse"
     CalendarResponse:
       type: object
       properties:
@@ -676,7 +679,7 @@ components:
         items:
           type: array
           items:
-            $ref: '#/components/schemas/EventTodayResponseItem'
+            $ref: "#/components/schemas/EventTodayResponseItem"
     EventTodayResponseItem:
       type: object
       properties:
@@ -744,7 +747,7 @@ components:
         items:
           type: array
           items:
-            $ref: '#/components/schemas/EventMonthResponseItem'
+            $ref: "#/components/schemas/EventMonthResponseItem"
     EventMonthResponseItem:
       type: object
       properties:
@@ -797,19 +800,19 @@ components:
           type: boolean
           example: false
     GithubStateResponse:
-       type: object
-       properties:
-         url:
-           type: string
-           format: url
+      type: object
+      properties:
+        url:
+          type: string
+          format: url
     GithubAppStateRequest:
-       type: object
-       required:
-         - calendarId
-       properties:
-         calendarId:
-           type: string
-           format: uuid
+      type: object
+      required:
+        - calendarId
+      properties:
+        calendarId:
+          type: string
+          format: uuid
     GithubUserLinkRequest:
       type: object
       required:
