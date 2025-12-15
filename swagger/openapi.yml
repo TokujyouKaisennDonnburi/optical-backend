@@ -917,15 +917,27 @@ components:
     GithubReviewLoadStatusListResponse:
       type: object
       properties:
-        id:
+        repositoryId:
           type: integer
           format: int64
-        name:
+        repositoryName:
           type: string
-        url:
+        total:
+          type: integer
+        reviewers:
+          type: array
+          items:
+            $ref: '#/components/schemas/GithubReviewLoadStatusListResponseItem'
+    GithubReviewLoadStatusListResponseItem:
+      type: object
+      properties:
+        githubId:
+          type: integer
+          format: int64
+        githubName:
+          type: string
+        githubUrl:
           type: string
           format: url
-        reviewed:
-          type: integer
         assigned:
           type: integer
