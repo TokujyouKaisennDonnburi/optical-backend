@@ -5,6 +5,8 @@ import (
 	"mime/multipart"
 
 	"github.com/TokujouKaisenDonburi/optical-backend/internal/user"
+	"github.com/TokujouKaisenDonburi/optical-backend/pkg/db"
+	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
 	"github.com/minio/minio-go/v7"
 )
@@ -43,14 +45,30 @@ func (r *AvatarPsqlAndMinioRepository) Upload(ctx context.Context, file multipar
 	return r.bucketName + "/" + filePath + header.Filename, nil
 }
 
-func (r *AvatarPsqlAndMinioRepository) Save(ctx context.Context, avatar *user.Avatar) error {
-	query := `
-		INSERT INTO avatars(id, url)
-		VALUES(:id, :url)
-	`
-	_, err := r.db.NamedExecContext(ctx, query, map[string]any{
-		"id":  avatar.Id,
-		"url": avatar.Url,
+func (r *AvatarPsqlAndMinioRepository) Save(ctx context.Context, userId uuid.UUID, avatar *user.Avatar) error {
+	return db.RunInTx(r.db, func(tx *sqlx.Tx) error {
+		query := `
+			INSERT INTO avatars(id, url)
+			VALUES(:id, :url)
+		`
+		_, err := tx.NamedExecContext(ctx, query, map[string]any{
+			"id":  avatar.Id,
+			"url": avatar.Url,
+		})
+		if err != nil {
+			return err
+		}
+		query = `
+			INSERT INTO user_profiles(user_id, avatar_id)
+			VALUES(:userId, :avatarId)
+			ON CONFLICT (user_id)
+			DO UPDATE SET
+				avatar_id = :avatarId
+		`
+		_, err = tx.NamedExecContext(ctx, query, map[string]any{
+			"userId":   userId,
+			"avatarId": avatar.Id,
+		})
+		return err
 	})
-	return err
 }
