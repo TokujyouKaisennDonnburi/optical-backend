@@ -151,6 +151,13 @@ type CalendarQueryModel struct {
 	Members  []calendar.Member `db:"member"`
 	Options  []option.Option   `db:"option"`
 }
+type CalendarRow struct {
+	Id       uuid.UUID      `db:"id"`
+	Name     string         `db:"name"`
+	Color    calendar.Color `db:"color"`
+	ImageId  uuid.NullUUID  `db:"image_id"`
+	ImageUrl sql.NullString `db:"image_url"`
+}
 
 // calendar単体取得
 func (r *CalendarPsqlRepository) FindByUserCalendarId(ctx context.Context, userId, calendarId uuid.UUID) (*calendar.Calendar, error) {
@@ -167,19 +174,12 @@ func (r *CalendarPsqlRepository) FindByUserCalendarId(ctx context.Context, userI
 	calendar_images.id = calendars.image_id
 	WHERE calendars.id = $1
 	`
-	var calimage struct {
-		Id       uuid.UUID      `db:"id"`
-		Name     string         `db:"name"`
-		Color    calendar.Color `db:"color"`
-		ImageId  uuid.NullUUID  `db:"image_id"`
-		ImageUrl sql.NullString `db:"image_url"`
-	}
-	err := r.db.GetContext(ctx, &calimage, query, calendarId)
+	var calRow CalendarRow
+	err := r.db.GetContext(ctx, &calRow, query, calendarId)
 	if err != nil {
 		return nil, err
 	}
-
-	queryy := `
+	query = `
 	SELECT
 	calendar_members.user_id,
 	users.name,
@@ -187,16 +187,23 @@ func (r *CalendarPsqlRepository) FindByUserCalendarId(ctx context.Context, userI
 	FROM calendar_members
 	INNER JOIN users ON
 	users.id = calendar_members.user_id
-	WHERE calendar_members.calendar_id = $2
-	AND calendar_members.user_id = $1
-	AND calendar_members.joined_at IS NOT NULL
+	WHERE calendar_members.calendar_id = $1
 	`
-	var members []calendar.Member
-	err = r.db.SelectContext(ctx, &members, queryy, userId, calendarId)
+	var memberRows []calendar.Member
+	err = r.db.SelectContext(ctx, &memberRows, query, calendarId)
 	if err != nil {
 		return nil, err
 	}
-	queryyy := `
+
+	members := make([]calendar.Member, len(memberRows))
+	for i, row := range memberRows {
+		members[i] = calendar.Member{
+			UserId:   row.UserId,
+			Name:     row.Name,
+			JoinedAt: row.JoinedAt,
+		}
+	}
+	query = `
 	SELECT
 	calendar_options.option_id AS id,
 	options.name,
@@ -206,22 +213,30 @@ func (r *CalendarPsqlRepository) FindByUserCalendarId(ctx context.Context, userI
 	options.id = calendar_options.option_id
 	WHERE calendar_options.calendar_id = $1
 	`
-	var options []option.Option
-	err = r.db.SelectContext(ctx, &options, queryyy, calendarId)
+	var optionRows []option.Option
+	err = r.db.SelectContext(ctx, &optionRows, query, calendarId)
 	if err != nil {
 		return nil, err
 	}
+	options := make([]option.Option, len(optionRows))
+	for i, row := range optionRows {
+		options[i] = option.Option{
+			Id:         row.Id,
+			Name:       row.Name,
+			Deprecated: row.Deprecated,
+		}
+	}
+	// bind
 	return &calendar.Calendar{
-		Id:    calimage.Id,
-		Name:  calimage.Name,
-		Color: calimage.Color,
+		Id:    calRow.Id,
+		Name:  calRow.Name,
+		Color: calRow.Color,
 		Image: calendar.Image{
-			Id:  calimage.ImageId.UUID,
-			Url: calimage.ImageUrl.String,
-			Valid: calimage.ImageId.Valid,
+			Id:    calRow.ImageId.UUID,
+			Url:   calRow.ImageUrl.String,
+			Valid: calRow.ImageId.Valid,
 		},
 		Members: members,
 		Options: options,
 	}, nil
 }
-
