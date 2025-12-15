@@ -96,6 +96,7 @@ func main() {
 
 		// Users
 		r.Get("/users/@me", userHandler.GetMe)
+		r.Patch("/users/@me", userHandler.UpdateMe)
 
 		// Github
 		r.Post("/github/apps/state", githubHandler.CreateAppState)
