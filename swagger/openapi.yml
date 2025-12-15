@@ -122,6 +122,30 @@ paths:
           description: Invalid request
         '500':
           description: Internal server error
+  /users/avatars:
+    put:
+      summary: Update current user avatar
+      tags:
+        - users
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                image:
+                  type: string
+                  format: binary
+      responses:
+        "200":
+          description: Avatar uploaded successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserResponse"
   /calendars:
     get:
       summary: Get list of calendars
@@ -570,6 +594,14 @@ components:
         updatedAt:
           type: string
           format: date-time
+    UploadAvatarResponse:
+      type: object
+      properties:
+        id:
+          type: string
+        url:
+          type: string
+          format: url
     UserLoginRequest:
       type: object
       required:
