@@ -103,6 +103,25 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/UserResponse"
+    patch:
+      summary: Update current user information
+      tags: 
+        - users
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserUpdateRequest'
+      responses:
+        '204':
+          description: User information updated successfully
+        '400':
+          description: Invalid request
+        '500':
+          description: Internal server error
   /calendars:
     get:
       summary: Get list of calendars
@@ -495,6 +514,14 @@ components:
           type: string
         refreshToken:
           type: string
+    UserUpdateRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        email:
+          type: string
+          format: email
     UserResponse:
       type: object
       properties:
