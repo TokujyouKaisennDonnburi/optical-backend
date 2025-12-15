@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/TokujouKaisenDonburi/optical-backend/internal/user"
+	"github.com/TokujouKaisenDonburi/optical-backend/pkg/apperr"
 	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
 	"github.com/lib/pq"
@@ -34,10 +35,13 @@ func FindUserById(ctx context.Context, tx *sqlx.Tx, id uuid.UUID) (*user.User, e
 	if err != nil {
 		return nil, err
 	}
+	if userModel.DeletedAt.Valid {
+		return nil, apperr.ForbiddenError("user is deleted")
+	}
 	return &user.User{
 		Id:        userModel.Id,
 		Name:      userModel.Name,
-		Email:     userModel.Email,
+		Email:     user.Email(userModel.Email),
 		Password:  userModel.Password,
 		CreatedAt: userModel.CreatedAt,
 		UpdatedAt: userModel.UpdatedAt,
@@ -61,7 +65,7 @@ func FindUserByEmail(ctx context.Context, tx *sqlx.Tx, email string) (*user.User
 	return &user.User{
 		Id:        userModel.Id,
 		Name:      userModel.Name,
-		Email:     userModel.Email,
+		Email:     user.Email(userModel.Email),
 		Password:  userModel.Password,
 		CreatedAt: userModel.CreatedAt,
 		UpdatedAt: userModel.UpdatedAt,
@@ -88,7 +92,7 @@ func FindUserByGithubSSO(ctx context.Context, tx *sqlx.Tx, githubId int64) (*use
 	return &user.User{
 		Id:        userModel.Id,
 		Name:      userModel.Name,
-		Email:     userModel.Email,
+		Email:     user.Email(userModel.Email),
 		Password:  userModel.Password,
 		CreatedAt: userModel.CreatedAt,
 		UpdatedAt: userModel.UpdatedAt,
@@ -114,7 +118,7 @@ func FindUsersByEmails(ctx context.Context, tx *sqlx.Tx, emails []string) ([]use
 		users[i] = user.User{
 			Id:        userModel.Id,
 			Name:      userModel.Name,
-			Email:     userModel.Email,
+			Email:     user.Email(userModel.Email),
 			Password:  userModel.Password,
 			CreatedAt: userModel.CreatedAt,
 			UpdatedAt: userModel.UpdatedAt,

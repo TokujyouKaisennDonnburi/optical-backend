@@ -19,3 +19,6 @@ func NewEmail(email string)(Email,error){
 	return Email(email), nil
 }
 
+func (e Email) String() string {
+	return string(e)
+}
