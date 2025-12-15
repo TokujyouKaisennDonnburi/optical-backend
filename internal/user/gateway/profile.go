@@ -24,7 +24,7 @@ func (r *UserPsqlRepository) FindProfileById(ctx context.Context, id uuid.UUID) 
 		SELECT 
 			id, name, email, created_at, updated_at, user_profiles.image_url
 		FROM users
-		JOIN user_profiles
+		LEFT JOIN user_profiles
 			ON users.id = user_profiles.user_id
 		WHERE 
 			users.id = $1
