@@ -2,6 +2,8 @@ package gateway
 
 import (
 	"context"
+	"errors"
+	"fmt"
 
 	"github.com/TokujouKaisenDonburi/optical-backend/internal/user"
 	"github.com/TokujouKaisenDonburi/optical-backend/pkg/db"
@@ -58,12 +60,27 @@ func (r *UserPsqlRepository) Update(
 		}
 		query := `
 			UPDATE users SET
-				name = :name
+				name = :name,
 				email = :email
 			WHERE
-				user.id = $1
+				users.id = :id
 		`
-		_, err = tx.NamedExecContext(ctx, query, id)
-		return err
+		result, err := tx.NamedExecContext(ctx, query, map[string]any{
+			"id":    user.Id,
+			"name":  user.Name,
+			"email": user.Email.String(),
+		})
+		fmt.Println(map[string]any{
+			"id":    user.Id,
+			"name":  user.Name,
+			"email": user.Email.String(),
+		})
+		if err != nil {
+			return err
+		}
+		if rows, _ := result.RowsAffected(); rows == 0 {
+			return errors.New("failed to update user")
+		}
+		return nil
 	})
 }

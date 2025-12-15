@@ -62,6 +62,9 @@ func FindUserByEmail(ctx context.Context, tx *sqlx.Tx, email string) (*user.User
 	if err != nil {
 		return nil, err
 	}
+	if userModel.DeletedAt.Valid {
+		return nil, apperr.ForbiddenError("user is deleted")
+	}
 	return &user.User{
 		Id:        userModel.Id,
 		Name:      userModel.Name,

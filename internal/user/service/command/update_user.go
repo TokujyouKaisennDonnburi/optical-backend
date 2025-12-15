@@ -33,5 +33,5 @@ func (c *UserCommand) UpdateUser(ctx context.Context, input UserUpdateInput) err
 	if err == ErrNoChange {
 		return nil
 	}
-	return nil
+	return err
 }
