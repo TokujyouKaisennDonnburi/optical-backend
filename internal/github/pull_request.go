@@ -14,5 +14,4 @@ type PullRequest struct {
 	Number         int    `json:"number"`
 	Assignees      []User `json:"assignees"`
 	Reviewers      []User `json:"requested_reviewers"`
-	ReviewComments int    `json:"review_comments"`
 }

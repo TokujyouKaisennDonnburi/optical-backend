@@ -57,10 +57,6 @@ func (q *GithubQuery) GetReviewRequests(ctx context.Context, input GithubReviewR
 	var pullRequests []github.PullRequest
 	for _, output := range outputs {
 		for _, pullRequest := range output.PullRequests {
-			// レビューされているスキップ
-			if pullRequest.ReviewComments != 0 {
-				continue
-			}
 			for _, reviewer := range pullRequest.Reviewers {
 				if reviewer.Id != output.GithubId {
 					continue
