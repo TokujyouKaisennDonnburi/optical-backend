@@ -53,8 +53,10 @@ func main() {
 
 	// Migration
 	MigrateMinio(minioClient)
+	bucketName := getBucketName()
 
 	userRepository := userGateway.NewUserPsqlRepository(db)
+	avatarRepository := userGateway.NewAvatarPsqlAndMinioRepository(db, minioClient, bucketName)
 	tokenRepository := userGateway.NewTokenRedisRepository(redisClient)
 	stateRepository := githubGateway.NewStateRedisRepository(db, redisClient)
 	optionRepository := optionGateway.NewOptionPsqlRepository(db)
@@ -63,13 +65,13 @@ func main() {
 	githubCommand := githubCommand.NewGithubCommand(tokenRepository, stateRepository, githubRepository)
 	githubHandler := githubHandler.NewGithubHandler(githubQuery, githubCommand)
 	userQuery := userQuery.NewUserQuery(userRepository)
-	userCommand := userCommand.NewUserCommand(userRepository, tokenRepository)
+	userCommand := userCommand.NewUserCommand(userRepository, tokenRepository, avatarRepository)
 	userHandler := userHandler.NewUserHttpHandler(userQuery, userCommand)
 	optionQuery := optionQuery.NewOptionQuery(optionRepository)
 	optionHandler := optionHandler.NewOptionHttpHandler(optionQuery)
 	eventRepository := calendarGateway.NewEventPsqlRepository(db)
 	calendarRepository := calendarGateway.NewCalendarPsqlRepository(db)
-	imageRepository := calendarGateway.NewImagePsqlAndMinioRepository(db, minioClient, getBucketName())
+	imageRepository := calendarGateway.NewImagePsqlAndMinioRepository(db, minioClient, bucketName)
 	memberRepository := calendarGateway.NewMemberPsqlRepository(db)
 	eventCommand := calendarCommand.NewEventCommand(eventRepository)
 	eventQuery := calendarQuery.NewEventQuery(eventRepository)
@@ -97,6 +99,9 @@ func main() {
 		// Users
 		r.Get("/users/@me", userHandler.GetMe)
 		r.Patch("/users/@me", userHandler.UpdateMe)
+
+		// User Profiles
+		r.Post("/users/avatars", userHandler.UploadAvatar)
 
 		// Github
 		r.Post("/github/apps/state", githubHandler.CreateAppState)
