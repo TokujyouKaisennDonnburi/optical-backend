@@ -3,7 +3,6 @@ package gateway
 import (
 	"context"
 	"errors"
-	"fmt"
 
 	"github.com/TokujouKaisenDonburi/optical-backend/internal/user"
 	"github.com/TokujouKaisenDonburi/optical-backend/pkg/db"
@@ -66,11 +65,6 @@ func (r *UserPsqlRepository) Update(
 				users.id = :id
 		`
 		result, err := tx.NamedExecContext(ctx, query, map[string]any{
-			"id":    user.Id,
-			"name":  user.Name,
-			"email": user.Email.String(),
-		})
-		fmt.Println(map[string]any{
 			"id":    user.Id,
 			"name":  user.Name,
 			"email": user.Email.String(),
