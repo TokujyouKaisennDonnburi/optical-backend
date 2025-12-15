@@ -35,7 +35,7 @@ func (r *EventPsqlRepository) ListEventsByCalendarId(
 		JOIN calendars c ON e.calendar_id = c.id
 		WHERE e.calendar_id = $1
 			AND e.deleted_at IS NULL -- 論理削除されていないもののみ取得
-		ORDER BY e.start_at ASC
+		ORDER BY e.id
 	`
 
 	// クエリ実行
@@ -154,7 +154,6 @@ func (r *EventPsqlRepository) GetEventsByDate(
 	return outputs, nil
 }
 
-
 func (r *EventPsqlRepository) GetEventsByMonth(
 	ctx context.Context,
 	userId uuid.UUID,
@@ -183,8 +182,8 @@ func (r *EventPsqlRepository) GetEventsByMonth(
 	`
 	var models []EventTodayQueryModel
 	month := datetime.Format("2006-01")
-	firstDay := datetime.Format("2006-01")+"-01"
-	nextFirstDay := datetime.AddDate(0, 1, 0).Format("2006-01")+"-01"
+	firstDay := datetime.Format("2006-01") + "-01"
+	nextFirstDay := datetime.AddDate(0, 1, 0).Format("2006-01") + "-01"
 	err := r.db.SelectContext(ctx, &models, query, userId, month, firstDay, nextFirstDay)
 	if err != nil {
 		return nil, err
