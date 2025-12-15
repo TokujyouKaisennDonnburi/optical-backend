@@ -15,11 +15,11 @@ type AvatarPsqlAndMinioRepository struct {
 	bucketName  string
 }
 
-func NewAvatarPsqlAndMinioRepository(db *sqlx.DB, minoiClient *minio.Client, bucketName string) *AvatarPsqlAndMinioRepository {
+func NewAvatarPsqlAndMinioRepository(db *sqlx.DB, minioClient *minio.Client, bucketName string) *AvatarPsqlAndMinioRepository {
 	if db == nil {
 		panic("psql db is nil")
 	}
-	if minoiClient == nil {
+	if minioClient == nil {
 		panic("minioClient is nil")
 	}
 	if bucketName == "" {
@@ -27,7 +27,7 @@ func NewAvatarPsqlAndMinioRepository(db *sqlx.DB, minoiClient *minio.Client, buc
 	}
 	return &AvatarPsqlAndMinioRepository{
 		db:          db,
-		minioClient: minoiClient,
+		minioClient: minioClient,
 		bucketName:  bucketName,
 	}
 }

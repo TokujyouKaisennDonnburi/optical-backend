@@ -17,7 +17,7 @@ func NewUserCommand(
 		panic("userRepository is nil")
 	}
 	if tokenRepository == nil {
-		panic("kokenRepository is nil")
+		panic("tokenRepository is nil")
 	}
 	if avatarRepository == nil {
 		panic("avatarRepository is nil")
