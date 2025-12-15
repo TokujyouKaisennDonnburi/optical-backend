@@ -35,7 +35,7 @@ func (c *UserCommand) UploadAvatar(ctx context.Context, input UploadAvatarInput)
 	found := false
 	// ファイルフォーマット確認
 	for ext := range strings.SplitSeq(VALID_IMAGE_EXT, ",") {
-		if strings.HasSuffix(input.Header.Filename, ext) {
+		if strings.HasSuffix(input.Header.Filename, "."+ext) {
 			found = true
 			break
 		}

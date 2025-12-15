@@ -34,7 +34,7 @@ func (c *CalendarCommand) SaveImage(ctx context.Context, input SaveImageCommandI
 	}
 	found := false
 	for ext := range strings.SplitSeq(VALID_IMAGE_EXT, ",") {
-		if strings.HasSuffix(input.Header.Filename, ext) {
+		if strings.HasSuffix(input.Header.Filename, "."+ext) {
 			found = true
 			break
 		}
