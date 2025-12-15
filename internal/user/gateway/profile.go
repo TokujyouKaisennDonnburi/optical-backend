@@ -14,7 +14,7 @@ type UserProfileModel struct {
 	Id        uuid.UUID      `db:"id"`
 	Name      string         `db:"name"`
 	Email     string         `db:"email"`
-	ImageUrl  sql.NullString `db:"image_url"`
+	AvatarUrl sql.NullString `db:"url"`
 	CreatedAt time.Time      `db:"created_at"`
 	UpdatedAt time.Time      `db:"updated_at"`
 }
@@ -22,11 +22,11 @@ type UserProfileModel struct {
 func (r *UserPsqlRepository) FindProfileById(ctx context.Context, id uuid.UUID) (*output.UserQueryOutput, error) {
 	query := `
 		SELECT 
-			id, name, email, created_at, updated_at, avatars.url,
+			users.id, name, email, created_at, updated_at, avatars.url
 		FROM users
 		LEFT JOIN user_profiles
 			ON users.id = user_profiles.user_id
-		JOIN avatars
+		LEFT JOIN avatars
 			ON user_profiles.avatar_id = avatars.id
 		WHERE 
 			users.id = $1
@@ -42,8 +42,8 @@ func (r *UserPsqlRepository) FindProfileById(ctx context.Context, id uuid.UUID) 
 		Name:  model.Name,
 		Email: model.Email,
 		Avatar: user.Avatar{
-			Url:   model.ImageUrl.String,
-			Valid: model.ImageUrl.Valid,
+			Url:   model.AvatarUrl.String,
+			Valid: model.AvatarUrl.Valid,
 		},
 		CreatedAt: model.CreatedAt,
 		UpdatedAt: model.UpdatedAt,
