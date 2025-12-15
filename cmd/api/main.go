@@ -101,7 +101,7 @@ func main() {
 		r.Patch("/users/@me", userHandler.UpdateMe)
 
 		// User Profiles
-		r.Post("/users/avatars", userHandler.UploadAvatar)
+		r.Put("/users/avatars", userHandler.UploadAvatar)
 
 		// Github
 		r.Post("/github/apps/state", githubHandler.CreateAppState)
