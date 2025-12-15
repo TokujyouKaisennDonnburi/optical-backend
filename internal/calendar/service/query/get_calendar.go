@@ -2,11 +2,11 @@ package query
 
 import (
 	"context"
-	"errors"
 
-	"github.com/google/uuid"
 	"github.com/TokujouKaisenDonburi/optical-backend/internal/calendar"
 	"github.com/TokujouKaisenDonburi/optical-backend/internal/option"
+	"github.com/TokujouKaisenDonburi/optical-backend/pkg/apperr"
+	"github.com/google/uuid"
 )
 
 type GetCalendarInput struct {
@@ -37,7 +37,7 @@ func (q *CalendarQuery) GetCalendar(ctx context.Context, input GetCalendarInput)
 		}
 	}
 	if !isMember {
-		return nil, errors.New("user is not in members")
+		return nil, apperr.ForbiddenError("user not in member")
 	}
 	return &CalendarQueryOutput{
 		Id:      calendar.Id,
@@ -47,5 +47,4 @@ func (q *CalendarQuery) GetCalendar(ctx context.Context, input GetCalendarInput)
 		Members: calendar.Members,
 		Options: calendar.Options,
 	}, nil
-
 } 

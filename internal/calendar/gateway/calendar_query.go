@@ -179,6 +179,7 @@ func (r *CalendarPsqlRepository) FindByUserCalendarId(ctx context.Context, userI
 	LEFT JOIN calendar_images ON
 	calendar_images.id = calendars.image_id
 	WHERE calendars.id = $1
+	AND calendars.deleted_at IS NULL
 	`
 	var calRow CalendarImageRow
 	err := r.db.GetContext(ctx, &calRow, query, calendarId)
