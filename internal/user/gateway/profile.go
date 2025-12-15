@@ -22,10 +22,12 @@ type UserProfileModel struct {
 func (r *UserPsqlRepository) FindProfileById(ctx context.Context, id uuid.UUID) (*output.UserQueryOutput, error) {
 	query := `
 		SELECT 
-			id, name, email, created_at, updated_at, user_profiles.image_url
+			id, name, email, created_at, updated_at, avatars.url,
 		FROM users
 		LEFT JOIN user_profiles
 			ON users.id = user_profiles.user_id
+		JOIN avatars
+			ON user_profiles.avatar_id = avatars.id
 		WHERE 
 			users.id = $1
 			AND users.deleted_at IS NULL

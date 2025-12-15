@@ -1,16 +1,26 @@
 package user
 
-import "net/url"
+import (
+	"net/url"
+
+	"github.com/google/uuid"
+)
 
 type Avatar struct {
+	Id    uuid.UUID
 	Url   string
 	Valid bool
 }
 
-func NewAvatar(url string) *Avatar {
+func NewAvatar(url string) (*Avatar, error) {
+	id, err := uuid.NewV7()
+	if err != nil {
+		return nil, err
+	}
 	img := &Avatar{}
+	img.Id = id
 	img.SetUrl(url)
-	return img
+	return img, nil
 }
 
 // URLを設定する
@@ -24,4 +34,3 @@ func (img *Avatar) SetUrl(imageUrl string) {
 		img.Valid = true
 	}
 }
-

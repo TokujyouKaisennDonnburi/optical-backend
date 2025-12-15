@@ -9,7 +9,7 @@ import (
 type Profile struct {
 	Id        uuid.UUID
 	UserId    uuid.UUID
-	Image     Avatar
+	Avatar    Avatar
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }
@@ -21,11 +21,14 @@ func NewProfile(userId uuid.UUID, imageUrl string) (*Profile, error) {
 	if err != nil {
 		return nil, err
 	}
-	img := NewAvatar(imageUrl)
+	avatar, err := NewAvatar(imageUrl)
+	if err != nil {
+		return nil, err
+	}
 	return &Profile{
 		Id:        id,
 		UserId:    userId,
-		Image:     *img,
+		Avatar:    *avatar,
 		CreatedAt: now,
 		UpdatedAt: now,
 	}, nil
