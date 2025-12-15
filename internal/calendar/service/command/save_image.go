@@ -54,7 +54,7 @@ func (c *CalendarCommand) SaveImage(ctx context.Context, input SaveImageCommandI
 		return nil, err
 	}
 	// URLを設定
-	image.SetUrl(url)
+	image.SetUrl(storage.GetImageStorageBaseUrl() + "/" + url)
 	// 画像情報を保存
 	err = c.imageRepository.Save(ctx, image)
 	if err != nil {
@@ -62,6 +62,6 @@ func (c *CalendarCommand) SaveImage(ctx context.Context, input SaveImageCommandI
 	}
 	return &SaveImageCommandOutput{
 		Id:  image.Id,
-		Url: storage.GetImageStorageBaseUrl() + "/" + image.Url,
+		Url: image.Url,
 	}, nil
 }
