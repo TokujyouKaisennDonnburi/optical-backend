@@ -122,3 +122,100 @@ func (r *CalendarPsqlRepository) Create(
 	})
 }
 
+func (r *CalendarPsqlRepository) Update(
+	ctx context.Context,
+	calendarId uuid.UUID,
+	updateFn func(*calendar.Calendar) (*calendar.Calendar, error),
+) error {
+	return db.RunInTx(r.db, func(tx *sqlx.Tx) error {
+		// カレンダー取得
+		calendar, err := FindCalendarById(ctx, tx, calendarId)
+		if err != nil {
+			return err
+		}
+		// 更新関数実行
+		calendar, err = updateFn(calendar)
+		if err != nil {
+			return err
+		}
+
+		// カレンダー更新
+		query := `
+            UPDATE calendars SET
+                name = :name,
+                color = :color,
+                image_id = :imageId
+            WHERE id = :id AND deleted_at IS NULL
+        `
+		_, err = tx.NamedExecContext(ctx, query, map[string]any{
+			"id":    calendar.Id,
+			"name":  calendar.Name,
+			"color": calendar.Color,
+			"imageId": uuid.NullUUID{
+				UUID:  calendar.Image.Id,
+				Valid: calendar.Image.Valid,
+			},
+		})
+		if err != nil {
+			return err
+		}
+
+		// 全置換
+		// メンバー全削除
+		_, err = tx.ExecContext(ctx,
+			"DELETE FROM calendar_members WHERE calendar_id = $1", calendarId)
+		if err != nil {
+			return err
+		}
+		// メンバー作成
+		if len(calendar.Members) > 0 {
+			query = `
+                INSERT INTO calendar_members(calendar_id, user_id, joined_at)
+                VALUES (:calendarId, :userId, :joinedAt)
+            `
+			calendarMemberMaps := []map[string]any{}
+			for _, member := range calendar.Members {
+				calendarMemberMaps = append(calendarMemberMaps, map[string]any{
+					"calendarId": calendar.Id,
+					"userId":     member.UserId,
+					"joinedAt": sql.NullTime{
+						Time:  member.JoinedAt,
+						Valid: !member.JoinedAt.IsZero(),
+					},
+				})
+			}
+			_, err = tx.NamedExecContext(ctx, query, calendarMemberMaps)
+			if err != nil {
+				return err
+			}
+		}
+
+		// 全置換
+		// オプション全削除
+		_, err = tx.ExecContext(ctx,
+			"DELETE FROM calendar_options WHERE calendar_id = $1", calendarId)
+		if err != nil {
+			return err
+		}
+		// オプション設定
+		if len(calendar.Options) > 0 {
+			query = `
+                INSERT INTO calendar_options(calendar_id, option_id)
+                VALUES (:calendarId, :optionId)
+            `
+			calendarOptionMaps := []map[string]any{}
+			for _, option := range calendar.Options {
+				calendarOptionMaps = append(calendarOptionMaps, map[string]any{
+					"calendarId": calendar.Id,
+					"optionId":   option.Id,
+				})
+			}
+			_, err = tx.NamedExecContext(ctx, query, calendarOptionMaps)
+			if err != nil {
+				return err
+			}
+		}
+
+		return nil
+	})
+}
