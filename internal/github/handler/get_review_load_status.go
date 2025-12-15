@@ -12,11 +12,17 @@ import (
 )
 
 type GithubReviewLoadStatusListResponse struct {
-	Id       int64  `json:"id"`
-	Name     string `json:"name"`
-	Url      string `json:"url"`
-	Reviewed int    `json:"reviewed"`
-	Assigned int    `json:"assigned"`
+	RepositoryId   int64                                    `json:"repositoryId"`
+	RepositoryName string                                   `json:"repositoryName"`
+	Total          int                                      `json:"total"`
+	Reviewers      []GithubReviewLoadStatusListResponseItem `json:"reviewers"`
+}
+
+type GithubReviewLoadStatusListResponseItem struct {
+	GithubId   int64  `json:"githubId"`
+	GithubName string `json:"githubName"`
+	GithubUrl  string `json:"githubUrl"`
+	Assigned   int    `json:"assigned"`
 }
 
 func (h *GithubHandler) GetReviewLoadStatus(w http.ResponseWriter, r *http.Request) {
@@ -40,12 +46,20 @@ func (h *GithubHandler) GetReviewLoadStatus(w http.ResponseWriter, r *http.Reque
 	}
 	responseList := make([]GithubReviewLoadStatusListResponse, len(outputs))
 	for i, loadStatus := range outputs {
+		reviewers := make([]GithubReviewLoadStatusListResponseItem, len(loadStatus.Status))
+		for i, status := range loadStatus.Status {
+			reviewers[i] = GithubReviewLoadStatusListResponseItem{
+				GithubId:   status.GithubId,
+				GithubName: status.GithubName,
+				GithubUrl:  status.GithubUrl,
+				Assigned:   status.Assigned,
+			}
+		}
 		responseList[i] = GithubReviewLoadStatusListResponse{
-			Id:       loadStatus.GithubId,
-			Name:     loadStatus.GithubName,
-			Url:      loadStatus.GithubUrl,
-			Reviewed: loadStatus.Reviewed,
-			Assigned: loadStatus.Assigned,
+			RepositoryId:   loadStatus.RepositoryId,
+			RepositoryName: loadStatus.RepositoryName,
+			Total:          loadStatus.Total,
+			Reviewers:      reviewers,
 		}
 	}
 	render.JSON(w, r, responseList)

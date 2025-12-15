@@ -18,10 +18,16 @@ type ReviewLoadStatusInput struct {
 }
 
 type ReviewLoadStatusListOutput struct {
+	RepositoryId   int64
+	RepositoryName string
+	Total          int
+	Status         []ReviewLoadStatusListOutputItem
+}
+
+type ReviewLoadStatusListOutputItem struct {
 	GithubId   int64
 	GithubName string
 	GithubUrl  string
-	Reviewed   int
 	Assigned   int
 }
 
@@ -42,7 +48,7 @@ func (q *GithubQuery) GetReviewLoadStatus(ctx context.Context, input ReviewLoadS
 		return nil, apperr.ForbiddenError("option not enabled")
 	}
 	// プルリクエストをGithubから取得
-	outputs, err := q.githubRepository.GetPullRequests(
+	prList, err := q.githubRepository.GetPullRequests(
 		ctx,
 		input.UserId,
 		input.CalendarId,
@@ -64,33 +70,36 @@ func (q *GithubQuery) GetReviewLoadStatus(ctx context.Context, input ReviewLoadS
 	if err != nil {
 		return nil, err
 	}
-	loadStatusMap := map[int64]ReviewLoadStatusListOutput{}
-	for _, output := range outputs {
+	outputs := make([]ReviewLoadStatusListOutput, len(prList))
+	for i, output := range prList {
+		total := 0
+		statusMap := map[int64]ReviewLoadStatusListOutputItem{}
+		outputs[i].RepositoryId = output.Repository.Id
+		outputs[i].RepositoryName = output.Repository.Name
 		for _, pullRequest := range output.PullRequests {
 			// レビュー依頼されていないものはスキップ
 			if len(pullRequest.Reviewers) == 0 {
 				continue
 			}
+			total += 1
 			// 全てのレビュアーをチェック
 			for _, reviewer := range pullRequest.Reviewers {
-				status, ok := loadStatusMap[reviewer.Id];
+				status, ok := statusMap[reviewer.Id]
 				if !ok {
 					// マップにない場合新規作成
-					 status = ReviewLoadStatusListOutput{
-						GithubId: reviewer.Id,
+					status = ReviewLoadStatusListOutputItem{
+						GithubId:   reviewer.Id,
 						GithubName: reviewer.Name,
-						GithubUrl: reviewer.Url,
+						GithubUrl:  reviewer.Url,
 					}
 				}
 				// アサイン数+1
 				status.Assigned += 1
-				if pullRequest.ReviewComments != 0 {
-					// レビュー済み+1
-					status.Reviewed += 1
-				}	
-				loadStatusMap[reviewer.Id] = status
+				statusMap[reviewer.Id] = status
 			}
 		}
+		outputs[i].Total = total
+		outputs[i].Status = slices.Collect(maps.Values(statusMap))
 	}
-	return slices.Collect(maps.Values(loadStatusMap)), nil
+	return outputs, nil
 }
