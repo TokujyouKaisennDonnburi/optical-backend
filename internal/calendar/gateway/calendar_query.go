@@ -151,12 +151,18 @@ type CalendarQueryModel struct {
 	Members  []calendar.Member `db:"member"`
 	Options  []option.Option   `db:"option"`
 }
-type CalendarRow struct {
+type CalendarImageRow struct {
 	Id       uuid.UUID      `db:"id"`
 	Name     string         `db:"name"`
 	Color    calendar.Color `db:"color"`
 	ImageId  uuid.NullUUID  `db:"image_id"`
 	ImageUrl sql.NullString `db:"image_url"`
+}
+
+type OptionModel struct {
+	Id         int32  `db:"id"`
+	Name       string `db:"name"`
+	Deprecated bool   `db:"deprecated"`
 }
 
 // calendar単体取得
@@ -174,11 +180,12 @@ func (r *CalendarPsqlRepository) FindByUserCalendarId(ctx context.Context, userI
 	calendar_images.id = calendars.image_id
 	WHERE calendars.id = $1
 	`
-	var calRow CalendarRow
+	var calRow CalendarImageRow
 	err := r.db.GetContext(ctx, &calRow, query, calendarId)
 	if err != nil {
 		return nil, err
 	}
+	// member
 	query = `
 	SELECT
 	calendar_members.user_id,
@@ -189,20 +196,21 @@ func (r *CalendarPsqlRepository) FindByUserCalendarId(ctx context.Context, userI
 	users.id = calendar_members.user_id
 	WHERE calendar_members.calendar_id = $1
 	`
-	var memberRows []calendar.Member
-	err = r.db.SelectContext(ctx, &memberRows, query, calendarId)
+	memberModels := []MemberModel{}
+	err = r.db.SelectContext(ctx, &memberModels, query, calendarId)
 	if err != nil {
 		return nil, err
 	}
 
-	members := make([]calendar.Member, len(memberRows))
-	for i, row := range memberRows {
+	members := make([]calendar.Member, len(memberModels))
+	for i, row := range memberModels {
 		members[i] = calendar.Member{
 			UserId:   row.UserId,
-			Name:     row.Name,
-			JoinedAt: row.JoinedAt,
+			Name:     row.UserName,
+			JoinedAt: row.JoinedAt.Time,
 		}
 	}
+	// option
 	query = `
 	SELECT
 	calendar_options.option_id AS id,
@@ -213,13 +221,13 @@ func (r *CalendarPsqlRepository) FindByUserCalendarId(ctx context.Context, userI
 	options.id = calendar_options.option_id
 	WHERE calendar_options.calendar_id = $1
 	`
-	var optionRows []option.Option
-	err = r.db.SelectContext(ctx, &optionRows, query, calendarId)
+	optionModels := []OptionModel{}
+	err = r.db.SelectContext(ctx, &optionModels, query, calendarId)
 	if err != nil {
 		return nil, err
 	}
-	options := make([]option.Option, len(optionRows))
-	for i, row := range optionRows {
+	options := make([]option.Option, len(optionModels))
+	for i, row := range optionModels {
 		options[i] = option.Option{
 			Id:         row.Id,
 			Name:       row.Name,
