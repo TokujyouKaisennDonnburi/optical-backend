@@ -481,6 +481,7 @@ components:
         avatarUrl:
           type: string
           format: url
+          nullable: true
         createdAt:
           type: string
           format: date-time
