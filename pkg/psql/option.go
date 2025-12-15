@@ -22,6 +22,7 @@ func FindOptionsByIds(ctx context.Context, tx *sqlx.Tx, ids []int32) ([]option.O
 		WHERE 
 			id in (?)
 		AND deprecated = FALSE
+		ORDER BY id
 	`
 	optionModels := []OptionModel{}
 	query, args, err := sqlx.In(query, ids)
@@ -42,4 +43,3 @@ func FindOptionsByIds(ctx context.Context, tx *sqlx.Tx, ids []int32) ([]option.O
 	}
 	return options, nil
 }
-

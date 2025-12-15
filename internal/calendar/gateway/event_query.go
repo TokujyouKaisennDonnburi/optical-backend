@@ -129,6 +129,7 @@ func (r *EventPsqlRepository) GetEventsByDate(
 				events.start_at::date = $2 OR events.end_at::date = $2 
 				OR events.start_at::date < $2 AND events.end_at::date > $2
 			)
+		ORDER BY events.id
 	`
 	var models []EventTodayQueryModel
 	date := datetime.Format("2006-01-02")
@@ -179,6 +180,7 @@ func (r *EventPsqlRepository) GetEventsByMonth(
 				TO_CHAR(events.start_at, 'YYYY-MM') = $2 OR TO_CHAR(events.end_at, 'YYYY-MM') = $2 
 				OR events.start_at::date < $3 AND events.end_at::date >= $4
 			)
+		ORDER BY events.id
 	`
 	var models []EventTodayQueryModel
 	month := datetime.Format("2006-01")

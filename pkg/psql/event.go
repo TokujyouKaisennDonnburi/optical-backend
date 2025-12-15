@@ -37,6 +37,7 @@ func FindEventByUserIdAndId(ctx context.Context, tx *sqlx.Tx, userId, eventId uu
 			calendar_members.user_id = $1 AND
 			calendar_members.joined_at IS NOT NULL AND
 			deleted_at IS NULL
+		ORDER BY event_locations.id
 	`
 	var eventModel EventModel
 	err := tx.GetContext(ctx, &eventModel, query, userId, eventId)

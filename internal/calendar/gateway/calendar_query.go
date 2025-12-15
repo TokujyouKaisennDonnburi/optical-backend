@@ -41,6 +41,7 @@ func FindCalendarById(ctx context.Context, tx *sqlx.Tx, calendarId uuid.UUID) (*
 			ON options.id = calendar_options.option_id
 		WHERE 
 			calendars.id = $1 AND calendars.deleted_at IS NULL
+		ORDER BY calendar_options.option_id
 	`
 	calendarModels := []CalendarModel{}
 	err := tx.SelectContext(ctx, &calendarModels, query, calendarId)
@@ -59,6 +60,7 @@ func FindCalendarById(ctx context.Context, tx *sqlx.Tx, calendarId uuid.UUID) (*
 			ON calendar_members.user_id = users.id
 		WHERE 
 			calendar_members.calendar_id = $1
+		ORDER BY calendar_members.user_id
 	`
 	memberModels := []MemberModel{}
 	err = tx.SelectContext(ctx, &memberModels, query, calendarId)
