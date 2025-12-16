@@ -81,6 +81,10 @@ func (q *GithubQuery) GetReviewLoadStatus(ctx context.Context, input ReviewLoadS
 			if len(pullRequest.Reviewers) == 0 {
 				continue
 			}
+			// ドラフトはスキップ
+			if pullRequest.Draft {
+				continue
+			}
 			total += 1
 			// 全てのレビュアーをチェック
 			for _, reviewer := range pullRequest.Reviewers {
