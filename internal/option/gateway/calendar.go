@@ -25,11 +25,11 @@ func (r *OptionPsqlRepository) FindsByCalendarId(ctx context.Context, calendarId
 		return nil, err
 	}
 	options := make([]option.Option, len(optionModels))
-	for _, optionModel := range optionModels {
-		options = append(options, option.Option{
+	for i, optionModel := range optionModels {
+		options[i] = option.Option{
 			Id:   optionModel.Id,
 			Name: optionModel.Name,
-		})
+		}
 	}
 	return options, nil
 }
