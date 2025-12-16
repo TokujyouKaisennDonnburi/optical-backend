@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"github.com/TokujouKaisenDonburi/optical-backend/internal/option"
-	"github.com/TokujouKaisenDonburi/optical-backend/pkg/db"
 	"github.com/TokujouKaisenDonburi/optical-backend/pkg/psql"
 	"github.com/jmoiron/sqlx"
 )
@@ -22,13 +21,23 @@ func NewOptionPsqlRepository(db *sqlx.DB) *OptionPsqlRepository {
 	}
 }
 
-func (r *OptionPsqlRepository) FindByIds(ctx context.Context, ids []int32) ([]option.Option, error) {
-	var err error
-	var options []option.Option
-	err = db.RunInTx(r.db, func(tx *sqlx.Tx) error {
-		options, err = psql.FindOptionsByIds(ctx, tx, ids)
-		return err
-	})
+func (r *OptionPsqlRepository) FindAll(ctx context.Context) ([]option.Option, error) {
+	var models []psql.OptionModel
+	query := `
+		SELECT id, name FROM options 
+		WHERE deprecated = FALSE
+	`
+	err := r.db.SelectContext(ctx, &models, query)
+	if err != nil {
+		return nil, err
+	}
+	options := make([]option.Option, len(models))
+	for i, model := range models {
+		options[i] = option.Option{
+			Id:         model.Id,
+			Name:       model.Name,
+			Deprecated: false,
+		}
+	}
 	return options, err
 }
-
