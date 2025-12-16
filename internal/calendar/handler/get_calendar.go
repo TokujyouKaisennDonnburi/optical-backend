@@ -15,10 +15,10 @@ import (
 )
 
 type CalendarResponse struct {
-	Id		string `json:"id"`
-	Name    string `json:"name"`
-	Color   calendar.Color `json:"color"`
-	Image   string `json:"image"`
+	Id      string            `json:"id"`
+	Name    string            `json:"name"`
+	Color   calendar.Color    `json:"color"`
+	Image   string            `json:"imageUrl"`
 	Members []calendar.Member `json:"member"`
 	Options []option.Option   `json:"option"`
 }
@@ -47,13 +47,12 @@ func (h *CalendarHttpHandler) GetCalendar(w http.ResponseWriter, r *http.Request
 	}
 	// output
 	response := CalendarResponse{
-		Id:		 output.Id.String(),
-		Name:	 output.Name,
-		Color:	 output.Color,
-		Image:	 output.Image.Url,
+		Id:      output.Id.String(),
+		Name:    output.Name,
+		Color:   output.Color,
+		Image:   output.Image.Url,
 		Members: output.Members,
 		Options: output.Options,
 	}
-	render.JSON(w,r,response)
+	render.JSON(w, r, response)
 }
-

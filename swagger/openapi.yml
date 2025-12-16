@@ -1091,20 +1091,20 @@ components:
     Member:
       type: object
       required:
-        - UserId
-        - Name
-        - JoinedAt
+        - userId
+        - name
+        - joinedAt
       properties:
-        UserId:
+        userId:
           type: string
           format: uuid
           description: ユーザーID
           example: "019b1ffe-99a2-7b4b-b013-64596fbbdb70"
-        Name:
+        name:
           type: string
           description: ユーザー名
           example: "TestUser"
-        JoinedAt:
+        joinedAt:
           type: string
           format: date-time
           description: カレンダーに参加した日時
