@@ -180,13 +180,16 @@ func (r *CalendarPsqlRepository) FindByUserCalendarId(ctx context.Context, userI
 	LEFT JOIN calendar_images ON calendar_images.id = calendars.image_id
 	LEFT JOIN calendar_members ON calendar_members.calendar_id = calendars.id
 	INNER JOIN users ON users.id = calendar_members.user_id
-	WHERE calendars.id = $1
-	AND calendars.deleted_at IS NULL
-	`
+	WHERE calendars.id = $2
+	AND calendar_members.user_id = $1
+	AND calendars.deleted_at IS NULL `
 	calRow := []CalendarImageMember{}
-	err := r.db.SelectContext(ctx, &calRow, query, calendarId)
+	err := r.db.SelectContext(ctx, &calRow, query,userId, calendarId)
 	if err != nil {
 		return nil, err
+	}
+	if len(calRow) == 0 {
+		return nil, errors.New("calendar member is not found")
 	}
 	members := make([]calendar.Member, len(calRow))
 	for i, row := range calRow {
