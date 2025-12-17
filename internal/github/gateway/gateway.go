@@ -23,7 +23,10 @@ func NewGithubApiRepository(db *sqlx.DB) *GithubApiRepository {
 	}
 }
 
-func NewStateRedisRepository(db *sqlx.DB, redisClient *redis.Client) *StateRedisRepository {
+func NewStateRedisRepository(
+	db *sqlx.DB,
+	redisClient *redis.Client,
+) *StateRedisRepository {
 	if db == nil {
 		panic("db is nil")
 	}

@@ -4,13 +4,13 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"os"
 	"time"
 
 	"github.com/TokujouKaisenDonburi/optical-backend/internal/github"
 	"github.com/TokujouKaisenDonburi/optical-backend/pkg/api"
 	"github.com/TokujouKaisenDonburi/optical-backend/pkg/security"
+	"github.com/sirupsen/logrus"
 )
 
 // トークンを復号化して取得
@@ -40,7 +40,7 @@ func (r *StateRedisRepository) GetOrganization(
 	if err == nil {
 		return organization, nil
 	}
-	fmt.Println("Cache get error: ", err.Error())
+	logrus.WithError(err).Error("Cache get error: ")
 	// 失敗した場合APIから取得
 	organization, err = api.GetInstalledOrganization(ctx, installationId)
 	if err != nil {
@@ -55,7 +55,7 @@ func (r *StateRedisRepository) GetOrganization(
 		return r.SaveOrganization(ctx, organization, organization.TokenExpiresAt.Sub(now))
 	}
 	if err := cacheFunc(); err != nil {
-		fmt.Printf("cache error: %s\n", err.Error())
+		logrus.WithError(err).Error("cache error")
 	}
 	return organization, nil
 }

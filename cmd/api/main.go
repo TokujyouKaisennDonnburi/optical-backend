@@ -21,23 +21,46 @@ import (
 	userHandler "github.com/TokujouKaisenDonburi/optical-backend/internal/user/handler"
 	userCommand "github.com/TokujouKaisenDonburi/optical-backend/internal/user/service/command"
 	userQuery "github.com/TokujouKaisenDonburi/optical-backend/internal/user/service/query"
+	"github.com/TokujouKaisenDonburi/optical-backend/pkg/logs"
 	"github.com/minio/minio-go/v7"
 	"github.com/minio/minio-go/v7/pkg/credentials"
+	"github.com/sirupsen/logrus"
+	prefixed "github.com/x-cray/logrus-prefixed-formatter"
 
 	"github.com/go-chi/chi/v5"
-	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/cors"
 	"github.com/jmoiron/sqlx"
 	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
 	"github.com/redis/go-redis/v9"
+	"github.com/redis/go-redis/v9/maintnotifications"
 )
 
 func main() {
 	_ = godotenv.Load()
 
+	// Logger configurations
+	reportCaller := os.Getenv("LOGGER_REPORT_CALLER") == "1"
+	logrus.SetReportCaller(reportCaller)
+	if os.Getenv("LOGGER_JSON_FORMAT") == "1" {
+		logrus.SetFormatter(&logrus.JSONFormatter{
+			PrettyPrint: false,
+		})
+	} else {
+		formatter := &prefixed.TextFormatter{
+			FullTimestamp: true,
+			TimestampFormat: "2006-01-02 15:04:05",
+		}
+		formatter.SetColorScheme(&prefixed.ColorScheme{
+			TimestampStyle: "white",
+			ErrorLevelStyle: "red+b",
+			FatalLevelStyle: "red+bu",
+		})
+		logrus.SetFormatter(formatter)
+	}
+
 	r := chi.NewRouter()
-	r.Use(middleware.Logger)
+	r.Use(logs.HttpLogger)
 	r.Use(cors.Handler(cors.Options{
 		AllowedOrigins:   []string{"http://localhost:3000", "https://tokujyoukaisenndonnburi.github.io"},
 		AllowedMethods:   []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
@@ -126,6 +149,7 @@ func main() {
 	})
 
 	// Start Serving
+	logrus.Info("Start serving :8000")
 	err := http.ListenAndServe(":8000", r)
 	if err != nil {
 		panic(err)
@@ -238,6 +262,9 @@ func GetRedisClient() *redis.Client {
 		Addr:     endpoint,
 		Password: password,
 		DB:       0,
+		MaintNotificationsConfig: &maintnotifications.Config{
+			Mode: maintnotifications.ModeDisabled,
+		},
 	})
 	_, err := client.Ping(context.Background()).Result()
 	if err != nil {

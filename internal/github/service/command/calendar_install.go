@@ -3,11 +3,11 @@ package command
 import (
 	"context"
 	"errors"
-	"fmt"
 	"time"
 
 	"github.com/TokujouKaisenDonburi/optical-backend/pkg/api"
 	"github.com/TokujouKaisenDonburi/optical-backend/pkg/apperr"
+	"github.com/sirupsen/logrus"
 )
 
 type GithubCalendarInstallInput struct {
@@ -43,7 +43,7 @@ func (c *GithubCommand) InstallToCalendar(ctx context.Context, input GithubCalen
 		return c.stateRepository.SaveOrganization(ctx, organization, organization.TokenExpiresAt.Sub(now))
 	}
 	if err := cacheFunc(); err != nil {
-		fmt.Printf("servive@cache error: %s\n", err.Error())
+		logrus.WithError(err).Error("failed to cache organization")
 	}
 	return c.githubRepository.InstallToCalendar(ctx, userId, calendarId, input.Code, input.InstallationId)
 }

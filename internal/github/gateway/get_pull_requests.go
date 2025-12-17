@@ -2,7 +2,6 @@ package gateway
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/TokujouKaisenDonburi/optical-backend/internal/github"
 	"github.com/TokujouKaisenDonburi/optical-backend/internal/github/service/query/output"
@@ -11,6 +10,7 @@ import (
 	"github.com/TokujouKaisenDonburi/optical-backend/pkg/psql"
 	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
+	"github.com/sirupsen/logrus"
 )
 
 // プルリクエストを取得
@@ -44,7 +44,11 @@ func (r *GithubApiRepository) GetPullRequests(
 				github.PULL_REQUEST_STATE_OPEN,
 			)
 			if err != nil {
-				fmt.Printf("repository error: %s\n", err.Error())
+				logrus.WithFields(logrus.Fields{
+					"organization_id":    organization.Id,
+					"organization_login": organization.Login,
+					"repository_name":    repos.Name,
+				}).WithError(err).Error("failed to get pullRequests")
 				continue
 			}
 			outputs = append(outputs, output.GithubPullRequestListQueryOutput{
