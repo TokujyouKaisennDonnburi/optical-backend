@@ -4,10 +4,12 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"time"
 
 	"github.com/TokujouKaisenDonburi/optical-backend/internal/calendar"
 	"github.com/TokujouKaisenDonburi/optical-backend/internal/calendar/service/query/output"
 	"github.com/TokujouKaisenDonburi/optical-backend/internal/option"
+	"github.com/TokujouKaisenDonburi/optical-backend/internal/user"
 	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
 )
@@ -143,20 +145,20 @@ func (r *CalendarPsqlRepository) FindByUserId(ctx context.Context, userId uuid.U
 }
 
 type CalendarQueryModel struct {
-	Id       uuid.UUID         `db:"id"`
-	Name     string            `db:"name"`
-	Color    calendar.Color    `db:"color"`
-	ImageId  uuid.NullUUID     `db:"imageId"`
-	ImageUrl sql.NullString    `db:"imageUrl"`
-	Members  []calendar.Member `db:"member"`
-	Options  []option.Option   `db:"option"`
+	Id      uuid.UUID      `db:"id"`
+	Name    string         `db:"name"`
+	Color   calendar.Color `db:"color"`
+	ImageId uuid.NullUUID  `db:"imageId"`
 }
-type CalendarImageRow struct {
+type CalendarImageMember struct {
 	Id       uuid.UUID      `db:"id"`
 	Name     string         `db:"name"`
 	Color    calendar.Color `db:"color"`
 	ImageId  uuid.NullUUID  `db:"image_id"`
 	ImageUrl sql.NullString `db:"image_url"`
+	UserId   uuid.UUID      `db:"user_id"`
+	UserName user.User      `db:"user_name"`
+	JoinedAt time.Time      `db:"joined_at"`
 }
 
 type OptionModel struct {
@@ -167,60 +169,42 @@ type OptionModel struct {
 
 // calendar単体取得
 func (r *CalendarPsqlRepository) FindByUserCalendarId(ctx context.Context, userId, calendarId uuid.UUID) (*calendar.Calendar, error) {
-	// calendar & image
+	// calendar & image & member & users
 	query := `
 	SELECT
-	calendars.id,
-	calendars.name,
-	calendars.color,
-	calendars.image_id,
-	calendar_images.url AS image_url
+	calendars.id, calendars.name, calendars.color,
+	calendars.image_id, calendar_images.url AS image_url,
+	calendar_members.user_id, calendar_members.joined_at,
+	users.name
 	FROM calendars
-	LEFT JOIN calendar_images ON
-	calendar_images.id = calendars.image_id
+	LEFT JOIN calendar_images ON calendar_images.id = calendars.image_id
+	LEFT JOIN calendar_members ON calendar_members.calendar_id = calendars.id
+	INNER JOIN users ON users.id = calendar_members.user_id
 	WHERE calendars.id = $1
 	AND calendars.deleted_at IS NULL
 	`
-	var calRow CalendarImageRow
-	err := r.db.GetContext(ctx, &calRow, query, calendarId)
+	calRow := []CalendarImageMember{}
+	err := r.db.SelectContext(ctx, &calRow, query, calendarId)
 	if err != nil {
 		return nil, err
 	}
-	// member
-	query = `
-	SELECT
-	calendar_members.user_id,
-	users.name,
-	calendar_members.joined_at
-	FROM calendar_members
-	INNER JOIN users ON
-	users.id = calendar_members.user_id
-	WHERE calendar_members.calendar_id = $1
-	`
-	memberModels := []MemberModel{}
-	err = r.db.SelectContext(ctx, &memberModels, query, calendarId)
-	if err != nil {
-		return nil, err
-	}
-
-	members := make([]calendar.Member, len(memberModels))
-	for i, row := range memberModels {
+	members := make([]calendar.Member, len(calRow))
+	for i, row := range calRow {
 		members[i] = calendar.Member{
 			UserId:   row.UserId,
-			Name:     row.UserName,
-			JoinedAt: row.JoinedAt.Time,
+			Name:     row.Name,
+			JoinedAt: row.JoinedAt,
 		}
 	}
 	// option
 	query = `
-	SELECT
-	calendar_options.option_id AS id,
-	options.name,
-	options.deprecated
-	FROM calendar_options
-	INNER JOIN options ON
-	options.id = calendar_options.option_id
-	WHERE calendar_options.calendar_id = $1
+	SELECT id, name, deprecated 
+	FROM options
+	WHERE options.id IN (
+		SELECT option_id
+		FROM calendar_options
+		WHERE calendar_id = $1
+	);
 	`
 	optionModels := []OptionModel{}
 	err = r.db.SelectContext(ctx, &optionModels, query, calendarId)
@@ -237,13 +221,13 @@ func (r *CalendarPsqlRepository) FindByUserCalendarId(ctx context.Context, userI
 	}
 	// bind
 	return &calendar.Calendar{
-		Id:    calRow.Id,
-		Name:  calRow.Name,
-		Color: calRow.Color,
+		Id:    calRow[0].Id,
+		Name:  calRow[0].Name,
+		Color: calRow[0].Color,
 		Image: calendar.Image{
-			Id:    calRow.ImageId.UUID,
-			Url:   calRow.ImageUrl.String,
-			Valid: calRow.ImageId.Valid,
+			Id:    calRow[0].ImageId.UUID,
+			Url:   calRow[0].ImageUrl.String,
+			Valid: calRow[0].ImageId.Valid,
 		},
 		Members: members,
 		Options: options,

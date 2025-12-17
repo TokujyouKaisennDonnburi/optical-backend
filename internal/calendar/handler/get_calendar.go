@@ -2,10 +2,9 @@ package handler
 
 import (
 	"net/http"
+	"time"
 
-	"github.com/TokujouKaisenDonburi/optical-backend/internal/calendar"
 	"github.com/TokujouKaisenDonburi/optical-backend/internal/calendar/service/query"
-	"github.com/TokujouKaisenDonburi/optical-backend/internal/option"
 	"github.com/TokujouKaisenDonburi/optical-backend/pkg/apperr"
 	"github.com/TokujouKaisenDonburi/optical-backend/pkg/auth"
 	"github.com/go-chi/chi/v5"
@@ -15,12 +14,22 @@ import (
 )
 
 type CalendarResponse struct {
-	Id      string            `json:"id"`
-	Name    string            `json:"name"`
-	Color   calendar.Color    `json:"color"`
-	Image   string            `json:"imageUrl"`
-	Members []calendar.Member `json:"member"`
-	Options []option.Option   `json:"option"`
+	Id      string   `json:"id"`
+	Name    string   `json:"name"`
+	Color   string   `json:"color"`
+	Image   string   `json:"imageUrl"`
+	Members []string `json:"member"`
+	Options []string `json:"option"`
+}
+type CalendarMemberResponse struct {
+	UserId   string    `json:"userId"`
+	Name     string    `json:"name"`
+	JoinedAt time.Time `json:"joinedAt"`
+}
+type CalendarOptionsResponse struct {
+	Id         int32  `json:"id"`
+	Name       string `json:"name"`
+	Deprecated bool   `json:"deprecated"`
 }
 
 func (h *CalendarHttpHandler) GetCalendar(w http.ResponseWriter, r *http.Request) {
@@ -45,14 +54,25 @@ func (h *CalendarHttpHandler) GetCalendar(w http.ResponseWriter, r *http.Request
 		_ = render.Render(w, r, apperr.ErrInternalServerError(err))
 		return
 	}
-	// output
-	response := CalendarResponse{
-		Id:      output.Id.String(),
-		Name:    output.Name,
-		Color:   output.Color,
-		Image:   output.Image.Url,
-		Members: output.Members,
-		Options: output.Options,
+	// for文でループ
+	response := make([]CalendarResponse, 0, len(output))
+	for _, hoge := range output {
+		response = append(response, CalendarResponse{
+			Id:    output.Id.String(),
+			Name:  output.Name,
+			Color: string(output.Color),
+			Image: output.Image.Url,
+			Members: CalendarMemberResponse{
+				UserId:   output.Id.String(),
+				Name:     output.Name,
+				JoinedAt: output.Members,
+			},
+			Options: CalendarOptionsResponse{
+				Id:         append(output.Options),
+				Name:       output.Options,
+				Deprecated: output.Options,
+			},
+		})
 	}
 	render.JSON(w, r, response)
 }
