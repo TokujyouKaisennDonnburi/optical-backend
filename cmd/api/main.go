@@ -25,6 +25,7 @@ import (
 	"github.com/minio/minio-go/v7"
 	"github.com/minio/minio-go/v7/pkg/credentials"
 	"github.com/sirupsen/logrus"
+	prefixed "github.com/x-cray/logrus-prefixed-formatter"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/cors"
@@ -38,10 +39,25 @@ import (
 func main() {
 	_ = godotenv.Load()
 
-	logrus.SetReportCaller(false)
-	logrus.SetFormatter(&logrus.JSONFormatter{
-		PrettyPrint: false,
-	})
+	// Logger configurations
+	reportCaller := os.Getenv("LOGGER_REPORT_CALLER") == "1"
+	logrus.SetReportCaller(reportCaller)
+	if os.Getenv("LOGGER_JSON_FORMAT") == "1" {
+		logrus.SetFormatter(&logrus.JSONFormatter{
+			PrettyPrint: false,
+		})
+	} else {
+		formatter := &prefixed.TextFormatter{
+			FullTimestamp: true,
+			TimestampFormat: "2006-01-02 15:04:05",
+		}
+		formatter.SetColorScheme(&prefixed.ColorScheme{
+			TimestampStyle: "white",
+			ErrorLevelStyle: "red+b",
+			FatalLevelStyle: "red+bu",
+		})
+		logrus.SetFormatter(formatter)
+	}
 
 	r := chi.NewRouter()
 	r.Use(logs.HttpLogger)
