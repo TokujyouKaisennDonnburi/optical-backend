@@ -4,7 +4,6 @@ import (
 	"context"
 	"database/sql"
 	"errors"
-	"fmt"
 
 	"github.com/TokujouKaisenDonburi/optical-backend/internal/calendar"
 	"github.com/TokujouKaisenDonburi/optical-backend/internal/option"
@@ -42,7 +41,6 @@ func FindCalendarById(ctx context.Context, tx *sqlx.Tx, calendarId uuid.UUID) (*
 			calendars.id = $1 AND calendars.deleted_at IS NULL
 	`
 	calendarModels := []CalendarModel{}
-	fmt.Println(calendarId.String())
 	err := tx.SelectContext(ctx, &calendarModels, query, calendarId)
 	if err != nil {
 		return nil, err

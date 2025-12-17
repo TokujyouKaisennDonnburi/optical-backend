@@ -23,6 +23,7 @@ import (
 	userQuery "github.com/TokujouKaisenDonburi/optical-backend/internal/user/service/query"
 	"github.com/minio/minio-go/v7"
 	"github.com/minio/minio-go/v7/pkg/credentials"
+	"github.com/sirupsen/logrus"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
@@ -126,6 +127,7 @@ func main() {
 	})
 
 	// Start Serving
+	logrus.Info("Start serving :8000")
 	err := http.ListenAndServe(":8000", r)
 	if err != nil {
 		panic(err)
