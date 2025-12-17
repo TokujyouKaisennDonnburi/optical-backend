@@ -64,7 +64,7 @@ func (c *CalendarCommand) CreateCalendar(ctx context.Context, input CalendarCrea
 		return nil, err
 	}
 	go func() {
-		content := getEmailContent(newCalendar.Id)
+		content := getEmailContent(getFontendUrl(), newCalendar.Id)
 		emails := make([]user.Email, len(input.MemberEmails))
 		for i, mail := range input.MemberEmails {
 			newEmail, err := user.NewEmail(mail)

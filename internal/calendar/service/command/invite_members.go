@@ -3,6 +3,7 @@ package command
 import (
 	"context"
 	"fmt"
+	"os"
 
 	"github.com/TokujouKaisenDonburi/optical-backend/internal/user"
 	"github.com/google/uuid"
@@ -29,7 +30,7 @@ func (c *CalendarCommand) InviteMember(ctx context.Context, input MemberCreateIn
 		return err
 	}
 	go func() {
-		content := getEmailContent(input.CalendarId)
+		content := getEmailContent(getFontendUrl(), input.CalendarId)
 		err := c.emailRepository.NotifyAll(
 			ctx,
 			"OptiCal: メンバーに招待されました",
@@ -43,10 +44,18 @@ func (c *CalendarCommand) InviteMember(ctx context.Context, input MemberCreateIn
 	return nil
 }
 
-func getEmailContent(calendarId uuid.UUID) string {
+func getFontendUrl() string {
+	baseUrl := os.Getenv("FRONTEND_BASE_URL")
+	if baseUrl == "" {
+		baseUrl = "http://localhost:3000"
+	}
+	return baseUrl
+}
+
+func getEmailContent(baseUrl string, calendarId uuid.UUID) string {
 	message := `
 	カレンダーに招待されました。
-	参加リンク：https://localhost:3000/calendars/%s/join
+	参加リンク：%s/calendars/%s/join
 	`
-	return fmt.Sprintf(message, calendarId.String())
+	return fmt.Sprintf(message, baseUrl, calendarId.String())
 }
