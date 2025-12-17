@@ -14,12 +14,12 @@ import (
 )
 
 type CalendarResponse struct {
-	Id      string   `json:"id"`
-	Name    string   `json:"name"`
-	Color   string   `json:"color"`
-	Image   string   `json:"imageUrl"`
-	Members []string `json:"member"`
-	Options []string `json:"option"`
+	Id      string                    `json:"id"`
+	Name    string                    `json:"name"`
+	Color   string                    `json:"color"`
+	Image   string                    `json:"imageUrl"`
+	Members []CalendarMemberResponse  `json:"member"`
+	Options []CalendarOptionsResponse `json:"option"`
 }
 type CalendarMemberResponse struct {
 	UserId   string    `json:"userId"`
@@ -54,25 +54,29 @@ func (h *CalendarHttpHandler) GetCalendar(w http.ResponseWriter, r *http.Request
 		_ = render.Render(w, r, apperr.ErrInternalServerError(err))
 		return
 	}
-	// for文でループ
-	response := make([]CalendarResponse, 0, len(output))
-	for _, hoge := range output {
-		response = append(response, CalendarResponse{
-			Id:    output.Id.String(),
-			Name:  output.Name,
-			Color: string(output.Color),
-			Image: output.Image.Url,
-			Members: CalendarMemberResponse{
-				UserId:   output.Id.String(),
-				Name:     output.Name,
-				JoinedAt: output.Members,
-			},
-			Options: CalendarOptionsResponse{
-				Id:         append(output.Options),
-				Name:       output.Options,
-				Deprecated: output.Options,
-			},
-		})
+	members := make([]CalendarMemberResponse, len(output.Members))
+	for i, row := range output.Members {
+		members[i] = CalendarMemberResponse{
+			UserId:   row.UserId.String(),
+			Name:     row.Name,
+			JoinedAt: row.JoinedAt,
+		}
+	}
+	options := make([]CalendarOptionsResponse, len(output.Options))
+	for i, row := range output.Options {
+		options[i] = CalendarOptionsResponse{
+			Id:         row.Id,
+			Name:       row.Name,
+			Deprecated: row.Deprecated,
+		}
+	}
+	response := CalendarResponse{
+		Id:      output.Id.String(),
+		Name:    output.Name,
+		Color:   string(output.Color),
+		Image:   output.Image.Url,
+		Members: members,
+		Options: options,
 	}
 	render.JSON(w, r, response)
 }
