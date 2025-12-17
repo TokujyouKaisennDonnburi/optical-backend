@@ -29,16 +29,6 @@ func (q *CalendarQuery) GetCalendar(ctx context.Context, input GetCalendarInput)
 	if err != nil {
 		return nil, err
 	}
-	isMember := false
-	for _, m := range calendar.Members {
-		if m.UserId == input.UserId{
-			isMember = true
-			break
-		}
-	}
-	if !isMember {
-		return nil, apperr.ForbiddenError("user not in member")
-	}
 	return &CalendarQueryOutput{
 		Id:      calendar.Id,
 		Name:    calendar.Name,
