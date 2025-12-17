@@ -3,6 +3,7 @@ package gateway
 import (
 	"context"
 	"errors"
+	"time"
 
 	"github.com/TokujouKaisenDonburi/optical-backend/internal/user"
 	"github.com/TokujouKaisenDonburi/optical-backend/pkg/db"
@@ -60,14 +61,16 @@ func (r *UserPsqlRepository) Update(
 		query := `
 			UPDATE users SET
 				name = :name,
-				email = :email
+				email = :email,
+				updated_at = :updatedAt
 			WHERE
 				users.id = :id
 		`
 		result, err := tx.NamedExecContext(ctx, query, map[string]any{
-			"id":    user.Id,
-			"name":  user.Name,
-			"email": user.Email.String(),
+			"id":        user.Id,
+			"name":      user.Name,
+			"email":     user.Email.String(),
+			"updatedAt": time.Now(),
 		})
 		if err != nil {
 			return err
