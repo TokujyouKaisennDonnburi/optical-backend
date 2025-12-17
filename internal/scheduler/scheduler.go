@@ -15,14 +15,14 @@ type Scheduler struct {
 	Title      string
 	Memo       string
 	StartTime  time.Time
-	EndTime   time.Time
+	EndTime    time.Time
 	IsAllDay   bool
 }
 
 type Scheduler_attendance struct {
-	Id        uuid.UUID
+	Id         uuid.UUID
 	CalendarId uuid.UUID
-	UserId    uuid.UUID
+	UserId     uuid.UUID
 	Comment    string
 }
 
@@ -43,20 +43,29 @@ func NewScheduler(userId, calendarId uuid.UUID, title, memo string, startTime, e
 	if userId == uuid.Nil {
 		return nil, errors.New("userId is nil")
 	}
-	err = Scheduler.SetTitle(title)
-	if err != nil {
-		return nil, err
-	}
-	return &Scheduler{
+	s, err := &Scheduler{
 		Id:         id,
 		CalendarId: calendarId,
 		UserId:     userId,
 		Title:      title,
 		Memo:       memo,
 		StartTime:  startTime,
-		EndTime:   endTime,
+		EndTime:    endTime,
 		IsAllDay:   isAllDay,
 	}, nil
+	err = s.SetTitle(title)
+	if err != nil {
+		return nil, err
+	}
+	err = s.SetMemo(memo)
+	if err != nil {
+		return nil, err
+	}
+	err = s.SetStartEndTime(startTime, endTime)
+	if err != nil {
+		return nil, err
+	}
+	return s, nil
 }
 func (s *Scheduler) SetTitle(title string) error {
 	titleLength := utf8.RuneCountInString(title)
@@ -68,10 +77,15 @@ func (s *Scheduler) SetTitle(title string) error {
 }
 func (s *Scheduler) SetMemo(memo string) error {
 	memoLength := utf8.RuneCountInString(memo)
-	if memoLength < 1 || memoLength > 32 {
+	if memoLength < 1 || memoLength > 256 {
 		return errors.New("memo is invalid")
 	}
 	s.Memo = memo
 	return nil
 }
-
+func (s *Scheduler) SetStartEndTime(startTime, endTime time.Time) error {
+	if startTime.After(endTime){
+		return errors.New("")
+	}
+	return nil
+}
