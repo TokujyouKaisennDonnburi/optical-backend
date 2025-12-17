@@ -1112,9 +1112,9 @@ components:
     Option:
       type: object
       required:
-        - Id
-        - Name
-        - Deprecated
+        - id
+        - name
+        - deprecated
       properties:
         id:
           type: integer
