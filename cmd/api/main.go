@@ -21,24 +21,30 @@ import (
 	userHandler "github.com/TokujouKaisenDonburi/optical-backend/internal/user/handler"
 	userCommand "github.com/TokujouKaisenDonburi/optical-backend/internal/user/service/command"
 	userQuery "github.com/TokujouKaisenDonburi/optical-backend/internal/user/service/query"
+	"github.com/TokujouKaisenDonburi/optical-backend/pkg/logs"
 	"github.com/minio/minio-go/v7"
 	"github.com/minio/minio-go/v7/pkg/credentials"
 	"github.com/sirupsen/logrus"
 
 	"github.com/go-chi/chi/v5"
-	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/cors"
 	"github.com/jmoiron/sqlx"
 	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
 	"github.com/redis/go-redis/v9"
+	"github.com/redis/go-redis/v9/maintnotifications"
 )
 
 func main() {
 	_ = godotenv.Load()
 
+	logrus.SetReportCaller(false)
+	logrus.SetFormatter(&logrus.JSONFormatter{
+		PrettyPrint: false,
+	})
+
 	r := chi.NewRouter()
-	r.Use(middleware.Logger)
+	r.Use(logs.HttpLogger)
 	r.Use(cors.Handler(cors.Options{
 		AllowedOrigins:   []string{"http://localhost:3000", "https://tokujyoukaisenndonnburi.github.io"},
 		AllowedMethods:   []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
@@ -240,6 +246,9 @@ func GetRedisClient() *redis.Client {
 		Addr:     endpoint,
 		Password: password,
 		DB:       0,
+		MaintNotificationsConfig: &maintnotifications.Config{
+			Mode: maintnotifications.ModeDisabled,
+		},
 	})
 	_, err := client.Ping(context.Background()).Result()
 	if err != nil {
