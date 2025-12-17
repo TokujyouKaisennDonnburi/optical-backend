@@ -42,6 +42,7 @@ func log(startAt time.Time, status int, r *http.Request) {
 	entry := logrus.WithFields(logrus.Fields{
 		"status":  status,
 		"path":    r.URL.Path,
+		"method":  r.Method,
 		"latency": fmt.Sprintf("%.4f", time.Since(startAt).Seconds()),
 	})
 	switch {
