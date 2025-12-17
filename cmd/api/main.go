@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"strconv"
 
 	calendarGateway "github.com/TokujouKaisenDonburi/optical-backend/internal/calendar/gateway"
 	calendarHandler "github.com/TokujouKaisenDonburi/optical-backend/internal/calendar/handler"
@@ -26,6 +27,7 @@ import (
 	"github.com/minio/minio-go/v7/pkg/credentials"
 	"github.com/sirupsen/logrus"
 	prefixed "github.com/x-cray/logrus-prefixed-formatter"
+	"gopkg.in/mail.v2"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/cors"
@@ -71,6 +73,7 @@ func main() {
 	jwtMiddleware := userHandler.NewUserAuthMiddleware()
 
 	db := getPostgresDB()
+	dialer := GetDialer()
 	redisClient := GetRedisClient()
 	minioClient := GetMinIOClient()
 
@@ -84,6 +87,7 @@ func main() {
 	stateRepository := githubGateway.NewStateRedisRepository(db, redisClient)
 	optionRepository := optionGateway.NewOptionPsqlRepository(db)
 	githubRepository := githubGateway.NewGithubApiRepository(db)
+	gmailRepository := calendarGateway.NewGmailRepository(dialer)
 	githubQuery := githubQuery.NewGithubQuery(stateRepository, optionRepository, githubRepository)
 	githubCommand := githubCommand.NewGithubCommand(tokenRepository, stateRepository, githubRepository)
 	githubHandler := githubHandler.NewGithubHandler(githubQuery, githubCommand)
@@ -98,7 +102,7 @@ func main() {
 	memberRepository := calendarGateway.NewMemberPsqlRepository(db)
 	eventCommand := calendarCommand.NewEventCommand(eventRepository)
 	eventQuery := calendarQuery.NewEventQuery(eventRepository)
-	calendarCommand := calendarCommand.NewCalendarCommand(calendarRepository, optionRepository, imageRepository, memberRepository)
+	calendarCommand := calendarCommand.NewCalendarCommand(calendarRepository, optionRepository, imageRepository, memberRepository, gmailRepository)
 	calendarQuery := calendarQuery.NewCalendarQuery(calendarRepository)
 	calendarHandler := calendarHandler.NewCalendarHttpHandler(eventCommand, eventQuery, calendarCommand, calendarQuery)
 
@@ -277,4 +281,28 @@ func GetRedisClient() *redis.Client {
 		panic("redis connection failed")
 	}
 	return client
+}
+
+func GetDialer() *mail.Dialer {
+	host, ok := os.LookupEnv("EMAIL_HOST")
+	if !ok {
+		panic("'EMAIL_HOST' is not set")
+	}
+	portStr, ok := os.LookupEnv("EMAIL_PORT")
+	if !ok {
+		panic("'EMAIL_PORT' is not set")
+	}
+	port, err := strconv.Atoi(portStr)
+	if err != nil {
+		panic("'EMAIL_PORT' is not int")
+	}
+	user, ok := os.LookupEnv("EMAIL_USER")
+	if !ok {
+		panic("'EMAIL_USER' is not set")
+	}
+	password, ok := os.LookupEnv("EMAIL_PASSWORD")
+	if !ok {
+		panic("'EMAIL_PASSWORD' is not set")
+	}
+	return mail.NewDialer(host, port, user, password)
 }
