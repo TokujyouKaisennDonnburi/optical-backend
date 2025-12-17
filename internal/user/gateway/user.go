@@ -2,6 +2,8 @@ package gateway
 
 import (
 	"context"
+	"errors"
+	"time"
 
 	"github.com/TokujouKaisenDonburi/optical-backend/internal/user"
 	"github.com/TokujouKaisenDonburi/optical-backend/pkg/db"
@@ -42,22 +44,40 @@ func (r *UserPsqlRepository) Create(ctx context.Context, user *user.User) error 
 	return nil
 }
 
-func (r *UserPsqlRepository) FindByEmail(ctx context.Context, email string) (*user.User, error) {
-	var err error
-	var user *user.User
-	err = db.RunInTx(r.db, func(tx *sqlx.Tx) error {
-		user, err = psql.FindUserByEmail(ctx, tx, email)
-		return err
+func (r *UserPsqlRepository) Update(
+	ctx context.Context,
+	id uuid.UUID,
+	updateFn func(*user.User) error,
+) error {
+	return db.RunInTx(r.db, func(tx *sqlx.Tx) error {
+		user, err := psql.FindUserById(ctx, tx, id)
+		if err != nil {
+			return err
+		}
+		err = updateFn(user)
+		if err != nil {
+			return err
+		}
+		query := `
+			UPDATE users SET
+				name = :name,
+				email = :email,
+				updated_at = :updatedAt
+			WHERE
+				users.id = :id
+		`
+		result, err := tx.NamedExecContext(ctx, query, map[string]any{
+			"id":        user.Id,
+			"name":      user.Name,
+			"email":     user.Email.String(),
+			"updatedAt": time.Now(),
+		})
+		if err != nil {
+			return err
+		}
+		if rows, _ := result.RowsAffected(); rows == 0 {
+			return errors.New("failed to update user")
+		}
+		return nil
 	})
-	return user, err
-}
-
-func (r *UserPsqlRepository) FindById(ctx context.Context, id uuid.UUID) (*user.User, error) {
-	var err error
-	var user *user.User
-	err = db.RunInTx(r.db, func(tx *sqlx.Tx) error {
-		user, err = psql.FindUserById(ctx, tx, id)
-		return err
-	})
-	return user, err
 }

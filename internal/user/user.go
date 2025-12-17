@@ -18,7 +18,7 @@ const (
 type User struct {
 	Id        uuid.UUID
 	Name      string
-	Email     string
+	Email     Email
 	Password  []byte
 	CreatedAt time.Time
 	UpdatedAt time.Time
@@ -34,7 +34,8 @@ func NewUser(name, email, password string) (*User, error) {
 	if err := validateName(name); err != nil {
 		return nil, err
 	}
-	if _, err := NewEmail(email); err != nil {
+	newEmail, err := NewEmail(email)
+	if err != nil {
 		return nil, err
 	}
 	if err := validatePassword(password); err != nil {
@@ -55,7 +56,7 @@ func NewUser(name, email, password string) (*User, error) {
 	return &User{
 		Id:		   id,
 		Name:      name,
-		Email:     email,
+		Email:     newEmail,
 		Password:  hashedPassword,
 		CreatedAt: now,
 		UpdatedAt: now,
@@ -64,7 +65,7 @@ func NewUser(name, email, password string) (*User, error) {
 }
 
 // update name
-func (u *User) UpdateName(name string) error {
+func (u *User) SetName(name string) error {
 	if err := validateName(name); err != nil {
 		return err
 	}
@@ -74,11 +75,12 @@ func (u *User) UpdateName(name string) error {
 }
 
 // update email
-func (u *User) UpdateEmail(email string) error {
-	if _, err := NewEmail(email); err != nil {
+func (u *User) SetEmail(email string) error {
+	newEmail, err := NewEmail(email)
+	if err != nil {
 		return err
 	}
-	u.Email = email
+	u.Email = newEmail
 	u.UpdatedAt = time.Now()
 	return nil
 }

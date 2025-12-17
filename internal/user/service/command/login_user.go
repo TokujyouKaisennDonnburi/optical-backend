@@ -52,7 +52,7 @@ func (c *UserCommand) LoginUser(ctx context.Context, input UserLoginInput) (*Use
 	return &UserLoginOutput{
 		Id:           loginUser.Id,
 		Name:         loginUser.Name,
-		Email:        loginUser.Email,
+		Email:        loginUser.Email.String(),
 		AccessToken:  accessToken.Token,
 		RefreshToken: refreshToken.Token,
 	}, nil

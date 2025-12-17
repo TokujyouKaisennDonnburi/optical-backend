@@ -48,7 +48,7 @@ func (c *UserCommand) CreateUser(ctx context.Context, input UserCreateInput) (*U
 	return &UserCreateOutput{
 		Id:           newUser.Id,
 		Name:         newUser.Name,
-		Email:        newUser.Email,
+		Email:        newUser.Email.String(),
 		AccessToken:  accessToken.Token,
 		RefreshToken: refreshToken.Token,
 	}, nil
