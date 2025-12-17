@@ -519,9 +519,11 @@ components:
       properties:
         name:
           type: string
+          example: optical-master
         email:
           type: string
           format: email
+          example: optical-user@example.com
     UserResponse:
       type: object
       properties:
