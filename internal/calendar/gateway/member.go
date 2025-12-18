@@ -102,4 +102,3 @@ func (r *MemberPsqlRepository) Reject(ctx context.Context, userId, calendarId uu
 	}
 	return nil
 }
-

@@ -35,7 +35,7 @@ func (r *EventPsqlRepository) ListEventsByCalendarId(
 		JOIN calendars c ON e.calendar_id = c.id
 		WHERE e.calendar_id = $1
 			AND e.deleted_at IS NULL -- 論理削除されていないもののみ取得
-		ORDER BY e.start_at ASC
+		ORDER BY e.id
 	`
 
 	// クエリ実行
@@ -129,6 +129,7 @@ func (r *EventPsqlRepository) GetEventsByDate(
 				events.start_at::date = $2 OR events.end_at::date = $2 
 				OR events.start_at::date < $2 AND events.end_at::date > $2
 			)
+		ORDER BY events.id
 	`
 	var models []EventTodayQueryModel
 	date := datetime.Format("2006-01-02")
@@ -153,7 +154,6 @@ func (r *EventPsqlRepository) GetEventsByDate(
 	}
 	return outputs, nil
 }
-
 
 func (r *EventPsqlRepository) GetEventsByMonth(
 	ctx context.Context,
@@ -180,11 +180,12 @@ func (r *EventPsqlRepository) GetEventsByMonth(
 				TO_CHAR(events.start_at, 'YYYY-MM') = $2 OR TO_CHAR(events.end_at, 'YYYY-MM') = $2 
 				OR events.start_at::date < $3 AND events.end_at::date >= $4
 			)
+		ORDER BY events.id
 	`
 	var models []EventTodayQueryModel
 	month := datetime.Format("2006-01")
-	firstDay := datetime.Format("2006-01")+"-01"
-	nextFirstDay := datetime.AddDate(0, 1, 0).Format("2006-01")+"-01"
+	firstDay := datetime.Format("2006-01") + "-01"
+	nextFirstDay := datetime.AddDate(0, 1, 0).Format("2006-01") + "-01"
 	err := r.db.SelectContext(ctx, &models, query, userId, month, firstDay, nextFirstDay)
 	if err != nil {
 		return nil, err

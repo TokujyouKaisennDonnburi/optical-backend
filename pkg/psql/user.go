@@ -110,6 +110,7 @@ func FindUsersByEmails(ctx context.Context, tx *sqlx.Tx, emails []string) ([]use
 		FROM users
 		WHERE 
 			users.email = ANY($1)
+		ORDER BY users.id
 	`
 	userModels := []UserModel{}
 	err := tx.SelectContext(ctx, &userModels, query, pq.Array(emails))
