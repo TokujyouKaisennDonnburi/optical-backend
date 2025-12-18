@@ -1119,4 +1119,3 @@ components:
           type: boolean
           description: description
           example: false
->>>>>>> 0fd4a2b (feat:swaggerの追加 #14)
