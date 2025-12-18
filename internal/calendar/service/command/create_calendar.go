@@ -5,8 +5,10 @@ import (
 
 	"github.com/TokujouKaisenDonburi/optical-backend/internal/calendar"
 	"github.com/TokujouKaisenDonburi/optical-backend/internal/option"
+	"github.com/TokujouKaisenDonburi/optical-backend/internal/user"
 	"github.com/TokujouKaisenDonburi/optical-backend/pkg/apperr"
 	"github.com/google/uuid"
+	"github.com/sirupsen/logrus"
 )
 
 type CalendarCreateInput struct {
@@ -25,10 +27,10 @@ type CalendarCreateOutput struct {
 }
 
 // カレンダーを新規作成する
-func (s *CalendarCommand) CreateCalendar(ctx context.Context, input CalendarCreateInput) (*CalendarCreateOutput, error) {
+func (c *CalendarCommand) CreateCalendar(ctx context.Context, input CalendarCreateInput) (*CalendarCreateOutput, error) {
 	var newCalendar *calendar.Calendar
 	// カレンダーをリポジトリで作成
-	err := s.calendarRepository.Create(ctx,
+	err := c.calendarRepository.Create(ctx,
 		input.ImageId,
 		input.MemberEmails,
 		input.OptionIds,
@@ -61,6 +63,26 @@ func (s *CalendarCommand) CreateCalendar(ctx context.Context, input CalendarCrea
 	if err != nil {
 		return nil, err
 	}
+	go func() {
+		content := getEmailContent(getFontendUrl(), newCalendar.Id)
+		emails := make([]user.Email, len(input.MemberEmails))
+		for i, mail := range input.MemberEmails {
+			newEmail, err := user.NewEmail(mail)
+			if err != nil {
+				continue
+			}
+			emails[i] = newEmail
+		}
+		err := c.emailRepository.NotifyAll(
+			ctx,
+			"OptiCal: メンバーに招待されました",
+			content,
+			emails,
+		)
+		if err != nil {
+			logrus.WithError(err).Error("failed to send emails")
+		}
+	}()
 	return &CalendarCreateOutput{
 		Id:   newCalendar.Id,
 		Name: newCalendar.Name,

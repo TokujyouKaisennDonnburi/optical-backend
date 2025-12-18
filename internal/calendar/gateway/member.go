@@ -2,7 +2,6 @@ package gateway
 
 import (
 	"context"
-	"errors"
 
 	"github.com/TokujouKaisenDonburi/optical-backend/internal/user"
 	"github.com/TokujouKaisenDonburi/optical-backend/pkg/apperr"
@@ -24,7 +23,7 @@ func NewMemberPsqlRepository(db *sqlx.DB) *MemberPsqlRepository {
 	}
 }
 
-func (r *MemberPsqlRepository) Create(ctx context.Context, userId, calendarId uuid.UUID, emails []user.Email) error {
+func (r *MemberPsqlRepository) Invite(ctx context.Context, userId, calendarId uuid.UUID, emails []user.Email) error {
 	emailModel := make([]string, len(emails))
 	for i, e := range emails {
 		emailModel[i] = string(e)
@@ -55,7 +54,7 @@ func (r *MemberPsqlRepository) Create(ctx context.Context, userId, calendarId uu
 		return err
 	}
 	if rows == 0 {
-		return errors.New("already member or not member for me")
+		return apperr.ForbiddenError("already member or not member for me")
 	}
 	return nil
 }
