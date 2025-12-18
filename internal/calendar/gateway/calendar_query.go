@@ -157,7 +157,7 @@ type CalendarImageMember struct {
 	ImageId  uuid.NullUUID  `db:"image_id"`
 	ImageUrl sql.NullString `db:"image_url"`
 	UserId   uuid.UUID      `db:"user_id"`
-	UserName user.User      `db:"user_name"`
+	UserName string         `db:"user_name"`
 	JoinedAt time.Time      `db:"joined_at"`
 }
 
@@ -175,7 +175,7 @@ func (r *CalendarPsqlRepository) FindByUserCalendarId(ctx context.Context, userI
 	calendars.id, calendars.name, calendars.color,
 	calendars.image_id, calendar_images.url AS image_url,
 	calendar_members.user_id, calendar_members.joined_at,
-	users.name
+	users.name AS user_name
 	FROM calendars
 	LEFT JOIN calendar_images ON calendar_images.id = calendars.image_id
 	LEFT JOIN calendar_members ON calendar_members.calendar_id = calendars.id
@@ -184,7 +184,7 @@ func (r *CalendarPsqlRepository) FindByUserCalendarId(ctx context.Context, userI
 	AND calendar_members.user_id = $1
 	AND calendars.deleted_at IS NULL `
 	calRow := []CalendarImageMember{}
-	err := r.db.SelectContext(ctx, &calRow, query,userId, calendarId)
+	err := r.db.SelectContext(ctx, &calRow, query, userId, calendarId)
 	if err != nil {
 		return nil, err
 	}

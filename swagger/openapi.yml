@@ -209,16 +209,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/CalendarDetailResponse'
-              example:
-                id: "019b1ffe-efd5-7d9b-a13f-f636cfc89c4d"
-                name: "テストカレンダー"
-                color: "#FF5733"
-                image: ""
-                member:
-                  - UserId: "019b1ffe-99a2-7b4b-b013-64596fbbdb70"
-                    Name: "TestUser"
-                    JoinedAt: "2025-12-15T12:12:39.893888Z"
-                option: []
         '400':
           description: Invalid request
         '401':
