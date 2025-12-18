@@ -194,7 +194,7 @@ func (r *CalendarPsqlRepository) FindByUserCalendarId(ctx context.Context, userI
 	for i, row := range calRow {
 		members[i] = calendar.Member{
 			UserId:   row.UserId,
-			Name:     row.Name,
+			Name:     row.UserName,
 			JoinedAt: row.JoinedAt,
 		}
 	}
