@@ -9,7 +9,6 @@ import (
 	"github.com/TokujouKaisenDonburi/optical-backend/internal/calendar"
 	"github.com/TokujouKaisenDonburi/optical-backend/internal/calendar/service/query/output"
 	"github.com/TokujouKaisenDonburi/optical-backend/internal/option"
-	"github.com/TokujouKaisenDonburi/optical-backend/internal/user"
 	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
 )
