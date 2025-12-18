@@ -40,13 +40,17 @@ func (r *GithubApiRepository) CreateUser(
 			if err != nil {
 				return err
 			}
-			return createGithubUser(ctx, tx, newUser, githubUser)
+			avatar, err := user.NewAvatar(githubUser.AvatarUrl)
+			if err != nil {
+				return err
+			}
+			return createGithubUser(ctx, tx, newUser, avatar, githubUser)
 		}
 	})
 	return newUser, err
 }
 
-func createGithubUser(ctx context.Context, tx *sqlx.Tx, newUser *user.User, githubUser *github.User) error {
+func createGithubUser(ctx context.Context, tx *sqlx.Tx, newUser *user.User, avatar *user.Avatar, githubUser *github.User) error {
 	query := `
 		INSERT INTO users(id, name, email, password_hash, created_at, updated_at)
 		VALUES(:id, :name, :email, :password, :createdAt, :updatedAt)
@@ -63,28 +67,42 @@ func createGithubUser(ctx context.Context, tx *sqlx.Tx, newUser *user.User, gith
 		return err
 	}
 	query = `
-			INSERT INTO user_profiles(user_id, image_url)	
-			VALUES(:userId, :imageUrl)
-		`
+		INSERT INTO user_githubs(user_id, github_id, github_name, github_email, sso_login, created_at, updated_at)
+		VALUES(:userId, :githubId, :githubName, :githubEmail, true, :createdAt, :updatedAt)
+	`
 	_, err = tx.NamedExecContext(ctx, query, map[string]any{
-		"userId":   newUser.Id,
-		"imageUrl": githubUser.AvatarUrl,
+		"userId":      newUser.Id,
+		"githubId":    githubUser.Id,
+		"githubName":  githubUser.Name,
+		"githubEmail": githubUser.Email,
+		"createdAt":   time.Now(),
+		"updatedAt":   time.Now(),
 	})
 	if err != nil {
 		return err
 	}
 	query = `
-		INSERT INTO user_githubs(user_id, github_id, github_name, github_email, sso_login, created_at, updated_at)
-		VALUES(:userId, :githubId, :githubName, :githubEmail, true, :createdAt, :updatedAt)
+		INSERT INTO avatars(id, url)	
+		VALUES(:id, :url)
 	`
 	_, err = tx.NamedExecContext(ctx, query, map[string]any{
-		"userId":     newUser.Id,
-		"githubId":   githubUser.Id,
-		"githubName": githubUser.Name,
-		"githubEmail": githubUser.Email,
-		"createdAt":  time.Now(),
-		"updatedAt":  time.Now(),
+		"id":  avatar.Id,
+		"url": avatar.Url,
 	})
+	if err != nil {
+		return err
+	}
+	query = `
+		INSERT INTO user_profiles(user_id, avatar_id)	
+		VALUES(:userId, :avatarId)
+	`
+	_, err = tx.NamedExecContext(ctx, query, map[string]any{
+		"userId":   newUser.Id,
+		"avatarId": avatar.Id,
+	})
+	if err != nil {
+		return err
+	}
 	return err
 }
 
@@ -100,12 +118,12 @@ func updateGithubUser(ctx context.Context, tx *sqlx.Tx, userId uuid.UUID, github
 			updated_at = :updatedAt
 	`
 	_, err := tx.NamedExecContext(ctx, query, map[string]any{
-		"userId":     userId,
-		"githubId":   githubUser.Id,
-		"githubName": githubUser.Name,
+		"userId":      userId,
+		"githubId":    githubUser.Id,
+		"githubName":  githubUser.Name,
 		"githubEmail": githubUser.Email,
-		"createdAt":  time.Now(),
-		"updatedAt":  time.Now(),
+		"createdAt":   time.Now(),
+		"updatedAt":   time.Now(),
 	})
 	return err
 }
