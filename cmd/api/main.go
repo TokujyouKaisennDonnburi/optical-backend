@@ -26,6 +26,7 @@ import (
 	"github.com/minio/minio-go/v7/pkg/credentials"
 	"github.com/sirupsen/logrus"
 	prefixed "github.com/x-cray/logrus-prefixed-formatter"
+
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/cors"
 	"github.com/jmoiron/sqlx"
@@ -47,11 +48,11 @@ func main() {
 		})
 	} else {
 		formatter := &prefixed.TextFormatter{
-			FullTimestamp: true,
+			FullTimestamp:   true,
 			TimestampFormat: "2006-01-02 15:04:05",
 		}
 		formatter.SetColorScheme(&prefixed.ColorScheme{
-			TimestampStyle: "white",
+			TimestampStyle:  "white",
 			ErrorLevelStyle: "red+b",
 			FatalLevelStyle: "red+bu",
 		})
