@@ -185,6 +185,40 @@ paths:
           description: Invalid request
         "500":
           description: Internal server error
+  /calendars/{calendarId}:
+    get:
+      summary: Get calendar by ID
+      description: 指定されたIDのカレンダー情報を取得します。ユーザーはカレンダーのメンバーである必要があります。
+      tags:
+        - calendars
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: calendarId
+          in: path
+          required: true
+          description: カレンダーID (UUID形式)
+          schema:
+            type: string
+            format: uuid
+            example: "019b1ffe-efd5-7d9b-a13f-f636cfc89c4d"
+      responses:
+        '200':
+          description: Calendar retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CalendarDetailResponse'
+        '400':
+          description: Invalid request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden - User is not a member of this calendar
+        '404':
+          description: Calendar not found
+        '500':
+          description: Internal server error
   /calendars/{calendarId}/events:
     post:
       summary: Create a new event
@@ -677,6 +711,44 @@ components:
         imageUrl:
           type: string
           nullable: true
+    CalendarDetailResponse:
+      type: object
+      required:
+        - id
+        - name
+        - color
+        - image
+        - member
+        - option
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: カレンダーID
+          example: "019b1ffe-efd5-7d9b-a13f-f636cfc89c4d"
+        name:
+          type: string
+          description: カレンダー名
+          example: "テストカレンダー"
+        color:
+          type: string
+          description: カレンダーの色 (16進数カラーコード)
+          pattern: '^#[0-9A-Fa-f]{6}$'
+          example: "#FF5733"
+        image:
+          type: string
+          description: カレンダー画像のURL
+          example: ""
+        member:
+          type: array
+          description: カレンダーのメンバー一覧
+          items:
+            $ref: '#/components/schemas/Member'
+        option:
+          type: array
+          description: カレンダーに設定されたオプション一覧
+          items:
+            $ref: '#/components/schemas/Option'
     EventCreateRequest:
       type: object
       required:
@@ -1006,3 +1078,44 @@ components:
           format: url
         assigned:
           type: integer
+    Member:
+      type: object
+      required:
+        - userId
+        - name
+        - joinedAt
+      properties:
+        userId:
+          type: string
+          format: uuid
+          description: userID
+          example: "019b1ffe-99a2-7b4b-b013-64596fbbdb70"
+        name:
+          type: string
+          description: userName
+          example: "TestUser"
+        joinedAt:
+          type: string
+          format: date-time
+          description: joined-calendar-date
+          example: "2025-12-15T12:12:39.893888Z"
+    Option:
+      type: object
+      required:
+        - id
+        - name
+        - deprecated
+      properties:
+        id:
+          type: integer
+          format: int32
+          description: optionID
+          example: 1
+        name:
+          type: string
+          description: option名
+          example: "notification-ON"
+        deprecated:
+          type: boolean
+          description: description
+          example: false

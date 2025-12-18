@@ -135,6 +135,7 @@ func main() {
 		// Calendars
 		r.Post("/calendars", calendarHandler.CreateCalendar)
 		r.Post("/calendars/images", calendarHandler.UploadImage)
+		r.Get("/calendars/{calendarId}", calendarHandler.GetCalendar)
 		r.Get("/calendars", calendarHandler.GetCalendars)
 
 		// Members
