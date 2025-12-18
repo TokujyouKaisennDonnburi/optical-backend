@@ -68,7 +68,7 @@ func NewScheduler(userId, calendarId uuid.UUID, title, memo string, startTime, e
 	}
 	err = s.SetStartEndTime(startTime, endTime)
 	if err != nil {
-		return nil, errors.New("")
+		return nil, err
 	}
 	return s, nil
 }
@@ -92,6 +92,8 @@ func (s *Scheduler) SetStartEndTime(startTime, endTime time.Time) error {
 	if startTime.After(endTime) {
 		return apperr.ValidationError("start time before must be end time")
 	}
+	s.StartTime = startTime
+	s.EndTime = endTime
 	return nil
 }
 
@@ -124,16 +126,17 @@ func (s *SchedulerAttendance) SetComment(comment string) error {
 	if commentLength > 255 {
 		return apperr.ValidationError("comment length error")
 	}
+	s.Comment = comment
 	return nil
 }
-func NewStatus(attendanceId uuid.UUID, time time.Time, status Status) (*SchedulerStatus, error) {
+func NewStatus(attendanceId uuid.UUID, time time.Time, status int8) (*SchedulerStatus, error) {
 	if attendanceId == uuid.Nil {
 		return nil, errors.New("attendanceId is nil")
 	}
 	s := &SchedulerStatus{
 		AttendanceId: attendanceId,
 		Time:         time,
-		Status:       status,
+		Status:       Status(status),
 	}
 	err := s.SetStatus(status)
 	if err != nil {
@@ -141,9 +144,10 @@ func NewStatus(attendanceId uuid.UUID, time time.Time, status Status) (*Schedule
 	}
 	return s, nil
 }
-func (s *SchedulerStatus) SetStatus(status Status) error {
+func (s *SchedulerStatus) SetStatus(status int8) error {
 	if status < 1 || status > 3 {
 		return apperr.ValidationError("status is invalid")
 	}
+	s.Status = Status(status)
 	return nil
 }
