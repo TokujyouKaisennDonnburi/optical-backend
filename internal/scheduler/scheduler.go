@@ -63,7 +63,7 @@ func NewScheduler(userId, calendarId uuid.UUID, title, memo string, startTime, e
 	}
 	err = s.SetStartEndTime(startTime, endTime)
 	if err != nil {
-		return nil, err
+		return nil, errors.New("start time before must be end time")
 	}
 	return s, nil
 }
@@ -90,16 +90,16 @@ func (s *Scheduler) SetStartEndTime(startTime, endTime time.Time) error {
 	return nil
 }
 
-func NewAttendance(id, schedulerId, userId uuid.UUID, comment string) error {
+func NewAttendance(id, schedulerId, userId uuid.UUID, comment string) (*SchedulerAttendance, error) {
 	id, err := uuid.NewV7()
 	if err != nil {
-		return nil
+		return nil, err
 	}
 	if schedulerId == uuid.Nil {
-		return errors.New("schedulerId is nil")
+		return nil, errors.New("schedulerId is nil")
 	}
 	if userId == uuid.Nil {
-		return errors.New("userId is nil")
+		return nil, errors.New("userId is nil")
 	}
 	s := &SchedulerAttendance{
 		Id:          id,
@@ -109,9 +109,9 @@ func NewAttendance(id, schedulerId, userId uuid.UUID, comment string) error {
 	}
 	err = s.SetComment(comment)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	return nil
+	return s, nil
 }
 
 func (s *SchedulerAttendance) SetComment(comment string) error {
@@ -121,9 +121,9 @@ func (s *SchedulerAttendance) SetComment(comment string) error {
 	}
 	return nil
 }
-func NewStatus(attendanceId uuid.UUID, time time.Time, status int) error {
+func NewStatus(attendanceId uuid.UUID, time time.Time, status int) (*SchedulerStatus, error) {
 	if attendanceId == uuid.Nil {
-		return errors.New("attendanceId is nil")
+		return nil, errors.New("attendanceId is nil")
 	}
 	s := &SchedulerStatus{
 		AttendanceId: attendanceId,
@@ -132,9 +132,9 @@ func NewStatus(attendanceId uuid.UUID, time time.Time, status int) error {
 	}
 	err := s.SetStatus(status)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	return nil
+	return s, nil
 }
 func (s *SchedulerStatus) SetStatus(status int) error {
 	if status < 0 || status > 2 {
