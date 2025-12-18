@@ -5,13 +5,22 @@ import (
 	"time"
 	"unicode/utf8"
 
+	"github.com/TokujouKaisenDonburi/optical-backend/pkg/apperr"
 	"github.com/google/uuid"
+)
+
+type Status int8
+
+const (
+	Nil     Status = 0
+	Good    Status = 1
+	UnKnown Status = 2
+	Bad     Status = 3
 )
 
 type Scheduler struct {
 	Id         uuid.UUID
 	CalendarId uuid.UUID
-	UserId     uuid.UUID
 	Title      string
 	Memo       string
 	StartTime  time.Time
@@ -29,7 +38,7 @@ type SchedulerAttendance struct {
 type SchedulerStatus struct {
 	AttendanceId uuid.UUID
 	Time         time.Time
-	Status       int
+	Status       Status
 }
 
 func NewScheduler(userId, calendarId uuid.UUID, title, memo string, startTime, endTime time.Time, isAllDay bool) (*Scheduler, error) {
@@ -40,13 +49,9 @@ func NewScheduler(userId, calendarId uuid.UUID, title, memo string, startTime, e
 	if calendarId == uuid.Nil {
 		return nil, errors.New("calendarId is nil")
 	}
-	if userId == uuid.Nil {
-		return nil, errors.New("userId is nil")
-	}
 	s, err := &Scheduler{
 		Id:         id,
 		CalendarId: calendarId,
-		UserId:     userId,
 		Title:      title,
 		Memo:       memo,
 		StartTime:  startTime,
@@ -63,14 +68,14 @@ func NewScheduler(userId, calendarId uuid.UUID, title, memo string, startTime, e
 	}
 	err = s.SetStartEndTime(startTime, endTime)
 	if err != nil {
-		return nil, errors.New("start time before must be end time")
+		return nil, errors.New("")
 	}
 	return s, nil
 }
 func (s *Scheduler) SetTitle(title string) error {
 	titleLength := utf8.RuneCountInString(title)
 	if titleLength < 1 || titleLength > 32 {
-		return errors.New("title is invalid")
+		return apperr.ValidationError("title is invalid")
 	}
 	s.Title = title
 	return nil
@@ -78,14 +83,14 @@ func (s *Scheduler) SetTitle(title string) error {
 func (s *Scheduler) SetMemo(memo string) error {
 	memoLength := utf8.RuneCountInString(memo)
 	if memoLength > 256 {
-		return errors.New("memo is invalid")
+		return apperr.ValidationError("memo is invalid")
 	}
 	s.Memo = memo
 	return nil
 }
 func (s *Scheduler) SetStartEndTime(startTime, endTime time.Time) error {
 	if startTime.After(endTime) {
-		return errors.New("")
+		return apperr.ValidationError("start time before must be end time")
 	}
 	return nil
 }
@@ -117,11 +122,11 @@ func NewAttendance(id, schedulerId, userId uuid.UUID, comment string) (*Schedule
 func (s *SchedulerAttendance) SetComment(comment string) error {
 	commentLength := len(comment)
 	if commentLength > 255 {
-		return nil
+		return apperr.ValidationError("comment length error")
 	}
 	return nil
 }
-func NewStatus(attendanceId uuid.UUID, time time.Time, status int) (*SchedulerStatus, error) {
+func NewStatus(attendanceId uuid.UUID, time time.Time, status Status) (*SchedulerStatus, error) {
 	if attendanceId == uuid.Nil {
 		return nil, errors.New("attendanceId is nil")
 	}
@@ -136,9 +141,9 @@ func NewStatus(attendanceId uuid.UUID, time time.Time, status int) (*SchedulerSt
 	}
 	return s, nil
 }
-func (s *SchedulerStatus) SetStatus(status int) error {
-	if status < 0 || status > 2 {
-		return errors.New("status is nil")
+func (s *SchedulerStatus) SetStatus(status Status) error {
+	if status < 1 || status > 3 {
+		return apperr.ValidationError("status is invalid")
 	}
 	return nil
 }

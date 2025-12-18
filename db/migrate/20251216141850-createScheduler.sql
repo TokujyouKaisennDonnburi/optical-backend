@@ -22,7 +22,7 @@ CREATE TABLE scheduler_attendance(
 CREATE TABLE scheduler_status(
     attendance_id UUID NOT NULL,
     date DATE NOT NULL,
-    status INTEGER,
+    status SMALLINT,
     PRIMARY KEY (attendance_id, date),
     FOREIGN KEY (attendance_id) REFERENCES scheduler_attendance(id) ON DELETE CASCADE
 );
