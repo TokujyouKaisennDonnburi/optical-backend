@@ -4,8 +4,8 @@ CREATE TABLE scheduler(
     calendar_id UUID NOT NULL,
     title VARCHAR(255) NOT NULL,
     memo VARCHAR(255) NOT NULL,
-    start_time TIMESTAMP NULL,
-    end_time TIMESTAMP NULL,
+    start_time TIMESTAMP NOT NULL,
+    end_time TIMESTAMP NOT NULL,
     is_allday BOOLEAN NOT NULL,
     FOREIGN KEY (calendar_id) REFERENCES calendars(id) ON DELETE CASCADE
 );
@@ -22,7 +22,7 @@ CREATE TABLE scheduler_attendance(
 CREATE TABLE scheduler_status(
     attendance_id UUID NOT NULL,
     date DATE NOT NULL,
-    status SMALLINT,
+    status SMALLINT NOT NULL,
     PRIMARY KEY (attendance_id, date),
     FOREIGN KEY (attendance_id) REFERENCES scheduler_attendance(id) ON DELETE CASCADE
 );
