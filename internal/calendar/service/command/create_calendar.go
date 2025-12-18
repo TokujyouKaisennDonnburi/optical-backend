@@ -2,13 +2,13 @@ package command
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/TokujouKaisenDonburi/optical-backend/internal/calendar"
 	"github.com/TokujouKaisenDonburi/optical-backend/internal/option"
 	"github.com/TokujouKaisenDonburi/optical-backend/internal/user"
 	"github.com/TokujouKaisenDonburi/optical-backend/pkg/apperr"
 	"github.com/google/uuid"
+	"github.com/sirupsen/logrus"
 )
 
 type CalendarCreateInput struct {
@@ -80,7 +80,7 @@ func (c *CalendarCommand) CreateCalendar(ctx context.Context, input CalendarCrea
 			emails,
 		)
 		if err != nil {
-			fmt.Println(err)
+			logrus.WithError(err).Error("failed to send emails")
 		}
 	}()
 	return &CalendarCreateOutput{

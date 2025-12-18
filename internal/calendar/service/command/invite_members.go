@@ -7,6 +7,7 @@ import (
 
 	"github.com/TokujouKaisenDonburi/optical-backend/internal/user"
 	"github.com/google/uuid"
+	"github.com/sirupsen/logrus"
 )
 
 type MemberCreateInput struct {
@@ -38,7 +39,7 @@ func (c *CalendarCommand) InviteMember(ctx context.Context, input MemberCreateIn
 			emails,
 		)
 		if err != nil {
-			fmt.Println(err)
+			logrus.WithError(err).Error("failed to send emails")
 		}
 	}()
 	return nil
