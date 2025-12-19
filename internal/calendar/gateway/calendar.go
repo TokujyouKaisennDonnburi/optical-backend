@@ -124,17 +124,38 @@ func (r *CalendarPsqlRepository) Create(
 
 func (r *CalendarPsqlRepository) Update(
 	ctx context.Context,
-	calendarId uuid.UUID,
-	updateFn func(*calendar.Calendar) (*calendar.Calendar, error),
+	imageId uuid.UUID,
+	memberEmails []string,
+	optionIds []int32,
+	updateFn func(image *calendar.Image, members []calendar.Member, options []option.Option) (*calendar.Calendar, error),
 ) error {
 	return db.RunInTx(r.db, func(tx *sqlx.Tx) error {
-		// カレンダー取得
-		calendar, err := FindCalendarById(ctx, tx, calendarId)
+		// オプション取得
+		options, err := psql.FindOptionsByIds(ctx, tx, optionIds)
+		if err != nil {
+			return err
+		}
+		// ユーザー取得
+		users, err := psql.FindUsersByEmails(ctx, tx, memberEmails)
+		if err != nil {
+			return err
+		}
+		// メンバーリスト作成
+		members := make([]calendar.Member, len(users))
+		for i, user := range users {
+			member, err := calendar.NewMember(user.Id, user.Name)
+			if err != nil {
+				continue
+			}
+			members[i] = *member
+		}
+		// 画像を取得
+		image, err := psql.FindImageById(ctx, tx, imageId)
 		if err != nil {
 			return err
 		}
 		// 更新関数実行
-		calendar, err = updateFn(calendar)
+		cal, err := updateFn(image, members, options)
 		if err != nil {
 			return err
 		}
@@ -148,12 +169,12 @@ func (r *CalendarPsqlRepository) Update(
             WHERE id = :id AND deleted_at IS NULL
         `
 		_, err = tx.NamedExecContext(ctx, query, map[string]any{
-			"id":    calendar.Id,
-			"name":  calendar.Name,
-			"color": calendar.Color,
+			"id":    cal.Id,
+			"name":  cal.Name,
+			"color": cal.Color,
 			"imageId": uuid.NullUUID{
-				UUID:  calendar.Image.Id,
-				Valid: calendar.Image.Valid,
+				UUID:  cal.Image.Id,
+				Valid: cal.Image.Valid,
 			},
 		})
 		if err != nil {
@@ -163,20 +184,20 @@ func (r *CalendarPsqlRepository) Update(
 		// 全置換
 		// メンバー全削除
 		_, err = tx.ExecContext(ctx,
-			"DELETE FROM calendar_members WHERE calendar_id = $1", calendarId)
+			"DELETE FROM calendar_members WHERE calendar_id = $1", cal.Id)
 		if err != nil {
 			return err
 		}
 		// メンバー作成
-		if len(calendar.Members) > 0 {
+		if len(cal.Members) > 0 {
 			query = `
                 INSERT INTO calendar_members(calendar_id, user_id, joined_at)
                 VALUES (:calendarId, :userId, :joinedAt)
             `
 			calendarMemberMaps := []map[string]any{}
-			for _, member := range calendar.Members {
+			for _, member := range cal.Members {
 				calendarMemberMaps = append(calendarMemberMaps, map[string]any{
-					"calendarId": calendar.Id,
+					"calendarId": cal.Id,
 					"userId":     member.UserId,
 					"joinedAt": sql.NullTime{
 						Time:  member.JoinedAt,
@@ -193,20 +214,20 @@ func (r *CalendarPsqlRepository) Update(
 		// 全置換
 		// オプション全削除
 		_, err = tx.ExecContext(ctx,
-			"DELETE FROM calendar_options WHERE calendar_id = $1", calendarId)
+			"DELETE FROM calendar_options WHERE calendar_id = $1", cal.Id)
 		if err != nil {
 			return err
 		}
 		// オプション設定
-		if len(calendar.Options) > 0 {
+		if len(cal.Options) > 0 {
 			query = `
                 INSERT INTO calendar_options(calendar_id, option_id)
                 VALUES (:calendarId, :optionId)
             `
 			calendarOptionMaps := []map[string]any{}
-			for _, option := range calendar.Options {
+			for _, option := range cal.Options {
 				calendarOptionMaps = append(calendarOptionMaps, map[string]any{
-					"calendarId": calendar.Id,
+					"calendarId": cal.Id,
 					"optionId":   option.Id,
 				})
 			}

@@ -20,8 +20,10 @@ type CalendarRepository interface {
 
 	Update(
 		ctx context.Context,
-		calendarId uuid.UUID,
-		updateFn func(*calendar.Calendar) (*calendar.Calendar, error),
+		imageId uuid.UUID,
+		memberEmails []string,
+		optionIds []int32,
+		updateFn func(*calendar.Image, []calendar.Member, []option.Option) (*calendar.Calendar, error),
 	) error
 
 	FindByUserId(ctx context.Context, userId uuid.UUID) ([]output.CalendarListQueryOutput, error)
