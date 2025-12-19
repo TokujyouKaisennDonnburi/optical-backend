@@ -3,12 +3,14 @@ package main
 import (
 	"context"
 	"fmt"
+	"io"
 	"net/http"
 	"os"
 	"strconv"
 
 	agentGateway "github.com/TokujouKaisenDonburi/optical-backend/internal/agent/gateway"
 	agentHandler "github.com/TokujouKaisenDonburi/optical-backend/internal/agent/handler"
+	agentCommand "github.com/TokujouKaisenDonburi/optical-backend/internal/agent/service/command"
 	agentQuery "github.com/TokujouKaisenDonburi/optical-backend/internal/agent/service/query"
 	calendarGateway "github.com/TokujouKaisenDonburi/optical-backend/internal/calendar/gateway"
 	calendarHandler "github.com/TokujouKaisenDonburi/optical-backend/internal/calendar/handler"
@@ -29,6 +31,7 @@ import (
 	userCommand "github.com/TokujouKaisenDonburi/optical-backend/internal/user/service/command"
 	userQuery "github.com/TokujouKaisenDonburi/optical-backend/internal/user/service/query"
 	"github.com/TokujouKaisenDonburi/optical-backend/pkg/logs"
+	"github.com/TokujouKaisenDonburi/optical-backend/pkg/openrouter"
 	"github.com/minio/minio-go/v7"
 	"github.com/minio/minio-go/v7/pkg/credentials"
 	"github.com/sirupsen/logrus"
@@ -51,6 +54,7 @@ func main() {
 	// Logger configurations
 	reportCaller := os.Getenv("LOGGER_REPORT_CALLER") == "1"
 	logrus.SetReportCaller(reportCaller)
+	logrus.SetLevel(logrus.DebugLevel)
 	if os.Getenv("LOGGER_JSON_FORMAT") == "1" {
 		logrus.SetFormatter(&logrus.JSONFormatter{
 			PrettyPrint: false,
@@ -69,14 +73,6 @@ func main() {
 	}
 
 	r := chi.NewRouter()
-	r.Use(logs.HttpLogger)
-	r.Use(cors.Handler(cors.Options{
-		AllowedOrigins:   []string{"http://localhost:3000", "https://tokujyoukaisenndonnburi.github.io"},
-		AllowedMethods:   []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
-		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
-		AllowCredentials: false,
-		MaxAge:           300,
-	}))
 	jwtMiddleware := userHandler.NewUserAuthMiddleware()
 
 	db := getPostgresDB()
@@ -84,7 +80,7 @@ func main() {
 	redisClient := GetRedisClient()
 	minioClient := GetMinIOClient()
 	// genaiClient := GetGenAIClient()
-	openrouterApikey := GetOpenrouterApiKey()
+	openRouter := GetOpenRouter()
 
 	// Migration
 	MigrateMinio(minioClient)
@@ -97,9 +93,12 @@ func main() {
 	optionRepository := optionGateway.NewOptionPsqlRepository(db)
 	githubRepository := githubGateway.NewGithubApiRepository(db)
 	gmailRepository := calendarGateway.NewGmailRepository(dialer)
-	optionAgentRepository := agentGateway.NewOptionAgentOpenRouterRepository(openrouterApikey)
-	agentQuery := agentQuery.NewAgentQuery(optionRepository, optionAgentRepository)
-	agentHandler := agentHandler.NewAgentHandler(agentQuery)
+	eventRepository := calendarGateway.NewEventPsqlRepository(db)
+	agentRepository := agentGateway.NewAgentOpenRouterRepository(openRouter)
+	optionAgentRepository := agentGateway.NewOptionAgentOpenRouterRepository(openRouter)
+	agentQuery := agentQuery.NewAgentQuery(agentRepository, optionRepository, eventRepository, optionAgentRepository)
+	agentCommand := agentCommand.NewAgentCommand(db, openRouter)
+	agentHandler := agentHandler.NewAgentHandler(agentQuery, agentCommand)
 	githubQuery := githubQuery.NewGithubQuery(stateRepository, optionRepository, githubRepository)
 	githubCommand := githubCommand.NewGithubCommand(tokenRepository, stateRepository, githubRepository)
 	githubHandler := githubHandler.NewGithubHandler(githubQuery, githubCommand)
@@ -108,7 +107,6 @@ func main() {
 	userHandler := userHandler.NewUserHttpHandler(userQuery, userCommand)
 	optionQuery := optionQuery.NewOptionQuery(optionRepository)
 	optionHandler := optionHandler.NewOptionHttpHandler(optionQuery)
-	eventRepository := calendarGateway.NewEventPsqlRepository(db)
 	calendarRepository := calendarGateway.NewCalendarPsqlRepository(db)
 	imageRepository := calendarGateway.NewImagePsqlAndMinioRepository(db, minioClient, bucketName)
 	memberRepository := calendarGateway.NewMemberPsqlRepository(db)
@@ -121,6 +119,15 @@ func main() {
 	noticeQueryService := noticeQuery.NewNoticeQuery(noticeRepository)
 	noticeHttpHandler := noticeHandler.NewNoticeHttpHandler(noticeQueryService)
 
+	r.Use(logs.HttpLogger)
+	r.Use(cors.Handler(cors.Options{
+		AllowedOrigins:   []string{"http://localhost:3000", "https://tokujyoukaisenndonnburi.github.io"},
+		AllowedMethods:   []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
+		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
+		AllowCredentials: false,
+		MaxAge:           300,
+	}))
+
 	// Unprotected Routes
 	r.Group(func(r chi.Router) {
 		// Users
@@ -132,6 +139,12 @@ func main() {
 		r.Post("/github/apps/install", githubHandler.InstallToCalendar)
 		r.Post("/github/oauth/link", githubHandler.LinkUser)
 		r.Post("/github/oauth/create", githubHandler.CreateNewUserOauthState)
+		r.Post("/chat/completions", func(w http.ResponseWriter, r *http.Request) {
+			body, err := io.ReadAll(r.Body)
+			if err == nil {
+				logrus.WithField("body", string(body)).Info("chat completion")
+			}
+		})
 	})
 
 	// Protected Routes
@@ -143,7 +156,9 @@ func main() {
 		r.Patch("/users/@me", userHandler.UpdateMe)
 
 		// Agents
+		r.Post("/agents/analyze", agentHandler.AnalyzeSchedules)
 		r.Post("/agents/options", agentHandler.SuggestOptions)
+		r.Post("/agents/exec", agentHandler.ExecAgent)
 
 		// User Profiles
 		r.Put("/users/avatars", userHandler.UploadAvatar)
@@ -343,10 +358,17 @@ func GetGenAIClient() *genai.Client {
 	return client
 }
 
-func GetOpenrouterApiKey() string {
+func GetOpenRouter() *openrouter.OpenRouter {
+	model, ok := os.LookupEnv("AGENT_MODEL")
+	if !ok {
+		panic("'AGENT_MODEL' is not set")
+	}
 	apiKey, ok := os.LookupEnv("AGENT_API_KEY")
 	if !ok {
 		panic("'AGENT_API_KEY' is not set")
 	}
-	return apiKey
+	// Initialize LLM
+	openRouter := openrouter.NewOpenRouter(apiKey)
+	openRouter.SetModel(model)
+	return openRouter
 }
