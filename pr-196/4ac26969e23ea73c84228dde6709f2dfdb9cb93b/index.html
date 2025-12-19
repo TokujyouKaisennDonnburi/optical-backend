@@ -1,0 +1,36 @@
+<!doctype html>
+<html>
+  <head><title>Scalar API Reference</title></head>
+  <body>
+    <div id="app"></div>
+    <script src="https://cdn.jsdelivr.net/npm/@scalar/api-reference"></script>
+    <script>
+      var token = "";
+      Scalar.createApiReference('#app', 
+          {
+            url: './openapi.yml'  // ローカルファイルサーバー経由
+          },
+          {
+              authentication: {
+                  securitySchemes: {
+                      // For API Key
+                      apiKeyHeader: {
+                        name: 'Bearer ',
+                        in: 'header',
+                        value: token,
+                      },
+                  },
+              },
+          }
+          {
+              {
+                  onRequestSent: (request) => {
+                    console.log('Request sent:', request)
+                  }
+                }
+              }
+           }
+      )
+    </script>
+  </body>
+</html>
