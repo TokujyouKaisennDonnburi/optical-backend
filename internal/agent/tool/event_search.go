@@ -12,21 +12,21 @@ import (
 )
 
 type EventSearchTool struct {
-	eventAgentRepository repository.AgentQueryRepository
+	agentQueryRepository repository.AgentQueryRepository
 	userId               uuid.UUID
 	streamFn             func(context.Context, []byte) error
 }
 
 func NewEventSearchTool(
-	eventAgentRepository repository.AgentQueryRepository,
+	agentQueryRepository repository.AgentQueryRepository,
 	userId uuid.UUID,
 	streamFn func(context.Context, []byte) error,
 ) (*EventSearchTool, error) {
-	if eventAgentRepository == nil {
+	if agentQueryRepository == nil {
 		return nil, errors.New("eventAgentRepository is nil")
 	}
 	return &EventSearchTool{
-		eventAgentRepository: eventAgentRepository,
+		agentQueryRepository: agentQueryRepository,
 		userId:               userId,
 		streamFn:             streamFn,
 	}, nil
@@ -94,7 +94,7 @@ func (t EventSearchTool) Call(ctx context.Context, input string) (string, error)
 	if err != nil {
 		logrus.WithError(err).Error("progress streaming error")
 	}
-	events, err := t.eventAgentRepository.FindByUserIdAndDate(ctx, t.userId, inputModel.StartAt, inputModel.EndAt)
+	events, err := t.agentQueryRepository.FindByUserIdAndDate(ctx, t.userId, inputModel.StartAt, inputModel.EndAt)
 	if err != nil {
 		return "", err
 	}
