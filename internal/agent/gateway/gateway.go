@@ -2,15 +2,10 @@ package gateway
 
 import (
 	"github.com/TokujouKaisenDonburi/optical-backend/pkg/openrouter"
-	"google.golang.org/genai"
 )
 
 type AgentOpenRouterRepository struct {
 	openRouter *openrouter.OpenRouter
-}
-
-type OptionAgentGeminiRepository struct {
-	client *genai.Client
 }
 
 type OptionAgentOpenRouterRepository struct {
@@ -23,17 +18,6 @@ func NewAgentOpenRouterRepository(openRouter *openrouter.OpenRouter) *AgentOpenR
 	}
 	return &AgentOpenRouterRepository{
 		openRouter: openRouter,
-	}
-}
-
-func NewOptionAgentGeminiRepository(
-	client *genai.Client,
-) *OptionAgentGeminiRepository {
-	if client == nil {
-		panic("genaiClient is nil")
-	}
-	return &OptionAgentGeminiRepository{
-		client: client,
 	}
 }
 

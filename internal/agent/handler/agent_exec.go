@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"strings"
 
 	"github.com/TokujouKaisenDonburi/optical-backend/internal/agent/service/command"
 	"github.com/TokujouKaisenDonburi/optical-backend/pkg/apperr"
@@ -46,7 +47,8 @@ func (h *AgentHandler) ExecAgent(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	streamingFn := func(ctx context.Context, b []byte) error {
-		fmt.Fprintf(w, "data: {\"content\":\"%s\"}\n\n", string(b))
+		chunk := strings.ReplaceAll(string(b), "\n", "\\n")
+		fmt.Fprintf(w, "data: %s\n\n", chunk)
 		flusher.Flush()
 		return nil
 	}

@@ -5,10 +5,11 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/TokujouKaisenDonburi/optical-backend/internal/agent/repository"
 	"github.com/TokujouKaisenDonburi/optical-backend/internal/agent/tool"
+	"github.com/TokujouKaisenDonburi/optical-backend/internal/agent/transact"
 	"github.com/TokujouKaisenDonburi/optical-backend/pkg/openrouter"
 	"github.com/google/uuid"
-	"github.com/jmoiron/sqlx"
 )
 
 const (
@@ -30,23 +31,29 @@ const (
 )
 
 type AgentCommand struct {
-	db         *sqlx.DB
-	openRouter *openrouter.OpenRouter
+	openRouter           *openrouter.OpenRouter
+	transactor           *transact.TransactionProvider
+	agentEventRepository repository.AgentEventRepository
 }
 
 func NewAgentCommand(
-	db *sqlx.DB,
 	openRouter *openrouter.OpenRouter,
+	transactor *transact.TransactionProvider,
+	agentEventRepository repository.AgentEventRepository,
 ) *AgentCommand {
-	if db == nil {
-		panic("db is nil")
-	}
 	if openRouter == nil {
 		panic("openRouter is nil")
 	}
+	if transactor == nil {
+		panic("trasactor is nil")
+	}
+	if agentEventRepository == nil {
+		panic("eventAgentRepository is nil")
+	}
 	return &AgentCommand{
-		db:         db,
-		openRouter: openRouter,
+		openRouter:           openRouter,
+		transactor:           transactor,
+		agentEventRepository: agentEventRepository,
 	}
 }
 
@@ -57,15 +64,21 @@ type AgentCommandExecInput struct {
 }
 
 func (c *AgentCommand) Exec(ctx context.Context, input AgentCommandExecInput) error {
+	eventSearchTool, err := tool.NewEventSearchTool(c.agentEventRepository, input.UserId, input.StreamingFn)
+	if err != nil {
+		return err
+	}
 	// ツール定義
 	tools := []openrouter.Tool{
-		tool.NewEventSearchTool(c.db, input.UserId),
+		eventSearchTool,
 	}
 	systemPrompt := fmt.Sprintf(SYSTEM_PROMPT, time.Now())
 	messages := []openrouter.Message{
 		openrouter.SystemMessage(systemPrompt),
 		openrouter.UserMessage(input.UserInput),
 	}
-	_, err := c.openRouter.WithTools(tools).ChainStream(ctx, messages, input.StreamingFn)
-	return err
+	return c.transactor.Transact(ctx, func(ctx context.Context) error {
+		_, err = c.openRouter.WithTools(tools).ChainStream(ctx, messages, input.StreamingFn)
+		return err
+	})
 }
