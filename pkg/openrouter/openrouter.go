@@ -14,7 +14,7 @@ type OpenRouter struct {
 	model          string
 	temperature    float64
 	maxTokens      float64
-	responseFormat string
+	responseFormat map[string]any
 	toolChoice     string
 	tools          []Tool
 	provider       Provider
@@ -89,7 +89,7 @@ func (r OpenRouter) WithTemperature(temperature float64) OpenRouter {
 	return r
 }
 
-func (r OpenRouter) WithResponseFormat(format string) OpenRouter {
+func (r OpenRouter) WithResponseFormat(format map[string]any) OpenRouter {
 	r.responseFormat = format
 	return r
 }

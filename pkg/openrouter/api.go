@@ -14,6 +14,10 @@ import (
 
 const (
 	openRouterAPIUrl = "https://openrouter.ai/api/v1/chat/completions"
+	MinimalReasoning = "minimal"
+	LowReasoning     = "low"
+	MediumReasoning  = "medium"
+	HighReasoning    = "high"
 )
 
 var (
@@ -24,14 +28,15 @@ var (
 )
 
 type OpenRouterRequest struct {
-	Model          string        `json:"model"`
-	Provider       Provider      `json:"provider"`
-	Message        []Message     `json:"messages"`
-	Temperature    float64       `json:"temperature"`
-	Stream         bool          `json:"stream,omitempty"`
-	Tools          []ToolRequest `json:"tools,omitempty"`
-	ToolChoice     string        `json:"tool_choice,omitempty"`
-	ResponseFormat string        `json:"response_format,omitempty"`
+	Model          string         `json:"model"`
+	Provider       Provider       `json:"provider"`
+	Message        []Message      `json:"messages"`
+	Temperature    float64        `json:"temperature"`
+	Stream         bool           `json:"stream,omitempty"`
+	Tools          []ToolRequest  `json:"tools,omitempty"`
+	ToolChoice     string         `json:"tool_choice,omitempty"`
+	Reasoning      string         `json:"reasoning,omitempty"`
+	ResponseFormat map[string]any `json:"response_format,omitempty"`
 }
 
 type ToolRequest struct {
@@ -40,6 +45,7 @@ type ToolRequest struct {
 		Name        string         `json:"name"`
 		Description string         `json:"description"`
 		Parameters  map[string]any `json:"parameters"`
+		Strict      *bool          `json:"strict"`
 	} `json:"function"`
 }
 
@@ -83,7 +89,7 @@ func (r *OpenRouter) Fetch(ctx context.Context, messages []Message) (*OpenRouter
 	if err != nil {
 		return nil, err
 	}
-	logrus.WithField("reqBody", string(reqBytes)).Debug("sending openrouter request")
+	logrus.WithField("reqBody", string(reqBytes)).Info("fetch openrouter request")
 	req, err := http.NewRequestWithContext(ctx, "POST", openRouterAPIUrl, bytes.NewBuffer(reqBytes))
 	if err != nil {
 		return nil, err
@@ -96,7 +102,7 @@ func (r *OpenRouter) Fetch(ctx context.Context, messages []Message) (*OpenRouter
 	}
 	defer resp.Body.Close()
 	if resp.StatusCode != http.StatusOK {
-		logrus.WithField("statusCode", resp.StatusCode).Debug("http status is invalid")
+		logrus.WithField("statusCode", resp.StatusCode).Error("http status is invalid")
 		return nil, ErrChatCompletionFailed
 	}
 	var respBody OpenRouterResponse
@@ -106,7 +112,7 @@ func (r *OpenRouter) Fetch(ctx context.Context, messages []Message) (*OpenRouter
 	if len(respBody.Choices) == 0 {
 		return nil, ErrResponseNoChoices
 	}
-	logrus.WithField("respBody", respBody).Debug("openrouter fetched")
+	logrus.WithField("respBody", respBody).Info("openrouter fetched")
 	return &respBody, nil
 }
 
@@ -142,7 +148,7 @@ func (r OpenRouter) Stream(
 	if err != nil {
 		return nil, err
 	}
-	logrus.WithField("reqBody", reqBody).Debug("sending openrouter stream")
+	logrus.WithField("reqBody", reqBody).Info("stream openrouter request")
 	req, err := http.NewRequestWithContext(ctx, "POST", openRouterAPIUrl, bytes.NewBuffer(reqBytes))
 	if err != nil {
 		return nil, err
@@ -155,7 +161,7 @@ func (r OpenRouter) Stream(
 	}
 	defer resp.Body.Close()
 	if resp.StatusCode != http.StatusOK {
-		logrus.WithField("statusCode", resp.StatusCode).Debug("http status is invalid")
+		logrus.WithField("statusCode", resp.StatusCode).Error("http status is invalid")
 		return nil, ErrChatCompletionFailed
 	}
 	scanner := bufio.NewScanner(resp.Body)
@@ -176,17 +182,18 @@ func (r OpenRouter) Stream(
 		}
 		var chunk openRouterStreamChunk
 		if err := json.Unmarshal([]byte(data), &chunk); err != nil {
-			logrus.WithField("chunk", data).WithError(err).Debug("chunk unmarshal error")
+			logrus.WithField("chunk", data).WithError(err).Error("chunk unmarshal error")
 			continue
 		}
 		if len(chunk.Choices) == 0 {
-			logrus.Debug("choices is nil")
+			logrus.Error("choices is nil")
 			continue
 		}
 		delta := chunk.Choices[0].Delta
 		deltaMessage.Content += delta.Content
 		deltaMessage.Reasoning += delta.Reasoning
 		deltaMessage.ToolCallId += delta.ToolCallId
+		logrus.WithField("delta", delta).Debug("chunk received")
 		if len(delta.ToolCalls) > 0 {
 			for _, tool := range delta.ToolCalls {
 				if len(deltaMessage.ToolCalls) <= tool.Index {
@@ -203,7 +210,7 @@ func (r OpenRouter) Stream(
 		}
 		if chunk.Choices[0].FinishReason == reason_tool_calls {
 			deltaMessage.Role += delta.Role
-			defer logrus.WithField("delta", deltaMessage).Debug("tool_calling")
+			defer logrus.WithField("delta", deltaMessage).Info("tool_calling")
 			return &OpenRouterResponse{
 				Choices: []Choice{
 					{
@@ -213,12 +220,12 @@ func (r OpenRouter) Stream(
 				},
 			}, nil
 		}
-		if err := streamFn(ctx, []byte(chunk.Choices[0].Delta.Content)); err != nil {
-			logrus.WithError(err).Debug("chunk streamingFn error")
+		if err := streamFn(ctx, []byte(delta.Content)); err != nil {
+			logrus.WithError(err).Error("chunk streamingFn error")
 			continue
 		}
 	}
-	logrus.WithField("delta", deltaMessage).Debug("received stream")
+	logrus.WithField("delta", deltaMessage).Info("received stream")
 	return &OpenRouterResponse{
 		Choices: []Choice{
 			{

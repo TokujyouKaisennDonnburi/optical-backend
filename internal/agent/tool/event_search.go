@@ -34,6 +34,11 @@ func (t EventSearchTool) Description() string {
 	return "期間を指定して予定を検索します。開始日時と終了日時をRFC3339形式で指定して検索します"
 }
 
+func (t EventSearchTool) Strict() *bool {
+	strict := true
+	return &strict
+}
+
 func (t EventSearchTool) Parameters() map[string]any {
 	return map[string]any{
 		"type": "object",

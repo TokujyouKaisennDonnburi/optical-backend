@@ -8,6 +8,7 @@ type Tool interface {
 	Name() string
 	Description() string
 	Parameters() map[string]any
+	Strict() *bool
 	Call(context.Context, string) (string, error)
 }
 
@@ -33,10 +34,12 @@ func toolsToRequests(toolList []Tool) []ToolRequest {
 				Name        string         `json:"name"`
 				Description string         `json:"description"`
 				Parameters  map[string]any `json:"parameters"`
+				Strict      *bool          `json:"strict"`
 			}{
 				Name:        t.Name(),
 				Description: t.Description(),
 				Parameters:  t.Parameters(),
+				Strict:      t.Strict(),
 			},
 		}
 	}
