@@ -1,7 +1,9 @@
 package logs
 
 import (
+	"bufio"
 	"fmt"
+	"net"
 	"net/http"
 	"time"
 
@@ -20,6 +22,34 @@ func (s *statusResponseWriter) WriteHeader(code int) {
 
 func (s *statusResponseWriter) Write(b []byte) (int, error) {
 	return s.ResponseWriter.Write(b)
+}
+
+func UnwrapWriter(writer any) (http.ResponseWriter, bool) {
+	statusWriter, ok := writer.(statusResponseWriter)
+	if !ok {
+		return nil, false
+	}
+	return statusWriter.ResponseWriter, true
+}
+
+func (rw *statusResponseWriter) Flush() {
+	if f, ok := rw.ResponseWriter.(http.Flusher); ok {
+		f.Flush()
+	}
+}
+
+func (rw *statusResponseWriter) Hijack() (net.Conn, *bufio.ReadWriter, error) {
+	if h, ok := rw.ResponseWriter.(http.Hijacker); ok {
+		return h.Hijack()
+	}
+	return nil, nil, http.ErrNotSupported
+}
+
+func (rw *statusResponseWriter) Push(target string, opts *http.PushOptions) error {
+	if p, ok := rw.ResponseWriter.(http.Pusher); ok {
+		return p.Push(target, opts)
+	}
+	return http.ErrNotSupported
 }
 
 func HttpLogger(next http.Handler) http.Handler {
