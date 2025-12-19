@@ -44,3 +44,32 @@ func NewCalendar(name string, color Color, image Image, members []Member, option
 		Options: options,
 	}, nil
 }
+
+func (c *Calendar) SetName(name string) error {
+	nameLength := utf8.RuneCountInString(name)
+	if nameLength < MIN_CALENDAR_NAME_LEN || nameLength > MAX_CALENDAR_NAME_LEN {
+		return errors.New("Calendar `name` is invalid")
+	}
+	c.Name = name
+	return nil
+}
+
+func (c *Calendar) SetColor(color Color) {
+	c.Color = color
+}
+
+func (c *Calendar) SetImage(image Image) {
+	c.Image = image
+}
+
+func (c *Calendar) SetMembers(members []Member) error {
+	if len(members) == 0 {
+		return apperr.ValidationError("Calendar `members` is empty")
+	}
+	c.Members = members
+	return nil
+}
+
+func (c *Calendar) SetOptions(options []option.Option) {
+	c.Options = options
+}
