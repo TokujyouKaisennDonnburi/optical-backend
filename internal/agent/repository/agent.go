@@ -2,15 +2,16 @@ package repository
 
 import (
 	"context"
+	"time"
 
 	"github.com/TokujouKaisenDonburi/optical-backend/internal/agent"
+	"github.com/google/uuid"
 )
 
-type AgentRepository interface {
-	AnalyzeSchedules(
+type AgentQueryRepository interface {
+	FindByUserIdAndDate(
 		ctx context.Context,
-		input string,
-		schedules []agent.AnalyzableEvent,
-		streamingFn func(ctx context.Context, chunk []byte) error,
-	) error
+		userId uuid.UUID,
+		startAt, endAt time.Time,
+	) ([]agent.AnalyzableEvent, error)
 }

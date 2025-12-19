@@ -2,24 +2,25 @@ package gateway
 
 import (
 	"github.com/TokujouKaisenDonburi/optical-backend/pkg/openrouter"
+	"github.com/jmoiron/sqlx"
 )
 
-type AgentOpenRouterRepository struct {
-	openRouter *openrouter.OpenRouter
+type AgentQueryPsqlRepository struct {
+	db *sqlx.DB
 }
 
 type OptionAgentOpenRouterRepository struct {
 	openRouter *openrouter.OpenRouter
 }
 
-func NewAgentOpenRouterRepository(openRouter *openrouter.OpenRouter) *AgentOpenRouterRepository {
-	if openRouter == nil {
-		panic("openRouter is nil")
-	}
-	return &AgentOpenRouterRepository{
-		openRouter: openRouter,
+func NewAgentQueryPsqlRepository(
+	db *sqlx.DB,
+) *AgentQueryPsqlRepository {
+	return &AgentQueryPsqlRepository{
+		db: db,
 	}
 }
+
 
 func NewOptionAgentOpenRouterRepository(
 	openRouter *openrouter.OpenRouter,

@@ -92,10 +92,9 @@ func main() {
 	githubRepository := githubGateway.NewGithubApiRepository(db)
 	gmailRepository := calendarGateway.NewGmailRepository(dialer)
 	eventRepository := calendarGateway.NewEventPsqlRepository(db)
-	agentRepository := agentGateway.NewAgentOpenRouterRepository(openRouter)
 	optionAgentRepository := agentGateway.NewOptionAgentOpenRouterRepository(openRouter)
-	agentEventRepository := agentGateway.NewAgentEventQueryRepository(db)
-	agentQuery := agentQuery.NewAgentQuery(agentRepository, optionRepository, eventRepository, optionAgentRepository)
+	agentEventRepository := agentGateway.NewAgentQueryPsqlRepository(db)
+	agentQuery := agentQuery.NewAgentQuery(optionRepository, eventRepository, optionAgentRepository)
 	agentCommand := agentCommand.NewAgentCommand(openRouter, transactor, agentEventRepository)
 	agentHandler := agentHandler.NewAgentHandler(agentQuery, agentCommand)
 	githubQuery := githubQuery.NewGithubQuery(stateRepository, optionRepository, githubRepository)
@@ -152,7 +151,6 @@ func main() {
 		r.Patch("/users/@me", userHandler.UpdateMe)
 
 		// Agents
-		r.Post("/agents/analyze", agentHandler.AnalyzeSchedules)
 		r.Post("/agents/options", agentHandler.SuggestOptions)
 		r.Post("/agents/exec", agentHandler.ExecAgent)
 
