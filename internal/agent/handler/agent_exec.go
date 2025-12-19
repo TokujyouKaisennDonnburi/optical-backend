@@ -15,11 +15,11 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-type ExecAgentRequest struct {
-	Request string `json:"request"`
+type AgentChatRequest struct {
+	Message string `json:"message"`
 }
 
-func (h *AgentHandler) ExecAgent(w http.ResponseWriter, r *http.Request) {
+func (h *AgentHandler) Chat(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/event-stream")
 	w.Header().Set("Cache-Control", "no-cache")
 	w.Header().Set("Connection", "keep-alive")
@@ -41,7 +41,7 @@ func (h *AgentHandler) ExecAgent(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var request ExecAgentRequest
+	var request AgentChatRequest
 	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
 		logrus.WithError(err).Error("agent message unmarshal error")
 		return
@@ -53,9 +53,9 @@ func (h *AgentHandler) ExecAgent(w http.ResponseWriter, r *http.Request) {
 		return nil
 	}
 
-	err = h.agentCommand.Exec(r.Context(), command.AgentCommandExecInput{
+	err = h.agentCommand.Chat(r.Context(), command.AgentCommandChatInput{
 		UserId:      userId,
-		UserInput:   request.Request,
+		UserInput:   request.Message,
 		StreamingFn: streamingFn,
 	})
 	if err != nil {

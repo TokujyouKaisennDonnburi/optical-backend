@@ -158,7 +158,7 @@ func main() {
 
 		// Agents
 		r.Post("/agents/options", agentHandler.SuggestOptions)
-		r.Post("/agents/exec", agentHandler.ExecAgent)
+		r.Post("/agents/chat", agentHandler.Chat)
 
 		// User Profiles
 		r.Put("/users/avatars", userHandler.UploadAvatar)
