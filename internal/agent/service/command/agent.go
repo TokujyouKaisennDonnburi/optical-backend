@@ -33,13 +33,13 @@ const (
 type AgentCommand struct {
 	openRouter           *openrouter.OpenRouter
 	transactor           *transact.TransactionProvider
-	agentEventRepository repository.AgentEventRepository
+	agentEventRepository repository.AgentQueryRepository
 }
 
 func NewAgentCommand(
 	openRouter *openrouter.OpenRouter,
 	transactor *transact.TransactionProvider,
-	agentEventRepository repository.AgentEventRepository,
+	agentEventRepository repository.AgentQueryRepository,
 ) *AgentCommand {
 	if openRouter == nil {
 		panic("openRouter is nil")

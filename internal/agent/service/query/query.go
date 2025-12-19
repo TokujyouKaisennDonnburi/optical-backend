@@ -7,21 +7,16 @@ import (
 )
 
 type AgentQuery struct {
-	agentRepository       repository.AgentRepository
 	optionRepository      optionRepo.OptionRepository
 	eventRepository       calendarRepo.EventRepository
 	optionAgentRepository repository.OptionAgentRepository
 }
 
 func NewAgentQuery(
-	agentRepository repository.AgentRepository,
 	optionRepository optionRepo.OptionRepository,
 	eventRepository calendarRepo.EventRepository,
 	optionAgentRepository repository.OptionAgentRepository,
 ) *AgentQuery {
-	if agentRepository == nil {
-		panic("agentRepository is nil")
-	}
 	if optionRepository == nil {
 		panic("optionRepository is nil")
 	}
@@ -32,7 +27,6 @@ func NewAgentQuery(
 		panic("optionAgentRepository is nil")
 	}
 	return &AgentQuery{
-		agentRepository:       agentRepository,
 		optionRepository:      optionRepository,
 		eventRepository:       eventRepository,
 		optionAgentRepository: optionAgentRepository,

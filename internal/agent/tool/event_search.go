@@ -12,13 +12,13 @@ import (
 )
 
 type EventSearchTool struct {
-	eventAgentRepository repository.AgentEventRepository
+	eventAgentRepository repository.AgentQueryRepository
 	userId               uuid.UUID
 	streamFn             func(context.Context, []byte) error
 }
 
 func NewEventSearchTool(
-	eventAgentRepository repository.AgentEventRepository,
+	eventAgentRepository repository.AgentQueryRepository,
 	userId uuid.UUID,
 	streamFn func(context.Context, []byte) error,
 ) (*EventSearchTool, error) {
@@ -90,7 +90,10 @@ func (t EventSearchTool) Call(ctx context.Context, input string) (string, error)
 		logrus.WithField("user_input", input).Error("invalid user input time")
 		return "", errors.New("input time is nil")
 	}
-	t.streamFn(ctx, statusChunk("event_search"))
+	err := t.streamFn(ctx, statusChunk("event_search"))
+	if err != nil {
+		logrus.WithError(err).Error("progress streaming error")
+	}
 	events, err := t.eventAgentRepository.FindByUserIdAndDate(ctx, t.userId, inputModel.StartAt, inputModel.EndAt)
 	if err != nil {
 		return "", err

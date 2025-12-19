@@ -11,18 +11,6 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-type AgentEventQueryRepository struct {
-	db *sqlx.DB
-}
-
-func NewAgentEventQueryRepository(
-	db *sqlx.DB,
-) *AgentEventQueryRepository {
-	return &AgentEventQueryRepository{
-		db: db,
-	}
-}
-
 type EventAndCalendarModel struct {
 	CalendarId    uuid.UUID `db:"calendar_id"`
 	CalendarName  string    `db:"calendar_name"`
@@ -36,7 +24,7 @@ type EventAndCalendarModel struct {
 	EndAt         time.Time `db:"end_at"`
 }
 
-func (r *AgentEventQueryRepository) FindByUserIdAndDate(
+func (r *AgentQueryPsqlRepository) FindByUserIdAndDate(
 	ctx context.Context,
 	userId uuid.UUID,
 	startAt, endAt time.Time,
