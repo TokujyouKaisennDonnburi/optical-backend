@@ -2,7 +2,7 @@
 CREATE TABLE calendar_members(
     calendar_id UUID REFERENCES calendars(id) ON DELETE CASCADE,
     user_id UUID REFERENCES users(id) ON DELETE CASCADE,
-    joined_at TIMESTAMP,  -- NULL許容
+    joined_at TIMESTAMPTZ,  -- NULL許容
     PRIMARY KEY (calendar_id, user_id)  -- 複合主キー
 );
 
