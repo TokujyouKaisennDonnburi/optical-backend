@@ -4,6 +4,7 @@ import (
 	"context"
 	"time"
 
+	"github.com/TokujouKaisenDonburi/optical-backend/internal/agent"
 	"github.com/TokujouKaisenDonburi/optical-backend/internal/calendar/service/query/output"
 	"github.com/google/uuid"
 )
@@ -197,6 +198,49 @@ func (r *EventPsqlRepository) GetEventsByMonth(
 			CalendarName:  model.CalendarName,
 			CalendarColor: model.CalendarColor,
 			Id:            model.EventId,
+			Title:         model.EventTitle,
+			Location:      model.Location,
+			Memo:          model.Memo,
+			StartAt:       model.StartAt,
+			EndAt:         model.EndAt,
+			IsAllDay:      model.IsAllDay,
+		}
+	}
+	return outputs, nil
+}
+
+func (r *EventPsqlRepository) FindAnalyzableEventsByUserId(
+	ctx context.Context,
+	userId uuid.UUID,
+) ([]agent.AnalyzableEvent, error) {
+	query := `
+		SELECT 
+			calendars.id AS calendar_id, calendars.name AS calendar_name, calendars.color AS calendar_color,
+			events.id AS event_id, events.title AS event_title, location, memo, start_at, end_at, all_day
+		FROM events
+		JOIN event_locations
+			ON events.id = event_locations.event_id
+		JOIN calendars
+			ON events.calendar_id = calendars.id
+		JOIN calendar_members
+			ON calendar_members.calendar_id = events.calendar_id
+		WHERE
+		    events.deleted_at IS NULL 
+			AND calendars.deleted_at IS NULL 
+			AND	calendar_members.user_id = $1
+	`
+	var models []EventTodayQueryModel
+	err := r.db.SelectContext(ctx, &models, query, userId)
+	if err != nil {
+		return nil, err
+	}
+	outputs := make([]agent.AnalyzableEvent, len(models))
+	for i, model := range models {
+		outputs[i] = agent.AnalyzableEvent{
+			CalendarId:    model.CalendarId.String(),
+			CalendarName:  model.CalendarName,
+			CalendarColor: model.CalendarColor,
+			Id:            model.EventId.String(),
 			Title:         model.EventTitle,
 			Location:      model.Location,
 			Memo:          model.Memo,
