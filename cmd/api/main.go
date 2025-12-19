@@ -13,6 +13,7 @@ import (
 	agentHandler "github.com/TokujouKaisenDonburi/optical-backend/internal/agent/handler"
 	agentCommand "github.com/TokujouKaisenDonburi/optical-backend/internal/agent/service/command"
 	agentQuery "github.com/TokujouKaisenDonburi/optical-backend/internal/agent/service/query"
+	"github.com/TokujouKaisenDonburi/optical-backend/internal/agent/transact"
 	calendarGateway "github.com/TokujouKaisenDonburi/optical-backend/internal/calendar/gateway"
 	calendarHandler "github.com/TokujouKaisenDonburi/optical-backend/internal/calendar/handler"
 	calendarCommand "github.com/TokujouKaisenDonburi/optical-backend/internal/calendar/service/command"
@@ -55,7 +56,6 @@ func main() {
 	// Logger configurations
 	reportCaller := os.Getenv("LOGGER_REPORT_CALLER") == "1"
 	logrus.SetReportCaller(reportCaller)
-	logrus.SetLevel(logrus.DebugLevel)
 	if os.Getenv("LOGGER_JSON_FORMAT") == "1" {
 		logrus.SetFormatter(&logrus.JSONFormatter{
 			PrettyPrint: false,
@@ -86,7 +86,7 @@ func main() {
 	// Migration
 	MigrateMinio(minioClient)
 	bucketName := getBucketName()
-
+	transactor := transact.NewTransactionProvider(db)
 	userRepository := userGateway.NewUserPsqlRepository(db)
 	avatarRepository := userGateway.NewAvatarPsqlAndMinioRepository(db, minioClient, bucketName)
 	tokenRepository := userGateway.NewTokenRedisRepository(redisClient)
@@ -97,8 +97,9 @@ func main() {
 	eventRepository := calendarGateway.NewEventPsqlRepository(db)
 	agentRepository := agentGateway.NewAgentOpenRouterRepository(openRouter)
 	optionAgentRepository := agentGateway.NewOptionAgentOpenRouterRepository(openRouter)
+	agentEventRepository := agentGateway.NewAgentEventQueryRepository(db)
 	agentQuery := agentQuery.NewAgentQuery(agentRepository, optionRepository, eventRepository, optionAgentRepository)
-	agentCommand := agentCommand.NewAgentCommand(db, openRouter)
+	agentCommand := agentCommand.NewAgentCommand(openRouter, transactor, agentEventRepository)
 	agentHandler := agentHandler.NewAgentHandler(agentQuery, agentCommand)
 	githubQuery := githubQuery.NewGithubQuery(stateRepository, optionRepository, githubRepository)
 	githubCommand := githubCommand.NewGithubCommand(tokenRepository, stateRepository, githubRepository)

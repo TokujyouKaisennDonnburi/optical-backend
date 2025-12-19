@@ -6,6 +6,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"net/http"
 	"strings"
 
@@ -220,7 +221,8 @@ func (r OpenRouter) Stream(
 				},
 			}, nil
 		}
-		if err := streamFn(ctx, []byte(delta.Content)); err != nil {
+		streamChunk := fmt.Sprintf("{\"content\":\"%s\"}", delta.Content)
+		if err := streamFn(ctx, []byte(streamChunk)); err != nil {
 			logrus.WithError(err).Error("chunk streamingFn error")
 			continue
 		}

@@ -246,7 +246,7 @@ func (r *EventPsqlRepository) FindAnalyzableEventsByUserId(
 			Memo:          model.Memo,
 			StartAt:       model.StartAt,
 			EndAt:         model.EndAt,
-			IsAllDay:      model.IsAllDay,
+			IsAllday:      model.IsAllDay,
 		}
 	}
 	return outputs, nil
