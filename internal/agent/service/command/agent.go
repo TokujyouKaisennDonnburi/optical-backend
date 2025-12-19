@@ -3,11 +3,13 @@ package command
 import (
 	"context"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/TokujouKaisenDonburi/optical-backend/internal/agent/repository"
 	"github.com/TokujouKaisenDonburi/optical-backend/internal/agent/tool"
 	"github.com/TokujouKaisenDonburi/optical-backend/internal/agent/transact"
+	"github.com/TokujouKaisenDonburi/optical-backend/pkg/apperr"
 	"github.com/TokujouKaisenDonburi/optical-backend/pkg/openrouter"
 	"github.com/google/uuid"
 )
@@ -64,6 +66,10 @@ type AgentCommandChatInput struct {
 }
 
 func (c *AgentCommand) Chat(ctx context.Context, input AgentCommandChatInput) error {
+	userPrompt := strings.TrimSpace(input.UserInput)
+	if userPrompt == "" {
+		return apperr.ValidationError("invalid user message")
+	}
 	eventSearchTool, err := tool.NewEventSearchTool(c.agentEventRepository, input.UserId, input.StreamingFn)
 	if err != nil {
 		return err
@@ -75,7 +81,7 @@ func (c *AgentCommand) Chat(ctx context.Context, input AgentCommandChatInput) er
 	systemPrompt := fmt.Sprintf(SYSTEM_PROMPT, time.Now())
 	messages := []openrouter.Message{
 		openrouter.SystemMessage(systemPrompt),
-		openrouter.UserMessage(input.UserInput),
+		openrouter.UserMessage(userPrompt),
 	}
 	return c.transactor.Transact(ctx, func(ctx context.Context) error {
 		_, err = c.openRouter.WithTools(tools).ChainStream(ctx, messages, input.StreamingFn)
