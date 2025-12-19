@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"strconv"
+	"strings"
 
 	agentGateway "github.com/TokujouKaisenDonburi/optical-backend/internal/agent/gateway"
 	agentHandler "github.com/TokujouKaisenDonburi/optical-backend/internal/agent/handler"
@@ -33,8 +34,8 @@ import (
 	"github.com/minio/minio-go/v7/pkg/credentials"
 	"github.com/sirupsen/logrus"
 	prefixed "github.com/x-cray/logrus-prefixed-formatter"
-	"gopkg.in/mail.v2"
 	"google.golang.org/genai"
+	"gopkg.in/mail.v2"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/cors"
@@ -357,8 +358,16 @@ func GetOpenRouter() *openrouter.OpenRouter {
 	if !ok {
 		panic("'AGENT_API_KEY' is not set")
 	}
+	providerList := []string{}
+	providers, ok := os.LookupEnv("AGENT_MODEL_PROVIDERS")
+	if ok {
+		providerList = strings.Split(providers, ",")
+	} else {
+		providerList = []string{"Groq", "Parasail", "Clarifai", "Nebius Token Factory", "Together"}
+	}
 	// Initialize LLM
 	openRouter := openrouter.NewOpenRouter(apiKey)
 	openRouter.SetModel(model)
+	openRouter.SetProviderOrder(providerList)
 	return openRouter
 }

@@ -17,6 +17,13 @@ type OpenRouter struct {
 	responseFormat string
 	toolChoice     string
 	tools          []Tool
+	provider       Provider
+}
+
+type Provider struct {
+	Order  []string `json:"order,omitempty"`
+	Only   []string `json:"only,omitempty"`
+	Ignore []string `json:"ignore,omitempty"`
 }
 
 type ResponseFormat string
@@ -37,6 +44,24 @@ func NewOpenRouter(apiKey string) *OpenRouter {
 
 func (r *OpenRouter) SetModel(model string) {
 	r.model = model
+}
+
+func (r *OpenRouter) SetProviderOrder(order []string) {
+	r.provider.Order = order
+}
+
+func (r *OpenRouter) SetProviderIgnore(ignore []string) {
+	r.provider.Ignore = ignore
+}
+
+func (r OpenRouter) WithProviderOrder(order []string) OpenRouter {
+	r.provider.Order = order
+	return r
+}
+
+func (r OpenRouter) WithProviderIgnore(ignore []string) OpenRouter {
+	r.provider.Ignore = ignore
+	return r
 }
 
 func (r OpenRouter) WithTools(tools []Tool) OpenRouter {
