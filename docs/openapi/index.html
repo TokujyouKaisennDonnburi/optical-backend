@@ -1,0 +1,31 @@
+<!doctype html>
+<html>
+  <head><title>Scalar API Reference</title></head>
+  <body>
+    <div id="app"></div>
+    <script src="https://cdn.jsdelivr.net/npm/@scalar/api-reference"></script>
+    <script>
+      var token = "qweqe";
+      Scalar.createApiReference('#app', 
+          {
+              url: './openapi.yml',
+              authentication: {
+                  securitySchemes: {
+                      apiKeyHeader: {
+                          name: 'bearerAuth',
+                          in: 'header',
+                          value: token,
+                      },
+                  }
+              },
+              hideClientButton: true,
+              persistAuth: true,
+              theme: 'elysiajs',
+              onRequestSent: (request, data) => {
+                  console.log('Request sent:', request, data)
+              }
+          },
+        )
+    </script>
+  </body>
+</html>
