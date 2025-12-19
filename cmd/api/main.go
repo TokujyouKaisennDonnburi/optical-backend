@@ -64,7 +64,7 @@ func main() {
 	r := chi.NewRouter()
 	r.Use(logs.HttpLogger)
 	r.Use(cors.Handler(cors.Options{
-		AllowedOrigins:   []string{"http://localhost:3000", "https://tokujyoukaisenndonnburi.github.io"},
+		AllowedOrigins:   []string{"http://localhost:3000", "http://localhost:8080", "https://tokujyoukaisenndonnburi.github.io"},
 		AllowedMethods:   []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
 		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
 		AllowCredentials: false,
