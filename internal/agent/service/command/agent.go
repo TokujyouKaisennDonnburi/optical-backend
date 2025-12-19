@@ -57,13 +57,13 @@ func NewAgentCommand(
 	}
 }
 
-type AgentCommandExecInput struct {
+type AgentCommandChatInput struct {
 	UserInput   string
 	UserId      uuid.UUID
 	StreamingFn func(context.Context, []byte) error
 }
 
-func (c *AgentCommand) Exec(ctx context.Context, input AgentCommandExecInput) error {
+func (c *AgentCommand) Chat(ctx context.Context, input AgentCommandChatInput) error {
 	eventSearchTool, err := tool.NewEventSearchTool(c.agentEventRepository, input.UserId, input.StreamingFn)
 	if err != nil {
 		return err
