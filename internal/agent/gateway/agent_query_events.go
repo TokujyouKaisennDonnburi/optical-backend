@@ -24,7 +24,7 @@ type EventAndCalendarModel struct {
 	EndAt         time.Time `db:"end_at"`
 }
 
-func (r *AgentQueryPsqlRepository) FindByUserIdAndDate(
+func (r *AgentQueryPsqlRepository) FindEventByUserIdAndDate(
 	ctx context.Context,
 	userId uuid.UUID,
 	startAt, endAt time.Time,

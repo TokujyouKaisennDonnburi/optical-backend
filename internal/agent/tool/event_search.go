@@ -67,19 +67,6 @@ type EventSearchInput struct {
 	EndAt   time.Time `json:"end_at"`
 }
 
-type EventSearchOutput struct {
-	CalendarId    string    `json:"calendar_id"`
-	CalendarName  string    `json:"calendar_name"`
-	CalendarColor string    `json:"calendar_color"`
-	Id            string    `json:"event_id"`
-	Title         string    `json:"event_title"`
-	Location      string    `json:"location"`
-	Memo          string    `json:"memo"`
-	StartAt       time.Time `json:"start_at"`
-	EndAt         time.Time `json:"end_at"`
-	IsAllday      bool      `json:"is_allday"`
-}
-
 func (t EventSearchTool) Call(ctx context.Context, input string) (string, error) {
 	logrus.WithField("user_input", input).Debug("event search called")
 	var inputModel EventSearchInput
@@ -94,7 +81,7 @@ func (t EventSearchTool) Call(ctx context.Context, input string) (string, error)
 	if err != nil {
 		logrus.WithError(err).Error("progress streaming error")
 	}
-	events, err := t.agentQueryRepository.FindByUserIdAndDate(ctx, t.userId, inputModel.StartAt, inputModel.EndAt)
+	events, err := t.agentQueryRepository.FindEventByUserIdAndDate(ctx, t.userId, inputModel.StartAt, inputModel.EndAt)
 	if err != nil {
 		return "", err
 	}

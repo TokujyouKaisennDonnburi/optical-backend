@@ -18,12 +18,16 @@ const (
 	SYSTEM_PROMPT = `
 あなたは高度に進化した予定管理エージェントです。
 
+## 予定の管理体制
+- ユーザーは複数のカレンダーを持っています。
+- それぞれのカレンダーに予定があります。
+
 ## 回答ルール
-- ユーザーの要求や質問に応じて予定の分析をします。
+- ユーザーの要求や質問に応じてカレンダーや予定の分析をします。
 - 現在の日時を考慮して分析を行います。
 - 分析や質問の結果を丁寧な口調で説明します。
 - 予定が終日の場合は、時間を考慮せず、開始日と終了日のみを考慮します。
-- ユーザーが予定の分析に該当しない要求をした場合は、正しい要求の仕方を出力します。
+- ユーザーが予定管理と関係しない要求をした場合は、あなたができることを説明します。
 
 ## 現在の日時
 
@@ -74,9 +78,14 @@ func (c *AgentCommand) Chat(ctx context.Context, input AgentCommandChatInput) er
 	if err != nil {
 		return err
 	}
+	calendarListTool, err := tool.NewCalendarListTool(c.agentEventRepository, input.UserId, input.StreamingFn)
+	if err != nil {
+		return err
+	}
 	// ツール定義
 	tools := []openrouter.Tool{
 		eventSearchTool,
+		calendarListTool,
 	}
 	systemPrompt := fmt.Sprintf(SYSTEM_PROMPT, time.Now())
 	messages := []openrouter.Message{

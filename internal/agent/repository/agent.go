@@ -9,9 +9,13 @@ import (
 )
 
 type AgentQueryRepository interface {
-	FindByUserIdAndDate(
+	FindEventByUserIdAndDate(
 		ctx context.Context,
 		userId uuid.UUID,
 		startAt, endAt time.Time,
 	) ([]agent.AnalyzableEvent, error)
+	FindCalendarByUserId(
+		ctx context.Context,
+		userId uuid.UUID,
+	) ([]agent.AnalyzableCalendar, error)
 }
