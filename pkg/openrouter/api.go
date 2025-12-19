@@ -25,6 +25,7 @@ var (
 
 type OpenRouterRequest struct {
 	Model          string        `json:"model"`
+	Provider       Provider      `json:"provider"`
 	Message        []Message     `json:"messages"`
 	Temperature    float64       `json:"temperature"`
 	Stream         bool          `json:"stream,omitempty"`
@@ -70,6 +71,7 @@ func (r *OpenRouter) Fetch(ctx context.Context, messages []Message) (*OpenRouter
 	}
 	reqBody := OpenRouterRequest{
 		Model:          r.model,
+		Provider:       r.provider,
 		Stream:         false,
 		Message:        messages,
 		Temperature:    r.temperature,
@@ -128,6 +130,7 @@ func (r OpenRouter) Stream(
 	}
 	reqBody := OpenRouterRequest{
 		Model:          r.model,
+		Provider:       r.provider,
 		Stream:         true,
 		Message:        messages,
 		Temperature:    r.temperature,
@@ -182,6 +185,7 @@ func (r OpenRouter) Stream(
 		}
 		delta := chunk.Choices[0].Delta
 		deltaMessage.Content += delta.Content
+		deltaMessage.Reasoning += delta.Reasoning
 		deltaMessage.ToolCallId += delta.ToolCallId
 		if len(delta.ToolCalls) > 0 {
 			for _, tool := range delta.ToolCalls {
@@ -209,13 +213,12 @@ func (r OpenRouter) Stream(
 				},
 			}, nil
 		}
-		// logrus.WithField("chunk", chunk).Debug("streaming")
 		if err := streamFn(ctx, []byte(chunk.Choices[0].Delta.Content)); err != nil {
 			logrus.WithError(err).Debug("chunk streamingFn error")
 			continue
 		}
 	}
-	defer logrus.WithField("delta", deltaMessage).Debug("received stream")
+	logrus.WithField("delta", deltaMessage).Debug("received stream")
 	return &OpenRouterResponse{
 		Choices: []Choice{
 			{

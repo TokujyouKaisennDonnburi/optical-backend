@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"strconv"
+	"strings"
 
 	agentGateway "github.com/TokujouKaisenDonburi/optical-backend/internal/agent/gateway"
 	agentHandler "github.com/TokujouKaisenDonburi/optical-backend/internal/agent/handler"
@@ -367,8 +368,16 @@ func GetOpenRouter() *openrouter.OpenRouter {
 	if !ok {
 		panic("'AGENT_API_KEY' is not set")
 	}
+	providerList := []string{}
+	providers, ok := os.LookupEnv("AGENT_MODEL_PROVIDERS")
+	if ok {
+		providerList = strings.Split(providers, ",")
+	} else {
+		providerList = []string{"Groq", "Parasail", "Clarifai", "Nebius Token Factory", "Together"}
+	}
 	// Initialize LLM
 	openRouter := openrouter.NewOpenRouter(apiKey)
 	openRouter.SetModel(model)
+	openRouter.SetProviderOrder(providerList)
 	return openRouter
 }
