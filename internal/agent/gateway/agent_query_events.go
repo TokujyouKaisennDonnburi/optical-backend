@@ -49,7 +49,9 @@ func (r *AgentQueryPsqlRepository) FindByUserIdAndDate(
 				AND	calendar_members.user_id = $1
 				AND	
 				(
-					events.start_at > $2 AND events.end_at < $3
+					events.start_at >= $2 AND events.start_at <= $3
+					OR events.end_at <= $3 AND events.end_at >= $2
+					OR events.start_at <= $2 AND events.end_at >= $3
 				)
 		`
 		err := tx.SelectContext(ctx, &models, query, userId, startAt, endAt)
