@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/TokujouKaisenDonburi/optical-backend/internal/agent"
+	"github.com/TokujouKaisenDonburi/optical-backend/internal/calendar"
 	"github.com/google/uuid"
 )
 
@@ -18,4 +19,12 @@ type AgentQueryRepository interface {
 		ctx context.Context,
 		userId uuid.UUID,
 	) ([]agent.AnalyzableCalendar, error)
+}
+
+type AgentCommandRepository interface {
+	CreateEvents(
+		ctx context.Context,
+		userId, calendarId uuid.UUID,
+		createFn func(*calendar.Calendar) ([]calendar.Event, error),
+	) error
 }

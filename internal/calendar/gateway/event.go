@@ -27,7 +27,7 @@ func (r *EventPsqlRepository) Create(
 	createFn func(calendar *calendar.Calendar) (*calendar.Event, error),
 ) error {
 	return db.RunInTx(r.db, func(tx *sqlx.Tx) error {
-		calendar, err := FindCalendarById(ctx, tx, calendarId)
+		calendar, err := psql.FindCalendarById(ctx, tx, calendarId)
 		if err != nil {
 			return err
 		}

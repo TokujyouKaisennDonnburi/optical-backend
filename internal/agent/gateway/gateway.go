@@ -9,6 +9,10 @@ type AgentQueryPsqlRepository struct {
 	db *sqlx.DB
 }
 
+type AgentCommandPsqlRepository struct {
+	db *sqlx.DB
+}
+
 type OptionAgentOpenRouterRepository struct {
 	openRouter *openrouter.OpenRouter
 }
@@ -21,6 +25,13 @@ func NewAgentQueryPsqlRepository(
 	}
 }
 
+func NewAgentCommandPsqlRepository(
+	db *sqlx.DB,
+) *AgentCommandPsqlRepository {
+	return &AgentCommandPsqlRepository{
+		db: db,
+	}
+}
 
 func NewOptionAgentOpenRouterRepository(
 	openRouter *openrouter.OpenRouter,
