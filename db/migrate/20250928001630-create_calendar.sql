@@ -3,7 +3,7 @@ CREATE TABLE calendars(
     id UUID PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     color VARCHAR(50) NOT NULL,
-    deleted_at TIMESTAMP NULL   -- NULL許容
+    deleted_at TIMESTAMPTZ NULL   -- NULL許容
 );
 
 COMMENT ON COLUMN calendars.id IS 'カレンダーID';
