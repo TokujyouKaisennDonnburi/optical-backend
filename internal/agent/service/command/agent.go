@@ -23,7 +23,7 @@ const (
 - それぞれのカレンダーに予定があります。
 
 ## 回答ルール
-- ユーザーの要求や質問に応じてカレンダーや予定の分析をします。
+- ユーザーの要求や質問に応じてカレンダーや予定の分析や作成をします。
 - 現在の日時を考慮して分析を行います。
 - 分析や質問の結果を丁寧な口調で説明します。
 - 予定が終日の場合は、時間を考慮せず、開始日と終了日のみを考慮します。
@@ -37,15 +37,17 @@ const (
 )
 
 type AgentCommand struct {
-	openRouter           *openrouter.OpenRouter
-	transactor           *transact.TransactionProvider
-	agentEventRepository repository.AgentQueryRepository
+	openRouter             *openrouter.OpenRouter
+	transactor             *transact.TransactionProvider
+	agentQueryRepository   repository.AgentQueryRepository
+	agentCommandRepository repository.AgentCommandRepository
 }
 
 func NewAgentCommand(
 	openRouter *openrouter.OpenRouter,
 	transactor *transact.TransactionProvider,
-	agentEventRepository repository.AgentQueryRepository,
+	agentQueryRepository repository.AgentQueryRepository,
+	agentCommandRepository repository.AgentCommandRepository,
 ) *AgentCommand {
 	if openRouter == nil {
 		panic("openRouter is nil")
@@ -53,13 +55,17 @@ func NewAgentCommand(
 	if transactor == nil {
 		panic("trasactor is nil")
 	}
-	if agentEventRepository == nil {
-		panic("eventAgentRepository is nil")
+	if agentQueryRepository == nil {
+		panic("agentQueryRepository is nil")
+	}
+	if agentCommandRepository == nil {
+		panic("agentCommandRepository is nil")
 	}
 	return &AgentCommand{
-		openRouter:           openRouter,
-		transactor:           transactor,
-		agentEventRepository: agentEventRepository,
+		openRouter:             openRouter,
+		transactor:             transactor,
+		agentQueryRepository:   agentQueryRepository,
+		agentCommandRepository: agentCommandRepository,
 	}
 }
 
@@ -74,11 +80,15 @@ func (c *AgentCommand) Chat(ctx context.Context, input AgentCommandChatInput) er
 	if userPrompt == "" {
 		return apperr.ValidationError("invalid user message")
 	}
-	eventSearchTool, err := tool.NewEventSearchTool(c.agentEventRepository, input.UserId, input.StreamingFn)
+	eventSearchTool, err := tool.NewEventSearchTool(c.agentQueryRepository, input.UserId, input.StreamingFn)
 	if err != nil {
 		return err
 	}
-	calendarListTool, err := tool.NewCalendarListTool(c.agentEventRepository, input.UserId, input.StreamingFn)
+	calendarListTool, err := tool.NewCalendarListTool(c.agentQueryRepository, input.UserId, input.StreamingFn)
+	if err != nil {
+		return err
+	}
+	eventCreateTool, err := tool.NewEventCreateTool(c.agentCommandRepository, input.UserId, input.StreamingFn)
 	if err != nil {
 		return err
 	}
@@ -86,6 +96,7 @@ func (c *AgentCommand) Chat(ctx context.Context, input AgentCommandChatInput) er
 	tools := []openrouter.Tool{
 		eventSearchTool,
 		calendarListTool,
+		eventCreateTool,
 	}
 	systemPrompt := fmt.Sprintf(SYSTEM_PROMPT, time.Now())
 	messages := []openrouter.Message{

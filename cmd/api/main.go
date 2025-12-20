@@ -97,8 +97,9 @@ func main() {
 	eventRepository := calendarGateway.NewEventPsqlRepository(db)
 	optionAgentRepository := agentGateway.NewOptionAgentOpenRouterRepository(openRouter)
 	agentQueryRepository := agentGateway.NewAgentQueryPsqlRepository(db)
+	agentCommandRepository := agentGateway.NewAgentCommandPsqlRepository(db)
 	agentQuery := agentQuery.NewAgentQuery(optionRepository, eventRepository, optionAgentRepository)
-	agentCommand := agentCommand.NewAgentCommand(openRouter, transactor, agentQueryRepository)
+	agentCommand := agentCommand.NewAgentCommand(openRouter, transactor, agentQueryRepository, agentCommandRepository)
 	agentHandler := agentHandler.NewAgentHandler(agentQuery, agentCommand)
 	githubQuery := githubQuery.NewGithubQuery(stateRepository, optionRepository, githubRepository)
 	githubCommand := githubCommand.NewGithubCommand(tokenRepository, stateRepository, githubRepository)
@@ -367,16 +368,13 @@ func GetOpenRouter() *openrouter.OpenRouter {
 	if !ok {
 		panic("'AGENT_API_KEY' is not set")
 	}
-	providerList := []string{}
-	providers, ok := os.LookupEnv("AGENT_MODEL_PROVIDERS")
-	if ok {
-		providerList = strings.Split(providers, ",")
-	} else {
-		providerList = []string{"Groq", "Parasail", "Clarifai", "Nebius Token Factory", "Together"}
-	}
 	// Initialize LLM
 	openRouter := openrouter.NewOpenRouter(apiKey)
 	openRouter.SetModel(model)
-	openRouter.SetProviderOrder(providerList)
+	providers, ok := os.LookupEnv("AGENT_MODEL_PROVIDERS")
+	if ok {
+		providerList := strings.Split(providers, ",")
+		openRouter.SetProviderOrder(providerList)
+	}
 	return openRouter
 }
