@@ -32,19 +32,21 @@ func NewCalendarListTool(
 }
 
 func (t CalendarListTool) Name() string {
-	return "カレンダー一覧取得ツール"
+	// カレンダー一覧取得ツール
+	return "list_calendars"
 }
 
 func (t CalendarListTool) Description() string {
-	return "ユーザーのカレンダーを一覧取得します。"
+	// ユーザーのカレンダーを一覧取得します。
+	return "Retrieves a list of all available calendars for the user."
 }
 
-func (t CalendarListTool) Strict() *bool {
-	return nil
+func (t CalendarListTool) Strict() bool {
+	return false
 }
 
 func (t CalendarListTool) Parameters() map[string]any {
-	return nil
+	return map[string]any{}
 }
 
 func (t CalendarListTool) Call(ctx context.Context, input string) (string, error) {

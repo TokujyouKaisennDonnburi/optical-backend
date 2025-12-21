@@ -35,22 +35,38 @@ func NewEventCreateTool(
 }
 
 func (t EventCreateTool) Name() string {
-	return "予定一括作成ツール"
+	// "予定一括作成ツール"
+	return "bulk_create_events"
 }
 
 func (t EventCreateTool) Description() string {
-	return "カレンダーに予定を一括作成します。作成された予定を出力します。"
+	// カレンダーに予定を一括作成します。作成された予定を出力します。
+	return "Creates multiple events within a single specified calendar in one operation. returns the details of the created events."
 }
 
-func (t EventCreateTool) Strict() *bool {
-	strict := true
-	return &strict
+func (t EventCreateTool) Strict() bool {
+	return true
+}
+
+type UserInputModel struct {
+	CalendarId uuid.UUID          `json:"calendar_id"`
+	Events     []EventCreateModel `json:"events"`
+}
+
+type EventCreateModel struct {
+	CalendarId uuid.UUID `json:"calendar_id"`
+	Title      string    `json:"title"`
+	Memo       string    `json:"memo"`
+	Location   string    `json:"location"`
+	IsAllday   bool      `json:"is_allday"`
+	StartAt    time.Time `json:"start_at"`
+	EndAt      time.Time `json:"end_at"`
 }
 
 func (t EventCreateTool) Parameters() map[string]any {
 	return map[string]any{
 		"type": "array",
-		"properties": map[string]any{
+		"items": map[string]any{
 			"type": "object",
 			"properties": map[string]any{
 				"calendar_id": map[string]any{
@@ -83,20 +99,6 @@ func (t EventCreateTool) Parameters() map[string]any {
 			"required": []string{"title", "is_allday", "start_at", "end_at"},
 		},
 	}
-}
-
-type UserInputModel struct {
-	Events []EventCreateModel `json:"events"`
-}
-
-type EventCreateModel struct {
-	CalendarId uuid.UUID `json:"calendar_id"`
-	Title      string    `json:"title"`
-	Memo       string    `json:"memo"`
-	Location   string    `json:"location"`
-	IsAllday   bool      `json:"is_allday"`
-	StartAt    time.Time `json:"start_at"`
-	EndAt      time.Time `json:"end_at"`
 }
 
 func (t EventCreateTool) Call(ctx context.Context, input string) (string, error) {
@@ -167,4 +169,52 @@ func (t EventCreateTool) Call(ctx context.Context, input string) (string, error)
 	}
 	logrus.WithField("len", len(events)).Info("event create tool called")
 	return string(output), nil
+}
+
+func (t EventCreateTool) ParametersUserInput() map[string]any {
+	return map[string]any{
+		"type": "object",
+		"properties": map[string]any{
+			"calendar_id": map[string]any{
+				"type":   "string",
+				"format": "uuid",
+			},
+			"events": map[string]any{
+				"type": "array",
+				"properties": map[string]any{
+					"type": "object",
+					"properties": map[string]any{
+						"calendar_id": map[string]any{
+							"type":   "string",
+							"format": "uuid",
+						},
+						"title": map[string]any{
+							"type": "string",
+						},
+						"memo": map[string]any{
+							"type": "string",
+						},
+						"location": map[string]any{
+							"type": "string",
+						},
+						"is_allday": map[string]any{
+							"type": "boolean",
+						},
+						"start_at": map[string]any{
+							"type":        "string",
+							"description": "RFC3339",
+							"format":      "date-time",
+						},
+						"end_at": map[string]any{
+							"type":        "string",
+							"description": "RFC3339",
+							"format":      "date-time",
+						},
+					},
+					"required": []string{"title", "is_allday", "start_at", "end_at"},
+				},
+			},
+		},
+		"required": []string{"calendar_id", "events"},
+	}
 }

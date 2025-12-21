@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"net/http"
 	"strings"
 
@@ -46,7 +47,7 @@ type ToolRequest struct {
 		Name        string         `json:"name"`
 		Description string         `json:"description"`
 		Parameters  map[string]any `json:"parameters"`
-		Strict      *bool          `json:"strict"`
+		Strict      bool           `json:"strict,omitempty"`
 	} `json:"function"`
 }
 
@@ -103,7 +104,12 @@ func (r *OpenRouter) Fetch(ctx context.Context, messages []Message) (*OpenRouter
 	}
 	defer resp.Body.Close()
 	if resp.StatusCode != http.StatusOK {
-		logrus.WithField("statusCode", resp.StatusCode).Error("http status is invalid")
+		entry := logrus.WithField("statusCode", resp.StatusCode)
+		body, err := io.ReadAll(resp.Body)
+		if err == nil {
+			entry = entry.WithField("responseBody", body)
+		}
+		entry.Error("openRouter reqeuest error")
 		return nil, ErrChatCompletionFailed
 	}
 	var respBody OpenRouterResponse
@@ -162,11 +168,17 @@ func (r OpenRouter) Stream(
 	}
 	defer resp.Body.Close()
 	if resp.StatusCode != http.StatusOK {
-		logrus.WithField("statusCode", resp.StatusCode).Error("http status is invalid")
+		entry := logrus.WithField("statusCode", resp.StatusCode)
+		body, err := io.ReadAll(resp.Body)
+		if err == nil {
+			entry = entry.WithField("responseBody", string(body))
+		}
+		entry.Error("openRouter reqeuest error")
 		return nil, ErrChatCompletionFailed
 	}
 	scanner := bufio.NewScanner(resp.Body)
 	deltaMessage := Message{}
+	finishReason := ""
 	for scanner.Scan() {
 		line := scanner.Text()
 		if strings.TrimSpace(line) == "" {
@@ -175,6 +187,7 @@ func (r OpenRouter) Stream(
 		data := strings.TrimPrefix(line, "data: ")
 		data = strings.TrimSpace(data)
 		if data == "[DONE]" {
+			logrus.Debug("received: [DONE]")
 			break
 		}
 		if data == ": OPENROUTER PROCESSING" {
@@ -194,6 +207,9 @@ func (r OpenRouter) Stream(
 		deltaMessage.Content += delta.Content
 		deltaMessage.Reasoning += delta.Reasoning
 		deltaMessage.ToolCallId += delta.ToolCallId
+		if chunk.Choices[0].FinishReason != "" {
+			finishReason = chunk.Choices[0].FinishReason
+		}
 		logrus.WithField("delta", delta).Debug("chunk received")
 		if len(delta.ToolCalls) > 0 {
 			for _, tool := range delta.ToolCalls {
@@ -227,11 +243,11 @@ func (r OpenRouter) Stream(
 			continue
 		}
 	}
-	logrus.WithField("delta", deltaMessage).Info("received stream")
+	logrus.WithField("delta", deltaMessage).WithField("reason", finishReason).Info("received stream")
 	return &OpenRouterResponse{
 		Choices: []Choice{
 			{
-				FinishReason: reason_stop,
+				FinishReason: finishReason,
 				Message:      deltaMessage,
 			},
 		},
