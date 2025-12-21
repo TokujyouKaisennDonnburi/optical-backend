@@ -154,6 +154,7 @@ func main() {
 		// Agents
 		r.Post("/agents/options", agentHandler.SuggestOptions)
 		r.Post("/agents/chat", agentHandler.Chat)
+		r.Post("/agents/{calendarId}/chat", agentHandler.CalendarChat)
 
 		// User Profiles
 		r.Put("/users/avatars", userHandler.UploadAvatar)

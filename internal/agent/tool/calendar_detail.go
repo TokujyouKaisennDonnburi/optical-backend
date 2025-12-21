@@ -13,12 +13,14 @@ import (
 type CalendarDetailTool struct {
 	agentQueryRepository repository.AgentQueryRepository
 	userId               uuid.UUID
+	calendarId           uuid.UUID
 	streamFn             func(context.Context, []byte) error
 }
 
 func NewCalendarDetailTool(
 	agentQueryRepository repository.AgentQueryRepository,
 	userId uuid.UUID,
+	calendarId uuid.UUID,
 	streamFn func(context.Context, []byte) error,
 ) (*CalendarDetailTool, error) {
 	if agentQueryRepository == nil {
@@ -27,6 +29,7 @@ func NewCalendarDetailTool(
 	return &CalendarDetailTool{
 		agentQueryRepository: agentQueryRepository,
 		userId:               userId,
+		calendarId:           calendarId,
 		streamFn:             streamFn,
 	}, nil
 }
@@ -38,7 +41,7 @@ func (t CalendarDetailTool) Name() string {
 
 func (t CalendarDetailTool) Description() string {
 	// ユーザーのカレンダー詳細を取得します。
-	return "Retrieves the detailed information of a specific calendar by its ID. Use this to check the calendar's title, memo, location, start_at, end_at, is_allday"
+	return "Retrieves the detailed information of a specific calendar. Use this to check the calendar's title, memo, location, start_at, end_at, is_allday"
 }
 
 func (t CalendarDetailTool) Strict() bool {
@@ -58,12 +61,7 @@ func (t CalendarDetailTool) Call(ctx context.Context, input string) (string, err
 	if err != nil {
 		logrus.WithError(err).Error("progress streaming error")
 	}
-	calendarId, err := uuid.Parse(input)
-	if err != nil {
-		logrus.WithError(err).Error("invalid user input")
-		return "", err
-	}
-	calendar, err := t.agentQueryRepository.FindCalendarByIdAndUserId(ctx, t.userId, calendarId)
+	calendar, err := t.agentQueryRepository.FindCalendarByIdAndUserId(ctx, t.userId, t.calendarId)
 	if err != nil {
 		return "", err
 	}
