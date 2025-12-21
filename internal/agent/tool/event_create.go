@@ -54,7 +54,6 @@ type UserInputModel struct {
 }
 
 type EventCreateModel struct {
-	CalendarId uuid.UUID `json:"calendar_id"`
 	Title      string    `json:"title"`
 	Memo       string    `json:"memo"`
 	Location   string    `json:"location"`
@@ -65,38 +64,44 @@ type EventCreateModel struct {
 
 func (t EventCreateTool) Parameters() map[string]any {
 	return map[string]any{
-		"type": "array",
-		"items": map[string]any{
-			"type": "object",
-			"properties": map[string]any{
-				"calendar_id": map[string]any{
-					"type":   "string",
-					"format": "uuid",
-				},
-				"title": map[string]any{
-					"type": "string",
-				},
-				"memo": map[string]any{
-					"type": "string",
-				},
-				"location": map[string]any{
-					"type": "string",
-				},
-				"is_allday": map[string]any{
-					"type": "boolean",
-				},
-				"start_at": map[string]any{
-					"type":        "string",
-					"description": "RFC3339",
-					"format":      "date-time",
-				},
-				"end_at": map[string]any{
-					"type":        "string",
-					"description": "RFC3339",
-					"format":      "date-time",
+		"type": "object",
+		"properties": map[string]any{
+			"calendar_id": map[string]any{
+				"type":   "string",
+				"format": "uuid",
+			},
+
+			"events": map[string]any{
+				"type": "array",
+				"items": map[string]any{
+					"type": "object",
+					"properties": map[string]any{
+						"title": map[string]any{
+							"type": "string",
+						},
+						"memo": map[string]any{
+							"type": "string",
+						},
+						"location": map[string]any{
+							"type": "string",
+						},
+						"is_allday": map[string]any{
+							"type": "boolean",
+						},
+						"start_at": map[string]any{
+							"type":        "string",
+							"description": "RFC3339",
+							"format":      "date-time",
+						},
+						"end_at": map[string]any{
+							"type":        "string",
+							"description": "RFC3339",
+							"format":      "date-time",
+						},
+					},
+					"required": []string{"title", "is_allday", "start_at", "end_at"},
 				},
 			},
-			"required": []string{"title", "is_allday", "start_at", "end_at"},
 		},
 	}
 }
@@ -107,19 +112,19 @@ func (t EventCreateTool) Call(ctx context.Context, input string) (string, error)
 	if err != nil {
 		logrus.WithError(err).Error("progress streaming error")
 	}
-	var models []EventCreateModel
-	if err := json.Unmarshal([]byte(input), &models); err != nil {
+	var model UserInputModel
+	if err := json.Unmarshal([]byte(input), &model); err != nil {
 		return "", err
 	}
-	if len(models) == 0 {
+	if len(model.Events) == 0 {
 		return "", nil
 	}
-	events := make([]calendar.Event, len(models))
-	analyzableModels := make([]agent.AnalyzableEvent, len(models))
+	events := make([]calendar.Event, len(model.Events))
+	analyzableModels := make([]agent.AnalyzableEvent, len(model.Events))
 	err = t.agentCommandRepository.CreateEvents(
 		ctx,
 		t.userId,
-		models[0].CalendarId,
+		model.CalendarId,
 		func(c *calendar.Calendar) ([]calendar.Event, error) {
 			isMember := false
 			for _, member := range c.Members {
@@ -131,10 +136,7 @@ func (t EventCreateTool) Call(ctx context.Context, input string) (string, error)
 			if !isMember {
 				return nil, errors.New("invalid user access")
 			}
-			for i, event := range models {
-				if models[0].CalendarId != event.CalendarId {
-					return nil, errors.New("invalid calendar Id event")
-				}
+			for i, event := range model.Events {
 				scheduledTime, err := calendar.NewScheduledTime(event.IsAllday, event.StartAt, event.EndAt)
 				if err != nil {
 					return nil, err
