@@ -33,16 +33,17 @@ func NewEventSearchTool(
 }
 
 func (t EventSearchTool) Name() string {
-	return "予定検索ツール"
+	// return "予定検索ツール"
+	return "search_events"
 }
 
 func (t EventSearchTool) Description() string {
-	return "期間を指定して予定を検索します。開始日時と終了日時をRFC3339形式で指定して検索します。"
+	// return "期間を指定して予定を検索します。開始日時と終了日時をRFC3339形式で指定して検索します。"
+	return "Searches for calendar events within a specified time range. Requires start and end times in RFC3339 format (e.g., 2025-01-01T09:00:00Z)."
 }
 
-func (t EventSearchTool) Strict() *bool {
-	strict := true
-	return &strict
+func (t EventSearchTool) Strict() bool {
+	return true
 }
 
 func (t EventSearchTool) Parameters() map[string]any {
