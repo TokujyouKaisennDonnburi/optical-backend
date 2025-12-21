@@ -12,41 +12,44 @@ import (
 )
 
 type GithubMilestonesRequest struct {
-	UserId    uuid.UUID `json:"userId"`
-	ClendarId uuid.UUID `json:"calendarId"`
+	UserId     uuid.UUID `json:"userId"`
+	CalendarId uuid.UUID `json:"calendarId"`
 }
 
 type GithubMilestonesResponse struct {
 	Title    string `json:"title"`
-	Progress int8   `json:"progress"`
-	Open     int8   `json:"open"`
-	Close    int8   `json:"close"`
+	Progress int    `json:"progress"`
+	Open     int    `json:"open"`
+	Close    int    `json:"close"`
 }
 
 func (h *GithubHandler) GetMilestones(w http.ResponseWriter, r *http.Request) {
 	userId, err := auth.GetUserIdFromContext(r)
 	if err != nil {
-		 _ = render.Render(w, r, apperr.ErrInternalServerError(err))
-		 return
+		_ = render.Render(w, r, apperr.ErrInternalServerError(err))
+		return
 	}
 	calendarId, err := uuid.Parse(chi.URLParam(r, "calendarId"))
 	if err != nil {
 		_ = render.Render(w, r, apperr.ErrInvalidRequest(err))
 		return
 	}
-	milestones, err := h.githubQuery.GetMilestone(r.Context(),query.MilestonesInput{
-		UserId: userId,
+	milestones, err := h.githubQuery.GetMilestone(r.Context(), query.MilestonesInput{
+		UserId:     userId,
 		CalendarId: calendarId,
 	})
 	if err != nil {
-		apperr.HandleAppError(w,r,err)
-		return 
+		apperr.HandleAppError(w, r, err)
+		return
 	}
-	response := GithubMilestonesResponse{
-		Title: milestones.title,
-		Progress: milestones.progress,
-		Open: milestones.open,
-		Close: milestones.close,
+	responseList := make([]GithubMilestonesResponse, len(milestones))
+	for i, milestone := range milestones {
+		responseList[i] = GithubMilestonesResponse{
+			Title:    milestone.Title,
+			Progress: milestone.Progress,
+			Open:     milestone.Open,
+			Close:    milestone.Close,
+		}
 	}
-	render.JSON(w,r,response)
+	render.JSON(w, r, responseList)
 }

@@ -7,6 +7,6 @@ const (
 
 type Milestones struct {
 	Title string `json:"title"`
-	Open  int8   `json:"open"`
-	Close int8   `json:"close"`
+	Open  int    `json:"open"`
+	Close int    `json:"close"`
 }
