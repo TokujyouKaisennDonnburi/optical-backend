@@ -19,6 +19,10 @@ type AgentQueryRepository interface {
 		ctx context.Context,
 		userId uuid.UUID,
 	) ([]agent.AnalyzableCalendar, error)
+	FindCalendarByIdAndUserId(
+		ctx context.Context,
+		userId, calendarId uuid.UUID,
+	) (*agent.AnalyzableCalendar, error)
 }
 
 type AgentCommandRepository interface {
