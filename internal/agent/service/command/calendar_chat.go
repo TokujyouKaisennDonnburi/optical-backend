@@ -52,7 +52,7 @@ func (c *AgentCommand) CalendarChat(ctx context.Context, input AgentCommandCalen
 	if userPrompt == "" {
 		return apperr.ValidationError("invalid user message")
 	}
-	eventSearchTool, err := tool.NewEventSearchTool(c.agentQueryRepository, input.UserId, input.StreamingFn)
+	calendarEventSearchTool, err := tool.NewCalendarEventSearchTool(c.agentQueryRepository, input.UserId, input.CalendarId, input.StreamingFn)
 	if err != nil {
 		return err
 	}
@@ -66,7 +66,7 @@ func (c *AgentCommand) CalendarChat(ctx context.Context, input AgentCommandCalen
 	}
 	// ツール定義
 	tools := []openrouter.Tool{
-		eventSearchTool,
+		calendarEventSearchTool,
 		calendarDetailTool,
 		eventCreateTool,
 	}
