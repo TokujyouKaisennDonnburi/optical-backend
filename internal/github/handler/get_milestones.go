@@ -3,6 +3,7 @@ package handler
 import (
 	"net/http"
 
+	"github.com/TokujouKaisenDonburi/optical-backend/internal/github/service/query"
 	"github.com/TokujouKaisenDonburi/optical-backend/pkg/apperr"
 	"github.com/TokujouKaisenDonburi/optical-backend/pkg/auth"
 	"github.com/go-chi/chi/v5"
@@ -23,13 +24,29 @@ type GithubMilestonesResponse struct {
 }
 
 func (h *GithubHandler) GetMilestones(w http.ResponseWriter, r *http.Request) {
-	userId, err := auth.GetClientId("userId")
+	userId, err := auth.GetUserIdFromContext(r)
 	if err != nil {
-		return _  = render.Render(w, r, apperr.ErrInternalServerError(err))
+		 _ = render.Render(w, r, apperr.ErrInternalServerError(err))
+		 return
 	}
 	calendarId, err := uuid.Parse(chi.URLParam(r, "calendarId"))
 	if err != nil {
-		return _ = render.Render(w, r, apperr.ErrInvalidRequest(err))
+		_ = render.Render(w, r, apperr.ErrInvalidRequest(err))
+		return
 	}
-
+	milestones, err := h.githubQuery.GetMilestone(r.Context(),query.MilestonesInput{
+		UserId: userId,
+		CalendarId: calendarId,
+	})
+	if err != nil {
+		apperr.HandleAppError(w,r,err)
+		return 
+	}
+	response := GithubMilestonesResponse{
+		Title: milestones.title,
+		Progress: milestones.progress,
+		Open: milestones.open,
+		Close: milestones.close,
+	}
+	render.JSON(w,r,response)
 }
