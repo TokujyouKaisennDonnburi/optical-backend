@@ -23,6 +23,7 @@ type CalendarUpdateInput struct {
 func (c *CalendarCommand) UpdateCalendar(ctx context.Context, input CalendarUpdateInput) error {
 	err := c.calendarRepository.Update(
 		ctx,
+		input.UserId,
 		input.CalendarId,
 		input.ImageId,
 		input.MemberEmails,

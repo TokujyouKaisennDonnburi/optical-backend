@@ -20,6 +20,7 @@ type CalendarRepository interface {
 
 	Update(
 		ctx context.Context,
+		userId uuid.UUID,
 		calendarId uuid.UUID,
 		imageId uuid.UUID,
 		memberEmails []string,
