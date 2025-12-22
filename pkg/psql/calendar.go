@@ -17,18 +17,20 @@ type CalendarModel struct {
 	Color string         `db:"color"`
 }
 
-// カレンダーをカレンダーIDから取得する
-func FindCalendarByCalendarId(ctx context.Context, tx *sqlx.Tx, calendarId uuid.UUID) (*calendar.Calendar, error) {
+// ユーザーIDとカレンダーIDからカレンダーを取得する
+func FindCalendarByUserIdAndId(ctx context.Context, tx *sqlx.Tx, userId, calendarId uuid.UUID) (*calendar.Calendar, error) {
 	query := `
-		SELECT id, image_id, name, color
+		SELECT calendars.id, image_id, name, color
 		FROM calendars
-		WHERE id = $1 AND
-		deleted_at IS NULL
-		ORDER BY id
+		JOIN calendar_members ON calendar_members.calendar_id = calendars.id
+		WHERE calendars.id = $1
+		AND calendar_members.user_id = $2
+		AND calendar_members.joined_at IS NOT NULL
+		AND calendars.deleted_at IS NULL
 	`
 
 	var calendarModel CalendarModel
-	err := tx.GetContext(ctx, &calendarModel, query, calendarId)
+	err := tx.GetContext(ctx, &calendarModel, query, calendarId, userId)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return nil, apperr.NotFoundError("calendar not found")

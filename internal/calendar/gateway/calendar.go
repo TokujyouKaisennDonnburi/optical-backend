@@ -124,12 +124,21 @@ func (r *CalendarPsqlRepository) Create(
 
 func (r *CalendarPsqlRepository) Update(
 	ctx context.Context,
+	userId uuid.UUID,
+	calendarId uuid.UUID,
 	imageId uuid.UUID,
 	memberEmails []string,
 	optionIds []int32,
-	updateFn func(image *calendar.Image, members []calendar.Member, options []option.Option) (*calendar.Calendar, error),
+	updateFn func(calendar *calendar.Calendar, image *calendar.Image, members []calendar.Member, options []option.Option) (*calendar.Calendar, error),
 ) error {
 	return db.RunInTx(r.db, func(tx *sqlx.Tx) error {
+
+		// カレンダー取得
+		existingCalendar, err := psql.FindCalendarByUserIdAndId(ctx, tx, userId, calendarId)
+		if err != nil {
+			return err
+		}
+
 		// オプション取得
 		options, err := psql.FindOptionsByIds(ctx, tx, optionIds)
 		if err != nil {
@@ -155,7 +164,7 @@ func (r *CalendarPsqlRepository) Update(
 			return err
 		}
 		// 更新関数実行
-		cal, err := updateFn(image, members, options)
+		cal, err := updateFn(existingCalendar, image, members, options)
 		if err != nil {
 			return err
 		}
