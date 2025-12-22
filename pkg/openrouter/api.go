@@ -77,11 +77,16 @@ func (r *OpenRouter) Fetch(ctx context.Context, messages []Message) (*OpenRouter
 	if len(messages) == 0 {
 		return nil, ErrMessageNoContent
 	}
+	sendingMessages := make([]Message, len(messages))
+	for i, message := range messages{
+		message.Reasoning = ""
+		sendingMessages[i] = message
+	}
 	reqBody := OpenRouterRequest{
 		Model:          r.model,
 		Provider:       r.provider,
 		Stream:         false,
-		Message:        messages,
+		Message:        sendingMessages,
 		Temperature:    r.temperature,
 		ResponseFormat: r.responseFormat,
 		Tools:          toolsToRequests(r.tools),
@@ -141,11 +146,16 @@ func (r OpenRouter) Stream(
 	if len(messages) == 0 {
 		return nil, ErrMessageNoContent
 	}
+	sendingMessages := make([]Message, len(messages))
+	for i, message := range messages{
+		message.Reasoning = ""
+		sendingMessages[i] = message
+	}
 	reqBody := OpenRouterRequest{
 		Model:          r.model,
 		Provider:       r.provider,
 		Stream:         true,
-		Message:        messages,
+		Message:        sendingMessages,
 		Temperature:    r.temperature,
 		ResponseFormat: r.responseFormat,
 		Tools:          toolsToRequests(r.tools),
