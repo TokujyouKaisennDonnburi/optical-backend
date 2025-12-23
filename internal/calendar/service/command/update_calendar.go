@@ -12,7 +12,6 @@ import (
 type CalendarUpdateInput struct {
 	UserId        uuid.UUID
 	CalendarId    uuid.UUID
-	UserName      string
 	CalendarName  string
 	CalendarColor string
 	MemberEmails  []string
