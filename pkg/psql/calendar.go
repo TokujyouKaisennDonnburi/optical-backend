@@ -11,17 +11,19 @@ import (
 )
 
 type CalendarModel struct {
-	Id    uuid.UUID      `db:"id"`
-	Image calendar.Image `db:"image_id"`
-	Name  string         `db:"name"`
-	Color string         `db:"color"`
+	Id       uuid.UUID      `db:"id"`
+	Name     string         `db:"name"`
+	Color    string         `db:"color"`
+	ImageID  uuid.NullUUID  `db:"image_id"`
+	ImageUrl sql.NullString `db:"image_url"`
 }
 
 // ユーザーIDとカレンダーIDからカレンダーを取得する
 func FindCalendarByUserIdAndId(ctx context.Context, tx *sqlx.Tx, userId, calendarId uuid.UUID) (*calendar.Calendar, error) {
 	query := `
-		SELECT calendars.id, image_id, name, color
+		SELECT calendars.id, image_id, name, color, calendar_images.url AS image_url
 		FROM calendars
+		LEFT JOIN calendar_images ON calendar_images.id = calendars.image_id
 		JOIN calendar_members ON calendar_members.calendar_id = calendars.id
 		WHERE calendars.id = $1
 		AND calendar_members.user_id = $2
@@ -41,6 +43,10 @@ func FindCalendarByUserIdAndId(ctx context.Context, tx *sqlx.Tx, userId, calenda
 		Id:    calendarModel.Id,
 		Name:  calendarModel.Name,
 		Color: calendar.Color(calendarModel.Color),
-		Image: calendarModel.Image,
+		Image: calendar.Image{
+			Id:    calendarModel.ImageID.UUID,
+			Url:   calendarModel.ImageUrl.String,
+			Valid: calendarModel.ImageID.Valid && calendarModel.ImageUrl.Valid,
+		},
 	}, nil
 }
