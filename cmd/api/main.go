@@ -264,9 +264,18 @@ func MigrateMinio(client *minio.Client) {
 // PostgresのDBに接続する
 func getPostgresDB() *sqlx.DB {
 	// #63 環境変数から読むように変える
-	host := "127.0.0.1"
-	port := "5433"
-	sslMode := "disable"
+	host, ok := os.LookupEnv("POSTGRES_HOST")
+	if !ok {
+		panic("'POSTGREST_HOST' is not set")
+	}
+	port, ok := os.LookupEnv("POSTGRES_PORT")
+	if !ok {
+		panic("'POSTGRES_PORT' is not set")
+	}
+	sslMode, ok := os.LookupEnv("POSTGRES_SSLMODE")
+	if !ok {
+		panic("'POSTGRES_SSLMODE' is not set")
+	}
 	user, ok := os.LookupEnv("POSTGRES_USER")
 	if !ok {
 		panic("'POSTGRES_USER' is not set")
