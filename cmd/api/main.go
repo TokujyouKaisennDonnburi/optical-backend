@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"github.com/rubenv/sql-migrate"
 	"net/http"
 	"os"
 	"strconv"
@@ -87,7 +88,18 @@ func main() {
 	openRouter := GetOpenRouter()
 
 	// Migration
-	MigrateMinio(minioClient)
+	if os.Getenv("RUNTIME_MIGRATION") == "1" {
+		migrations := &migrate.FileMigrationSource{
+			Dir: "db/migrate",
+		}
+		n, err := migrate.Exec(db.DB, "postgres", migrations, migrate.Up)
+		if err != nil {
+			panic(err.Error())
+		} else {
+			logrus.WithField("applied", n).Info("migration executed")
+		}
+		MigrateMinio(minioClient)
+	}
 	bucketName := getBucketName()
 	transactor := transact.NewTransactionProvider(db)
 	userRepository := userGateway.NewUserPsqlRepository(db)
