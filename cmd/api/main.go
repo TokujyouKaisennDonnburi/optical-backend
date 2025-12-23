@@ -30,8 +30,8 @@ import (
 	"github.com/minio/minio-go/v7/pkg/credentials"
 	"github.com/sirupsen/logrus"
 	prefixed "github.com/x-cray/logrus-prefixed-formatter"
-	"gopkg.in/mail.v2"
 	"google.golang.org/genai"
+	"gopkg.in/mail.v2"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/cors"
@@ -135,7 +135,7 @@ func main() {
 		// Users
 		r.Get("/users/@me", userHandler.GetMe)
 		r.Patch("/users/@me", userHandler.UpdateMe)
-		
+
 		// Agents
 		r.Post("/agents/options", agentHandler.SuggestOptions)
 
@@ -153,6 +153,7 @@ func main() {
 		r.Post("/calendars/images", calendarHandler.UploadImage)
 		r.Get("/calendars/{calendarId}", calendarHandler.GetCalendar)
 		r.Get("/calendars", calendarHandler.GetCalendars)
+		r.Patch("/calendars/{calendarId}", calendarHandler.UpdateCalendar)
 
 		// Members
 		r.Post("/calendars/{calendarId}/members", calendarHandler.CreateMembers)
