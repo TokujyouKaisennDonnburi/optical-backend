@@ -309,6 +309,17 @@ func GetMinIOClient() *minio.Client {
 	if !ok {
 		panic("'MINIO_ENDPOINT' is not set'")
 	}
+	if os.Getenv("MINIO_FROM_IAM") == "1" {
+		client, err := minio.New(endpoint, &minio.Options{
+			Region: getMinioRegion(),
+			Secure: true,
+			Creds:  credentials.NewIAM(""),
+		})
+		if err != nil {
+			panic(err)
+		}
+		return client
+	}
 	accessKeyId, ok := os.LookupEnv("MINIO_ACCESS_KEY_ID")
 	if !ok {
 		panic("'MINIO_ACCESS_KEY_ID' is not set'")
