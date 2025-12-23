@@ -1,0 +1,43 @@
+name: Nightly Release
+
+on:
+  workflow_dispatch:
+  push:
+    # branches:
+    #   - main
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.24.4'
+          cache: true
+
+      - name: Build
+        run: |
+          CGO_ENABLED=0 GOOS=linux GOARCH=amd64
+          go build -v -ldflags="-s -w -X main.version=nightly-${{ github.sha }}" -o optical-backend-app-nightly ./cmd/api
+          tar -cvzf optical-backend-nightly-linux_amd64.tar.gz optical-backend-app-nightly
+
+      - name: Update Nightly Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: nightly
+          name: "Nightly Build (${{ github.sha }})"
+          body: |
+            - **Commit:** ${{ github.sha }}
+            - **Build Date:** ${{ github.event.head_commit.timestamp }}
+          prerelease: true
+          files: |
+            optical-backend-nightly-linux_amd64.tar.gz
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

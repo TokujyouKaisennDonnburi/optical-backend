@@ -2,8 +2,6 @@ name: Deploy Image
 on:
   workflow_dispatch:
   push:
-    branches:
-      - main
 
 jobs:
   deploy-ghcr:
