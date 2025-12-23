@@ -1,6 +1,6 @@
 services:
   optical_backend:
-    image: optical:latest
+    image: ghcr.io/tokujyoukaisenndonnburi/optical-backend:latest
     container_name: optical_backend
     ports:
       - 127.0.0.1:8000:8000
