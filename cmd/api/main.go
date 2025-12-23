@@ -2,11 +2,13 @@ package main
 
 import (
 	"context"
+	"crypto/tls"
 	"fmt"
-	"github.com/rubenv/sql-migrate"
 	"net/http"
 	"os"
 	"strconv"
+
+	"github.com/rubenv/sql-migrate"
 
 	agentGateway "github.com/TokujouKaisenDonburi/optical-backend/internal/agent/gateway"
 	agentHandler "github.com/TokujouKaisenDonburi/optical-backend/internal/agent/handler"
@@ -255,10 +257,18 @@ func GetMinIOClient() *minio.Client {
 		panic("'MINIO_ENDPOINT' is not set'")
 	}
 	if os.Getenv("MINIO_FROM_IAM") == "1" {
+		customTransport, err := minio.DefaultTransport(true)
+		if err != nil {
+			panic(err)
+		}
+		customTransport.TLSClientConfig = &tls.Config{
+			InsecureSkipVerify: true,
+		}
 		client, err := minio.New(endpoint, &minio.Options{
 			Region: getMinioRegion(),
 			Secure: true,
 			Creds:  credentials.NewIAM(""),
+			Transport: customTransport,
 		})
 		if err != nil {
 			panic(err)
@@ -312,14 +322,22 @@ func GetRedisClient() *redis.Client {
 	if !ok {
 		panic("'REDIS_PASSWORD' is not set")
 	}
-	client := redis.NewClient(&redis.Options{
+	opts := &redis.Options{
 		Addr:     endpoint,
 		Password: password,
 		DB:       0,
 		MaintNotificationsConfig: &maintnotifications.Config{
 			Mode: maintnotifications.ModeDisabled,
 		},
-	})
+	}
+	if os.Getenv("REDIS_TLS") == "1" {
+		logrus.Info("REDIS_TLS enabled")
+		opts.TLSConfig = &tls.Config{
+			MinVersion:         tls.VersionTLS12,
+			InsecureSkipVerify: true,
+		}
+	}
+	client := redis.NewClient(opts)
 	_, err := client.Ping(context.Background()).Result()
 	if err != nil {
 		panic("redis connection failed")
