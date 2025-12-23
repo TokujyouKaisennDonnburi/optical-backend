@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"github.com/rubenv/sql-migrate"
 	"net/http"
 	"os"
 	"strconv"
@@ -30,8 +31,8 @@ import (
 	"github.com/minio/minio-go/v7/pkg/credentials"
 	"github.com/sirupsen/logrus"
 	prefixed "github.com/x-cray/logrus-prefixed-formatter"
-	"gopkg.in/mail.v2"
 	"google.golang.org/genai"
+	"gopkg.in/mail.v2"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/cors"
@@ -84,7 +85,18 @@ func main() {
 	openrouterApikey := GetOpenrouterApiKey()
 
 	// Migration
-	MigrateMinio(minioClient)
+	if os.Getenv("RUNTIME_MIGRATION") == "1" {
+		migrations := &migrate.FileMigrationSource{
+			Dir: "db/migrate",
+		}
+		n, err := migrate.Exec(db.DB, "postgres", migrations, migrate.Up)
+		if err != nil {
+			panic(err.Error())
+		} else {
+			logrus.WithField("applied", n).Info("migration executed")
+		}
+		MigrateMinio(minioClient)
+	}
 	bucketName := getBucketName()
 
 	userRepository := userGateway.NewUserPsqlRepository(db)
@@ -135,7 +147,7 @@ func main() {
 		// Users
 		r.Get("/users/@me", userHandler.GetMe)
 		r.Patch("/users/@me", userHandler.UpdateMe)
-		
+
 		// Agents
 		r.Post("/agents/options", agentHandler.SuggestOptions)
 
