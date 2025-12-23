@@ -26,13 +26,13 @@ func (h *CalendarHttpHandler) UpdateCalendar(w http.ResponseWriter, r *http.Requ
 	// リクエスト
 	userId, err := auth.GetUserIdFromContext(r)
 	if err != nil {
-		render.Render(w, r, apperr.ErrInternalServerError(err))
+		_ = render.Render(w, r, apperr.ErrInternalServerError(err))
 		return
 	}
 
 	calendarId, err := uuid.Parse(chi.URLParam(r, "calendarId"))
 	if err != nil {
-		render.Render(w, r, apperr.ErrInvalidRequest(err))
+		_ = render.Render(w, r, apperr.ErrInvalidRequest(err))
 		return
 	}
 
@@ -48,7 +48,7 @@ func (h *CalendarHttpHandler) UpdateCalendar(w http.ResponseWriter, r *http.Requ
 	if request.ImageId != "" {
 		ImageId, err = uuid.Parse(request.ImageId)
 		if err != nil {
-			render.Render(w, r, apperr.ErrInvalidRequest(err))
+			_ = render.Render(w, r, apperr.ErrInvalidRequest(err))
 			return
 		}
 	}
