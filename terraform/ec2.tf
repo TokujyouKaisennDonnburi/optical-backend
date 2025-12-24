@@ -7,8 +7,8 @@ resource "aws_instance" "optical_backend_api" {
 
   iam_instance_profile   = aws_iam_instance_profile.optical_api.name
   vpc_security_group_ids = [aws_security_group.optical_api_sg.id]
-  # subnet_id              = aws_subnet.private_a.id
-  subnet_id              = aws_subnet.public_sub_a.id
+  subnet_id              = aws_subnet.private_a.id
+  # subnet_id              = aws_subnet.public_sub_a.id
 
   user_data = <<EOF
 #!/bin/bash
