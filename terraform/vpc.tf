@@ -59,3 +59,26 @@ resource "aws_subnet" "private_c" {
   cidr_block        = "10.0.11.0/24"
   availability_zone = "ap-northeast-1c"
 }
+
+# NAT Gateway
+resource "aws_eip" "nat" {
+  domain = "vpc"
+}
+
+resource "aws_nat_gateway" "nat_gateway" {
+  allocation_id = aws_eip.nat.id
+  subnet_id     = aws_subnet.public_sub_a.id
+}
+
+resource "aws_route_table" "private_nat_gateway" {
+  vpc_id = aws_vpc.optical_vpc.id
+  route {
+    cidr_block     = "0.0.0.0/0"
+    nat_gateway_id = aws_nat_gateway.nat_gateway.id
+  }
+}
+
+resource "aws_route_table_association" "private_assoc_a" {
+  subnet_id      = aws_subnet.private_a.id
+  route_table_id = aws_route_table.private_nat_gateway.id
+}
