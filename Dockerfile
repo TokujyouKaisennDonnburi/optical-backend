@@ -2,6 +2,8 @@ FROM golang:1.24-bookworm AS builder
 
 WORKDIR /app
 
+RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates
+
 COPY go.mod go.sum ./
 
 RUN go mod download
@@ -15,6 +17,7 @@ RUN CGO_ENABLED=0 GOOS=linux go build -buildvcs=false -o /usr/local/bin/go_app .
 FROM scratch
 WORKDIR /app
 
+COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 COPY --from=builder /usr/local/bin/go_app /app/go_app
 COPY --from=builder /app/db /app/db
 
