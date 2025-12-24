@@ -1,0 +1,13 @@
+services:
+  optical_backend:
+    image: ghcr.io/tokujyoukaisenndonnburi/optical-backend:latest
+    container_name: optical_backend
+    ports:
+      - 127.0.0.1:8000:8000
+    env_file:
+      - .env
+    environment:
+      - REDIS_ADDRESS=optical_redis:6379
+      - MINIO_ENDPOINT=optical-minio:9000
+      - POSTGRES_HOST=optical_postgres
+      - POSTGRES_PORT=5432

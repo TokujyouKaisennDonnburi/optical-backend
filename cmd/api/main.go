@@ -2,10 +2,13 @@ package main
 
 import (
 	"context"
+	"crypto/tls"
 	"fmt"
 	"net/http"
 	"os"
 	"strconv"
+
+	"github.com/rubenv/sql-migrate"
 
 	agentGateway "github.com/TokujouKaisenDonburi/optical-backend/internal/agent/gateway"
 	agentHandler "github.com/TokujouKaisenDonburi/optical-backend/internal/agent/handler"
@@ -30,8 +33,8 @@ import (
 	"github.com/minio/minio-go/v7/pkg/credentials"
 	"github.com/sirupsen/logrus"
 	prefixed "github.com/x-cray/logrus-prefixed-formatter"
-	"gopkg.in/mail.v2"
 	"google.golang.org/genai"
+	"gopkg.in/mail.v2"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/cors"
@@ -84,7 +87,18 @@ func main() {
 	openrouterApikey := GetOpenrouterApiKey()
 
 	// Migration
-	MigrateMinio(minioClient)
+	if os.Getenv("RUNTIME_MIGRATION") == "1" {
+		migrations := &migrate.FileMigrationSource{
+			Dir: "db/migrate",
+		}
+		n, err := migrate.Exec(db.DB, "postgres", migrations, migrate.Up)
+		if err != nil {
+			panic(err.Error())
+		} else {
+			logrus.WithField("applied", n).Info("migration executed")
+		}
+		MigrateMinio(minioClient)
+	}
 	bucketName := getBucketName()
 
 	userRepository := userGateway.NewUserPsqlRepository(db)
@@ -135,7 +149,7 @@ func main() {
 		// Users
 		r.Get("/users/@me", userHandler.GetMe)
 		r.Patch("/users/@me", userHandler.UpdateMe)
-		
+
 		// Agents
 		r.Post("/agents/options", agentHandler.SuggestOptions)
 
@@ -197,9 +211,18 @@ func MigrateMinio(client *minio.Client) {
 // PostgresのDBに接続する
 func getPostgresDB() *sqlx.DB {
 	// #63 環境変数から読むように変える
-	host := "127.0.0.1"
-	port := "5433"
-	sslMode := "disable"
+	host, ok := os.LookupEnv("POSTGRES_HOST")
+	if !ok {
+		panic("'POSTGREST_HOST' is not set")
+	}
+	port, ok := os.LookupEnv("POSTGRES_PORT")
+	if !ok {
+		panic("'POSTGRES_PORT' is not set")
+	}
+	sslMode, ok := os.LookupEnv("POSTGRES_SSLMODE")
+	if !ok {
+		panic("'POSTGRES_SSLMODE' is not set")
+	}
 	user, ok := os.LookupEnv("POSTGRES_USER")
 	if !ok {
 		panic("'POSTGRES_USER' is not set")
@@ -232,6 +255,25 @@ func GetMinIOClient() *minio.Client {
 	endpoint, ok := os.LookupEnv("MINIO_ENDPOINT")
 	if !ok {
 		panic("'MINIO_ENDPOINT' is not set'")
+	}
+	if os.Getenv("MINIO_FROM_IAM") == "1" {
+		customTransport, err := minio.DefaultTransport(true)
+		if err != nil {
+			panic(err)
+		}
+		customTransport.TLSClientConfig = &tls.Config{
+			InsecureSkipVerify: true,
+		}
+		client, err := minio.New(endpoint, &minio.Options{
+			Region: getMinioRegion(),
+			Secure: true,
+			Creds:  credentials.NewIAM(""),
+			Transport: customTransport,
+		})
+		if err != nil {
+			panic(err)
+		}
+		return client
 	}
 	accessKeyId, ok := os.LookupEnv("MINIO_ACCESS_KEY_ID")
 	if !ok {
@@ -280,14 +322,22 @@ func GetRedisClient() *redis.Client {
 	if !ok {
 		panic("'REDIS_PASSWORD' is not set")
 	}
-	client := redis.NewClient(&redis.Options{
+	opts := &redis.Options{
 		Addr:     endpoint,
 		Password: password,
 		DB:       0,
 		MaintNotificationsConfig: &maintnotifications.Config{
 			Mode: maintnotifications.ModeDisabled,
 		},
-	})
+	}
+	if os.Getenv("REDIS_TLS") == "1" {
+		logrus.Info("REDIS_TLS enabled")
+		opts.TLSConfig = &tls.Config{
+			MinVersion:         tls.VersionTLS12,
+			InsecureSkipVerify: true,
+		}
+	}
+	client := redis.NewClient(opts)
 	_, err := client.Ping(context.Background()).Result()
 	if err != nil {
 		panic("redis connection failed")
