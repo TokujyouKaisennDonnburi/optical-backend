@@ -6,23 +6,27 @@ import (
 )
 
 type Notice struct {
-	Id      uuid.UUID
-	EventId uuid.UUID
-	Title   string
-	Content string
-	IsRead  bool
+	Id         uuid.UUID
+	UserId     uuid.UUID
+	EventId    *uuid.UUID
+	CalendarId *uuid.UUID
+	Title      string
+	Content    string
+	IsRead     bool
 }
 
-func NewNotice(eventID uuid.UUID, title, content string) (*Notice, error) {
+func NewNotice(userID uuid.UUID, eventID, calendarID *uuid.UUID, title, content string) (*Notice, error) {
 	id, err := uuid.NewV7()
 	if err != nil {
 		return nil, err
 	}
 	return &Notice{
-		Id:      id,
-		EventId: eventID,
-		Title:   title,
-		Content: content,
-		IsRead:  false,
+		Id:         id,
+		UserId:     userID,
+		EventId:    eventID,
+		CalendarId: calendarID,
+		Title:      title,
+		Content:    content,
+		IsRead:     false,
 	}, nil
 }
