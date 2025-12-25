@@ -10,7 +10,7 @@ import (
 // dbタグでマッピングするためのモデル
 type NoticeListQueryModel struct {
 	Id         uuid.UUID     `db:"id"`
-	UserID     uuid.UUID     `db:"user_id"`
+	UserId     uuid.UUID     `db:"user_id"`
 	EventId    uuid.NullUUID `db:"event_id"`
 	CalendarId uuid.NullUUID `db:"calendar_id"`
 	Title      string        `db:"title"`
@@ -52,7 +52,7 @@ func (r NoticePsqlRepository) ListNoticesByUserId(
 
 		notices[i] = output.NoticeQueryOutput{
 			Id:         row.Id,
-			UserId:     row.UserID,
+			UserId:     row.UserId,
 			EventId:    eventIdPtr,
 			CalendarId: calendarIdPtr,
 			Title:      row.Title,
