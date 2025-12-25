@@ -18,6 +18,9 @@ import (
 	githubHandler "github.com/TokujouKaisenDonburi/optical-backend/internal/github/handler"
 	githubCommand "github.com/TokujouKaisenDonburi/optical-backend/internal/github/service/command"
 	githubQuery "github.com/TokujouKaisenDonburi/optical-backend/internal/github/service/query"
+	noticeRepository "github.com/TokujouKaisenDonburi/optical-backend/internal/notice/gateway"
+	noticeHandler "github.com/TokujouKaisenDonburi/optical-backend/internal/notice/handler"
+	noticeQuery "github.com/TokujouKaisenDonburi/optical-backend/internal/notice/service/query"
 	optionGateway "github.com/TokujouKaisenDonburi/optical-backend/internal/option/gateway"
 	optionHandler "github.com/TokujouKaisenDonburi/optical-backend/internal/option/handler"
 	optionQuery "github.com/TokujouKaisenDonburi/optical-backend/internal/option/service/query"
@@ -114,6 +117,9 @@ func main() {
 	calendarCommand := calendarCommand.NewCalendarCommand(calendarRepository, optionRepository, imageRepository, memberRepository, gmailRepository)
 	calendarQuery := calendarQuery.NewCalendarQuery(calendarRepository)
 	calendarHandler := calendarHandler.NewCalendarHttpHandler(eventCommand, eventQuery, calendarCommand, calendarQuery)
+	noticeRepository := noticeRepository.NewNoticePsqlRepository(db)
+	noticeQueryService := noticeQuery.NewNoticeQuery(noticeRepository)
+	noticeHttpHandler := noticeHandler.NewNoticeHttpHandler(noticeQueryService)
 
 	// Unprotected Routes
 	r.Group(func(r chi.Router) {
@@ -169,6 +175,9 @@ func main() {
 
 		// Options
 		r.Get("/options", optionHandler.GetList)
+
+		// Notices
+		r.Get("/notices", noticeHttpHandler.GetNotices)
 	})
 
 	// Start Serving
