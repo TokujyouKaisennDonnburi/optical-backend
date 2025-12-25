@@ -18,6 +18,9 @@ import (
 	githubHandler "github.com/TokujouKaisenDonburi/optical-backend/internal/github/handler"
 	githubCommand "github.com/TokujouKaisenDonburi/optical-backend/internal/github/service/command"
 	githubQuery "github.com/TokujouKaisenDonburi/optical-backend/internal/github/service/query"
+	noticeRepository "github.com/TokujouKaisenDonburi/optical-backend/internal/notice/gateway"
+	noticeHandler "github.com/TokujouKaisenDonburi/optical-backend/internal/notice/handler"
+	noticeQuery "github.com/TokujouKaisenDonburi/optical-backend/internal/notice/service/query"
 	optionGateway "github.com/TokujouKaisenDonburi/optical-backend/internal/option/gateway"
 	optionHandler "github.com/TokujouKaisenDonburi/optical-backend/internal/option/handler"
 	optionQuery "github.com/TokujouKaisenDonburi/optical-backend/internal/option/service/query"
@@ -30,8 +33,8 @@ import (
 	"github.com/minio/minio-go/v7/pkg/credentials"
 	"github.com/sirupsen/logrus"
 	prefixed "github.com/x-cray/logrus-prefixed-formatter"
-	"gopkg.in/mail.v2"
 	"google.golang.org/genai"
+	"gopkg.in/mail.v2"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/cors"
@@ -114,6 +117,9 @@ func main() {
 	calendarCommand := calendarCommand.NewCalendarCommand(calendarRepository, optionRepository, imageRepository, memberRepository, gmailRepository)
 	calendarQuery := calendarQuery.NewCalendarQuery(calendarRepository)
 	calendarHandler := calendarHandler.NewCalendarHttpHandler(eventCommand, eventQuery, calendarCommand, calendarQuery)
+	noticeRepository := noticeRepository.NewNoticePsqlRepository(db)
+	noticeQueryService := noticeQuery.NewNoticeQuery(noticeRepository)
+	noticeHttpHandler := noticeHandler.NewNoticeHttpHandler(noticeQueryService)
 
 	// Unprotected Routes
 	r.Group(func(r chi.Router) {
@@ -135,7 +141,7 @@ func main() {
 		// Users
 		r.Get("/users/@me", userHandler.GetMe)
 		r.Patch("/users/@me", userHandler.UpdateMe)
-		
+
 		// Agents
 		r.Post("/agents/options", agentHandler.SuggestOptions)
 
@@ -168,6 +174,9 @@ func main() {
 
 		// Options
 		r.Get("/options", optionHandler.GetList)
+
+		// Notices
+		r.Get("/notices", noticeHttpHandler.GetNotices)
 	})
 
 	// Start Serving
