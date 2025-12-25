@@ -2,8 +2,8 @@
 CREATE TABLE notice(
     id UUID PRIMARY KEY,
     user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE, -- ユーザーIDへの外部キー
-    event_id UUID REFERENCES event(id) ON DELETE CASCADE, -- イベントIDへの外部キー
-    calendar_id UUID REFERENCES calendar(id) ON DELETE CASCADE, -- カレンダーIDへの外部キー
+    event_id UUID REFERENCES events(id) ON DELETE CASCADE, -- イベントIDへの外部キー
+    calendar_id UUID REFERENCES calendars(id) ON DELETE CASCADE, -- カレンダーIDへの外部キー
     title VARCHAR(255) NOT NULL,
     content TEXT NOT NULL,
     is_read BOOLEAN NOT NULL DEFAULT FALSE,  -- 読んだかどうかのフラグ
