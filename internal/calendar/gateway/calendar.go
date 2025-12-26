@@ -126,10 +126,7 @@ func (r *CalendarPsqlRepository) Update(
 	ctx context.Context,
 	userId uuid.UUID,
 	calendarId uuid.UUID,
-	imageId uuid.UUID,
-	memberEmails []string,
-	optionIds []int32,
-	updateFn func(calendar *calendar.Calendar, image *calendar.Image, members []calendar.Member, options []option.Option) (*calendar.Calendar, error),
+	updateFn func(calendar *calendar.Calendar) (*calendar.Calendar, error),
 ) error {
 	return db.RunInTx(r.db, func(tx *sqlx.Tx) error {
 
@@ -139,32 +136,8 @@ func (r *CalendarPsqlRepository) Update(
 			return err
 		}
 
-		// オプション取得
-		options, err := psql.FindOptionsByIds(ctx, tx, optionIds)
-		if err != nil {
-			return err
-		}
-		// ユーザー取得
-		users, err := psql.FindUsersByEmails(ctx, tx, memberEmails)
-		if err != nil {
-			return err
-		}
-		// メンバーリスト作成
-		members := make([]calendar.Member, len(users))
-		for i, user := range users {
-			member, err := calendar.NewMember(user.Id, user.Name)
-			if err != nil {
-				continue
-			}
-			members[i] = *member
-		}
-		// 画像を取得
-		image, err := psql.FindImageById(ctx, tx, imageId)
-		if err != nil {
-			return err
-		}
 		// 更新関数実行
-		cal, err := updateFn(existingCalendar, image, members, options)
+		cal, err := updateFn(existingCalendar)
 		if err != nil {
 			return err
 		}
@@ -173,51 +146,16 @@ func (r *CalendarPsqlRepository) Update(
 		query := `
             UPDATE calendars SET
                 name = :name,
-                color = :color,
-                image_id = :imageId
+                color = :color
             WHERE id = :id AND deleted_at IS NULL
         `
 		_, err = tx.NamedExecContext(ctx, query, map[string]any{
 			"id":    cal.Id,
 			"name":  cal.Name,
 			"color": cal.Color,
-			"imageId": uuid.NullUUID{
-				UUID:  cal.Image.Id,
-				Valid: cal.Image.Valid,
-			},
 		})
 		if err != nil {
 			return err
-		}
-
-		// 全置換
-		// メンバー全削除
-		_, err = tx.ExecContext(ctx,
-			"DELETE FROM calendar_members WHERE calendar_id = $1", cal.Id)
-		if err != nil {
-			return err
-		}
-		// メンバー作成
-		if len(cal.Members) > 0 {
-			query = `
-                INSERT INTO calendar_members(calendar_id, user_id, joined_at)
-                VALUES (:calendarId, :userId, :joinedAt)
-            `
-			calendarMemberMaps := []map[string]any{}
-			for _, member := range cal.Members {
-				calendarMemberMaps = append(calendarMemberMaps, map[string]any{
-					"calendarId": cal.Id,
-					"userId":     member.UserId,
-					"joinedAt": sql.NullTime{
-						Time:  member.JoinedAt,
-						Valid: !member.JoinedAt.IsZero(),
-					},
-				})
-			}
-			_, err = tx.NamedExecContext(ctx, query, calendarMemberMaps)
-			if err != nil {
-				return err
-			}
 		}
 
 		// 全置換

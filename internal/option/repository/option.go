@@ -11,4 +11,5 @@ type OptionRepository interface {
 	FindAll(ctx context.Context) ([]option.Option, error)
 	GetList(ctx context.Context, userId uuid.UUID) ([]option.Option, error)
 	FindsByCalendarId(ctx context.Context, calendarId uuid.UUID) ([]option.Option, error)
+	FindOptionsByIds(ctx context.Context, optionIds []int32) ([]option.Option, error)
 }

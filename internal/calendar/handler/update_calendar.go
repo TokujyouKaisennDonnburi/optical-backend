@@ -13,11 +13,9 @@ import (
 )
 
 type CalendarUpdateRequest struct {
-	Name      string   `json:"name"`
-	Color     string   `json:"color"`
-	ImageId   string   `json:"imageId"`
-	Members   []string `json:"members"`
-	OptionIds []int32  `json:"optionIds"`
+	Name      string  `json:"name"`
+	Color     string  `json:"color"`
+	OptionIds []int32 `json:"optionIds"`
 }
 
 // カレンダー更新のためのHTTPハンドラー
@@ -44,22 +42,12 @@ func (h *CalendarHttpHandler) UpdateCalendar(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	var ImageId uuid.UUID
-	if request.ImageId != "" {
-		ImageId, err = uuid.Parse(request.ImageId)
-		if err != nil {
-			_ = render.Render(w, r, apperr.ErrInvalidRequest(err))
-			return
-		}
-	}
-
+	// カレンダー更新
 	err = h.calendarCommand.UpdateCalendar(r.Context(), command.CalendarUpdateInput{
 		UserId:        userId,
 		CalendarId:    calendarId,
 		CalendarName:  request.Name,
 		CalendarColor: request.Color,
-		MemberEmails:  request.Members,
-		ImageId:       ImageId,
 		OptionIds:     request.OptionIds,
 	})
 	if err != nil {
