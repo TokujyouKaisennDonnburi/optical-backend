@@ -1,33 +1,45 @@
 package gateway
 
-import "google.golang.org/genai"
+import (
+	"github.com/TokujouKaisenDonburi/optical-backend/pkg/openrouter"
+	"github.com/jmoiron/sqlx"
+)
 
-type OptionAgentGeminiRepository struct {
-	client *genai.Client
+type AgentQueryPsqlRepository struct {
+	db *sqlx.DB
+}
+
+type AgentCommandPsqlRepository struct {
+	db *sqlx.DB
 }
 
 type OptionAgentOpenRouterRepository struct {
-	apiKey string
+	openRouter *openrouter.OpenRouter
 }
 
-func NewOptionAgentGeminiRepository(
-	client *genai.Client,
-) *OptionAgentGeminiRepository {
-	if client == nil {
-		panic("genaiClient is nil")
+func NewAgentQueryPsqlRepository(
+	db *sqlx.DB,
+) *AgentQueryPsqlRepository {
+	return &AgentQueryPsqlRepository{
+		db: db,
 	}
-	return &OptionAgentGeminiRepository{
-		client: client,
+}
+
+func NewAgentCommandPsqlRepository(
+	db *sqlx.DB,
+) *AgentCommandPsqlRepository {
+	return &AgentCommandPsqlRepository{
+		db: db,
 	}
 }
 
 func NewOptionAgentOpenRouterRepository(
-	apiKey string,
+	openRouter *openrouter.OpenRouter,
 ) *OptionAgentOpenRouterRepository {
-	if apiKey == "" {
-		panic("OpenRouter API KEY is nil")
+	if openRouter == nil {
+		panic("openRouter is nil")
 	}
 	return &OptionAgentOpenRouterRepository{
-		apiKey: apiKey,
+		openRouter: openRouter,
 	}
 }

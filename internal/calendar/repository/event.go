@@ -4,6 +4,7 @@ import (
 	"context"
 	"time"
 
+	"github.com/TokujouKaisenDonburi/optical-backend/internal/agent"
 	"github.com/TokujouKaisenDonburi/optical-backend/internal/calendar"
 	"github.com/TokujouKaisenDonburi/optical-backend/internal/calendar/service/query/output"
 	"github.com/google/uuid"
@@ -36,4 +37,5 @@ type EventRepository interface {
 	) (bool, error)
 	GetEventsByDate(ctx context.Context, userId uuid.UUID, date time.Time) ([]output.EventTodayQueryOutputItem, error)
 	GetEventsByMonth(ctx context.Context, userId uuid.UUID, date time.Time) ([]output.EventTodayQueryOutputItem, error)
+	FindAnalyzableEventsByUserId(ctx context.Context, userId uuid.UUID) ([]agent.AnalyzableEvent, error)
 }
