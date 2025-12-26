@@ -57,7 +57,7 @@ func (t CalendarDetailTool) Parameters() map[string]any {
 
 func (t CalendarDetailTool) Call(ctx context.Context, input string) (string, error) {
 	logrus.WithField("user_input", input).Debug("calendar detail called")
-	err := t.streamFn(ctx, statusChunk("calendar_detail"))
+	err := t.streamFn(ctx, statusChunk("fetching_calendars"))
 	if err != nil {
 		logrus.WithError(err).Error("progress streaming error")
 	}

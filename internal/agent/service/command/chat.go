@@ -70,6 +70,8 @@ func (c *AgentCommand) Chat(ctx context.Context, input AgentCommandChatInput) er
 		openrouter.UserMessage(userPrompt),
 	}
 	return c.transactor.Transact(ctx, func(ctx context.Context) error {
+		// 生成中ステータスを送信
+		input.StreamingFn(ctx, []byte("{\"status\": \"analyzing\"}"))
 		_, err = c.openRouter.WithTools(tools).ChainStream(ctx, messages, input.StreamingFn)
 		return err
 	})

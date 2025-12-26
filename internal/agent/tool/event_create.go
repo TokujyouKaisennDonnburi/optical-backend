@@ -108,7 +108,7 @@ func (t EventCreateTool) Parameters() map[string]any {
 
 func (t EventCreateTool) Call(ctx context.Context, input string) (string, error) {
 	logrus.WithField("user_input", input).Info("event create tool called")
-	err := t.streamFn(ctx, statusChunk("event_create"))
+	err := t.streamFn(ctx, statusChunk("creating_events"))
 	if err != nil {
 		logrus.WithError(err).Error("progress streaming error")
 	}
