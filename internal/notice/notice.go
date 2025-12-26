@@ -8,14 +8,14 @@ import (
 type Notice struct {
 	Id         uuid.UUID
 	UserId     uuid.UUID
-	EventId    *uuid.UUID
-	CalendarId *uuid.UUID
+	EventId    uuid.NullUUID
+	CalendarId uuid.NullUUID
 	Title      string
 	Content    string
 	IsRead     bool
 }
 
-func NewNotice(userID uuid.UUID, eventID, calendarID *uuid.UUID, title, content string) (*Notice, error) {
+func NewNotice(userID uuid.UUID, eventID, calendarID uuid.NullUUID, title, content string) (*Notice, error) {
 	id, err := uuid.NewV7()
 	if err != nil {
 		return nil, err
