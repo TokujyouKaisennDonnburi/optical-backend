@@ -1,7 +1,9 @@
 -- +migrate Up
 CREATE TABLE notice(
     id UUID PRIMARY KEY,
-    event_id UUID NOT NULL REFERENCES events(id) ON DELETE CASCADE, -- イベントIDへの外部キー
+    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE, -- ユーザーIDへの外部キー
+    event_id UUID REFERENCES events(id) ON DELETE CASCADE, -- イベントIDへの外部キー
+    calendar_id UUID REFERENCES calendars(id) ON DELETE CASCADE, -- カレンダーIDへの外部キー
     title VARCHAR(255) NOT NULL,
     content TEXT NOT NULL,
     is_read BOOLEAN NOT NULL DEFAULT FALSE,  -- 読んだかどうかのフラグ
@@ -9,7 +11,9 @@ CREATE TABLE notice(
 );
 
 COMMENT ON COLUMN notice.id IS '通知ID';
+COMMENT ON COLUMN notice.user_id IS 'ユーザーID';
 COMMENT ON COLUMN notice.event_id IS 'イベントID';
+COMMENT ON COLUMN notice.calendar_id IS 'カレンダーID';
 COMMENT ON COLUMN notice.title IS '通知タイトル';
 COMMENT ON COLUMN notice.content IS '通知内容';
 COMMENT ON COLUMN notice.is_read IS '読んだかどうかのフラグ';
