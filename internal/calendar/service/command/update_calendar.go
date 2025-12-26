@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/TokujouKaisenDonburi/optical-backend/internal/calendar"
+	"github.com/TokujouKaisenDonburi/optical-backend/internal/option"
 	"github.com/TokujouKaisenDonburi/optical-backend/pkg/apperr"
 	"github.com/google/uuid"
 )
@@ -18,17 +19,12 @@ type CalendarUpdateInput struct {
 
 func (c *CalendarCommand) UpdateCalendar(ctx context.Context, input CalendarUpdateInput) error {
 
-	// オプション取得
-	options, err := c.optionRepository.FindOptionsByIds(ctx, input.OptionIds)
-	if err != nil {
-		return err
-	}
-
-	err = c.calendarRepository.Update(
+	err := c.calendarRepository.Update(
 		ctx,
 		input.UserId,
 		input.CalendarId,
-		func(existingCalendar *calendar.Calendar) (*calendar.Calendar, error) {
+		input.OptionIds,
+		func(existingCalendar *calendar.Calendar, options []option.Option) (*calendar.Calendar, error) {
 			if len(options) != len(input.OptionIds) {
 				return nil, apperr.ValidationError("invalid option ids")
 			}

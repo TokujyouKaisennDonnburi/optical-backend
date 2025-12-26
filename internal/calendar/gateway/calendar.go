@@ -126,7 +126,8 @@ func (r *CalendarPsqlRepository) Update(
 	ctx context.Context,
 	userId uuid.UUID,
 	calendarId uuid.UUID,
-	updateFn func(calendar *calendar.Calendar) (*calendar.Calendar, error),
+	optionIds []int32,
+	updateFn func(calendar *calendar.Calendar, options []option.Option) (*calendar.Calendar, error),
 ) error {
 	return db.RunInTx(r.db, func(tx *sqlx.Tx) error {
 
@@ -136,8 +137,14 @@ func (r *CalendarPsqlRepository) Update(
 			return err
 		}
 
+		// オプション取得
+		options, err := psql.FindOptionsByIds(ctx, tx, optionIds)
+		if err != nil {
+			return err
+		}
+
 		// 更新関数実行
-		cal, err := updateFn(existingCalendar)
+		cal, err := updateFn(existingCalendar, options)
 		if err != nil {
 			return err
 		}

@@ -22,8 +22,10 @@ type CalendarRepository interface {
 		ctx context.Context,
 		userId uuid.UUID,
 		calendarId uuid.UUID,
+		optionIds []int32,
 		updateFn func(
 			existingCalendar *calendar.Calendar,
+			options []option.Option,
 		) (*calendar.Calendar, error),
 	) error
 
