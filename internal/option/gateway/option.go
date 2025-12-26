@@ -6,6 +6,7 @@ import (
 	"github.com/TokujouKaisenDonburi/optical-backend/internal/option"
 	"github.com/TokujouKaisenDonburi/optical-backend/pkg/psql"
 	"github.com/jmoiron/sqlx"
+	"github.com/lib/pq"
 )
 
 type OptionPsqlRepository struct {
@@ -40,4 +41,30 @@ func (r *OptionPsqlRepository) FindAll(ctx context.Context) ([]option.Option, er
 		}
 	}
 	return options, err
+}
+
+func (r *OptionPsqlRepository) FindOptionsByIds(ctx context.Context, optionIds []int32) ([]option.Option, error) {
+	if len(optionIds) == 0 {
+		return []option.Option{}, nil
+	}
+	query := `
+		SELECT id, name
+		FROM options
+		WHERE id = ANY($1)
+		AND deprecated = FALSE
+		ORDER BY id
+	`
+	var models []psql.OptionModel
+	err := r.db.SelectContext(ctx, &models, query, pq.Array(optionIds))
+	if err != nil {
+		return nil, err
+	}
+	options := make([]option.Option, len(models))
+	for i, model := range models {
+		options[i] = option.Option{
+			Id:   model.Id,
+			Name: model.Name,
+		}
+	}
+	return options, nil
 }
