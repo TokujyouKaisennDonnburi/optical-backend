@@ -104,6 +104,7 @@ func (r OpenRouter) ChainStream(
 				Content:    toolOutput,
 			})
 		}
+		streamingFn(ctx, []byte("{\"status\": \"generating\"}"))
 		return r.ChainStream(ctx, messages, streamingFn)
 		// エラー
 	case reason_error:

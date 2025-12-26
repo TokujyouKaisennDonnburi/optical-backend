@@ -81,7 +81,7 @@ func (t CalendarEventSearchTool) Call(ctx context.Context, input string) (string
 		logrus.WithField("user_input", input).Error("invalid user input time")
 		return "", errors.New("input time is nil")
 	}
-	err := t.streamFn(ctx, statusChunk("calendar_event_search"))
+	err := t.streamFn(ctx, statusChunk("fetching_events"))
 	if err != nil {
 		logrus.WithError(err).Error("progress streaming error")
 	}
