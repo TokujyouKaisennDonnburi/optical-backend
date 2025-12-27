@@ -40,12 +40,12 @@ func (h *NoticeHttpHandler) GetNotices(w http.ResponseWriter, r *http.Request) {
 	notice := make([]NoticeResponse, len(output))
 	for i, n := range output {
 		var eventIdStrPtr, calendarIdStrPtr *string
-		if n.EventId != nil {
-			s := n.EventId.String()
+		if n.EventId.Valid {
+			s := n.EventId.UUID.String()
 			eventIdStrPtr = &s
 		}
-		if n.CalendarId != nil {
-			s := n.CalendarId.String()
+		if n.CalendarId.Valid {
+			s := n.CalendarId.UUID.String()
 			calendarIdStrPtr = &s
 		}
 

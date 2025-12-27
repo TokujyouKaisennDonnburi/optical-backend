@@ -41,20 +41,11 @@ func (r NoticePsqlRepository) ListNoticesByUserId(
 	notices := make([]output.NoticeQueryOutput, len(rows))
 	for i, row := range rows {
 
-		var eventIdPtr *uuid.UUID
-		if row.EventId.Valid {
-			eventIdPtr = &row.EventId.UUID
-		}
-		var calendarIdPtr *uuid.UUID
-		if row.CalendarId.Valid {
-			calendarIdPtr = &row.CalendarId.UUID
-		}
-
 		notices[i] = output.NoticeQueryOutput{
 			Id:         row.Id,
 			UserId:     row.UserId,
-			EventId:    eventIdPtr,
-			CalendarId: calendarIdPtr,
+			EventId:    row.EventId,
+			CalendarId: row.CalendarId,
 			Title:      row.Title,
 			Content:    row.Content,
 			IsRead:     row.IsRead,

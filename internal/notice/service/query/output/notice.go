@@ -8,8 +8,8 @@ import (
 type NoticeQueryOutput struct {
 	Id         uuid.UUID
 	UserId     uuid.UUID
-	EventId    *uuid.UUID
-	CalendarId *uuid.UUID
+	EventId    uuid.NullUUID
+	CalendarId uuid.NullUUID
 	Title      string
 	Content    string
 	IsRead     bool
