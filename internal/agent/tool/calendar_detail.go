@@ -50,8 +50,8 @@ func (t CalendarDetailTool) Strict() bool {
 
 func (t CalendarDetailTool) Parameters() map[string]any {
 	return map[string]any{
-		"type":   "string",
-		"format": "uuid",
+		"type":   "object",
+		"properties": map[string]any{},
 	}
 }
 

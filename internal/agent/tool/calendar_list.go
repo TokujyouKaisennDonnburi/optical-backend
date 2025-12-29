@@ -46,7 +46,10 @@ func (t CalendarListTool) Strict() bool {
 }
 
 func (t CalendarListTool) Parameters() map[string]any {
-	return map[string]any{}
+	return map[string]any{
+		"type": "object",
+		"properties": map[string]any{},
+	}
 }
 
 func (t CalendarListTool) Call(ctx context.Context, input string) (string, error) {

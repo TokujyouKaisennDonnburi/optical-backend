@@ -45,7 +45,7 @@ func (t EventCreateTool) Description() string {
 }
 
 func (t EventCreateTool) Strict() bool {
-	return true
+	return false
 }
 
 type UserInputModel struct {
@@ -54,7 +54,7 @@ type UserInputModel struct {
 }
 
 type EventCreateModel struct {
-	Title      string    `json:"title"`
+	Title      string    `json:"event_title"`
 	Memo       string    `json:"memo"`
 	Location   string    `json:"location"`
 	IsAllday   bool      `json:"is_allday"`
@@ -70,13 +70,12 @@ func (t EventCreateTool) Parameters() map[string]any {
 				"type":   "string",
 				"format": "uuid",
 			},
-
 			"events": map[string]any{
 				"type": "array",
 				"items": map[string]any{
 					"type": "object",
 					"properties": map[string]any{
-						"title": map[string]any{
+						"event_title": map[string]any{
 							"type": "string",
 						},
 						"memo": map[string]any{
@@ -100,6 +99,7 @@ func (t EventCreateTool) Parameters() map[string]any {
 						},
 					},
 					"required": []string{"title", "is_allday", "start_at", "end_at"},
+					"additionalProperties": false,
 				},
 			},
 		},
