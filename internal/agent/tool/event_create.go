@@ -45,7 +45,7 @@ func (t EventCreateTool) Description() string {
 }
 
 func (t EventCreateTool) Strict() bool {
-	return true
+	return false
 }
 
 type UserInputModel struct {
@@ -70,7 +70,6 @@ func (t EventCreateTool) Parameters() map[string]any {
 				"type":   "string",
 				"format": "uuid",
 			},
-
 			"events": map[string]any{
 				"type": "array",
 				"items": map[string]any{
@@ -100,6 +99,7 @@ func (t EventCreateTool) Parameters() map[string]any {
 						},
 					},
 					"required": []string{"title", "is_allday", "start_at", "end_at"},
+					"additionalProperties": false,
 				},
 			},
 		},
