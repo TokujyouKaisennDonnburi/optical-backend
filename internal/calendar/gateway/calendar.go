@@ -122,3 +122,75 @@ func (r *CalendarPsqlRepository) Create(
 	})
 }
 
+func (r *CalendarPsqlRepository) Update(
+	ctx context.Context,
+	userId uuid.UUID,
+	calendarId uuid.UUID,
+	optionIds []int32,
+	updateFn func(calendar *calendar.Calendar, options []option.Option) (*calendar.Calendar, error),
+) error {
+	return db.RunInTx(r.db, func(tx *sqlx.Tx) error {
+
+		// カレンダー取得
+		existingCalendar, err := psql.FindCalendarByUserIdAndId(ctx, tx, userId, calendarId)
+		if err != nil {
+			return err
+		}
+
+		// オプション取得
+		options, err := psql.FindOptionsByIds(ctx, tx, optionIds)
+		if err != nil {
+			return err
+		}
+
+		// 更新関数実行
+		cal, err := updateFn(existingCalendar, options)
+		if err != nil {
+			return err
+		}
+
+		// カレンダー更新
+		query := `
+            UPDATE calendars SET
+                name = :name,
+                color = :color
+            WHERE id = :id AND deleted_at IS NULL
+        `
+		_, err = tx.NamedExecContext(ctx, query, map[string]any{
+			"id":    cal.Id,
+			"name":  cal.Name,
+			"color": cal.Color,
+		})
+		if err != nil {
+			return err
+		}
+
+		// 全置換
+		// オプション全削除
+		_, err = tx.ExecContext(ctx,
+			"DELETE FROM calendar_options WHERE calendar_id = $1", cal.Id)
+		if err != nil {
+			return err
+		}
+		// オプション設定
+		if len(cal.Options) > 0 {
+			query = `
+                INSERT INTO calendar_options(calendar_id, option_id)
+                VALUES (:calendarId, :optionId)
+            `
+			calendarOptionMaps := []map[string]any{}
+			for _, option := range cal.Options {
+				calendarOptionMaps = append(calendarOptionMaps, map[string]any{
+					"calendarId": cal.Id,
+					"optionId":   option.Id,
+				})
+			}
+			_, err = tx.NamedExecContext(ctx, query, calendarOptionMaps)
+			if err != nil {
+				return err
+			}
+		}
+
+		return nil
+	})
+}
