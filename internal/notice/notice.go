@@ -22,6 +22,7 @@ type Notice struct {
 	Title      string
 	Content    string
 	IsRead     bool
+	CreatedAt  string
 }
 
 func NewNotice(userID uuid.UUID, eventID, calendarID uuid.NullUUID, title, content string) (*Notice, error) {

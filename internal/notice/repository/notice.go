@@ -3,7 +3,7 @@ package repository
 import (
 	"context"
 
-	"github.com/TokujouKaisenDonburi/optical-backend/internal/notice/service/query/output"
+	"github.com/TokujouKaisenDonburi/optical-backend/internal/notice"
 	"github.com/google/uuid"
 )
 
@@ -13,5 +13,5 @@ type NoticeRepository interface {
 	ListNoticesByUserId(
 		ctx context.Context,
 		userId uuid.UUID,
-	) ([]output.NoticeQueryOutput, error)
+	) ([]notice.Notice, error)
 }

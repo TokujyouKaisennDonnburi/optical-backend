@@ -3,7 +3,7 @@ package gateway
 import (
 	"context"
 
-	"github.com/TokujouKaisenDonburi/optical-backend/internal/notice/service/query/output"
+	"github.com/TokujouKaisenDonburi/optical-backend/internal/notice"
 	"github.com/google/uuid"
 )
 
@@ -22,7 +22,7 @@ type NoticeListQueryModel struct {
 func (r NoticePsqlRepository) ListNoticesByUserId(
 	ctx context.Context,
 	userId uuid.UUID,
-) ([]output.NoticeQueryOutput, error) {
+) ([]notice.Notice, error) {
 	query := `
 		SELECT id, user_id, event_id, calendar_id, title, content, is_read, created_at
 		FROM notice
@@ -38,10 +38,10 @@ func (r NoticePsqlRepository) ListNoticesByUserId(
 	}
 
 	// 出力形式に変換
-	notices := make([]output.NoticeQueryOutput, len(rows))
+	notices := make([]notice.Notice, len(rows))
 	for i, row := range rows {
 
-		notices[i] = output.NoticeQueryOutput{
+		notices[i] = notice.Notice{
 			Id:         row.Id,
 			UserId:     row.UserId,
 			EventId:    row.EventId,
