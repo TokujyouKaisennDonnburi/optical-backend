@@ -1,0 +1,19 @@
+.git/**
+.github/**
+.opencode/**
+docs/**
+.air.toml
+.gitignore
+.golangci.yml
+dbconfig.yml
+migrate.sh
+psql.sh
+review.sh
+
+# enviroment
+.example.env
+.env
+*.pem
+
+# binary
+tmp/**`
