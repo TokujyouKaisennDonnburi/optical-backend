@@ -1258,15 +1258,11 @@ components:
         eventId:
           type: string
           format: uuid
-          nullable: true
-          description: イベントID（関連がある場合）
-          example: null
+          description: イベントID（関連がある場合のみ含まれる）
         calendarId:
           type: string
           format: uuid
-          nullable: true
-          description: カレンダーID（関連がある場合）
-          example: null
+          description: カレンダーID（関連がある場合のみ含まれる）
         title:
           type: string
           description: 通知タイトル

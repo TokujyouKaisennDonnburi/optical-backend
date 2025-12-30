@@ -10,14 +10,14 @@ import (
 )
 
 type NoticeResponse struct {
-	Id         string  `json:"id"`
-	UserId     string  `json:"userId"`
-	EventId    *string `json:"eventId"`
-	CalendarId *string `json:"calendarId"`
-	Title      string  `json:"title"`
-	Content    string  `json:"content"`
-	IsRead     bool    `json:"isRead"`
-	CreatedAt  string  `json:"createdAt"`
+	Id         string `json:"id"`
+	UserId     string `json:"userId"`
+	EventId    string `json:"eventId,omitempty"`
+	CalendarId string `json:"calendarId,omitempty"`
+	Title      string `json:"title"`
+	Content    string `json:"content"`
+	IsRead     bool   `json:"isRead"`
+	CreatedAt  string `json:"createdAt"`
 }
 
 func (h *NoticeHttpHandler) GetNotices(w http.ResponseWriter, r *http.Request) {
@@ -39,25 +39,20 @@ func (h *NoticeHttpHandler) GetNotices(w http.ResponseWriter, r *http.Request) {
 	// レスポンスに変換
 	notice := make([]NoticeResponse, len(output))
 	for i, n := range output {
-		var eventIdStrPtr, calendarIdStrPtr *string
-		if n.EventId.Valid {
-			s := n.EventId.UUID.String()
-			eventIdStrPtr = &s
-		}
-		if n.CalendarId.Valid {
-			s := n.CalendarId.UUID.String()
-			calendarIdStrPtr = &s
-		}
 
 		notice[i] = NoticeResponse{
-			Id:         n.Id.String(),
-			UserId:     n.UserId.String(),
-			EventId:    eventIdStrPtr,
-			CalendarId: calendarIdStrPtr,
-			Title:      n.Title,
-			Content:    n.Content,
-			IsRead:     n.IsRead,
-			CreatedAt:  n.CreatedAt,
+			Id:        n.Id.String(),
+			UserId:    n.UserId.String(),
+			Title:     n.Title,
+			Content:   n.Content,
+			IsRead:    n.IsRead,
+			CreatedAt: n.CreatedAt,
+		}
+		if n.EventId.Valid {
+			notice[i].EventId = n.EventId.UUID.String()
+		}
+		if n.CalendarId.Valid {
+			notice[i].CalendarId = n.CalendarId.UUID.String()
 		}
 	}
 
