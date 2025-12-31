@@ -19,7 +19,7 @@ func NewNoticePsqlRepository(db *sqlx.DB) *NoticePsqlRepository {
 }
 
 // 通知作成
-func (r NoticePsqlRepository) Create(
+func (r NoticePsqlRepository) CreateNotice(
 	ctx context.Context,
 	notice *notice.Notice,
 ) error {
