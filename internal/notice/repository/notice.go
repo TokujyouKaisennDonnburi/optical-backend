@@ -14,4 +14,10 @@ type NoticeRepository interface {
 		ctx context.Context,
 		userId uuid.UUID,
 	) ([]notice.Notice, error)
+
+	// 作成
+	CreateNotice(
+		ctx context.Context,
+		notice *notice.Notice,
+	) error
 }
