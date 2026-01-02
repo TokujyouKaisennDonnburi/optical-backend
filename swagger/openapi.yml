@@ -20,6 +20,8 @@ tags:
     description: AI agent functionality
   - name: github
     description: GitHub integration
+  - name: notices
+    description: Notifications management
 paths:
   /register:
     post:
@@ -496,6 +498,27 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/OptionResponse"
+        "401":
+          description: Unauthorized
+        "500":
+          description: Internal server error
+  /notices:
+    get:
+      summary: Get list of notices for current user
+      description: ログインユーザーに紐づく通知一覧を取得します。
+      tags:
+        - notices
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Notices retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/NoticeResponse"
         "401":
           description: Unauthorized
         "500":
@@ -1219,3 +1242,41 @@ components:
           format: int32
         name:
           type: string
+    NoticeResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: 通知ID
+          example: "45a9ee74-a3df-4d4f-b1fb-ef34cf67681e"
+        userId:
+          type: string
+          format: uuid
+          description: ユーザーID
+          example: "019b56be-27de-7856-b0fa-343e8a507a20"
+        eventId:
+          type: string
+          format: uuid
+          description: イベントID（関連がある場合のみ含まれる）
+        calendarId:
+          type: string
+          format: uuid
+          description: カレンダーID（関連がある場合のみ含まれる）
+        title:
+          type: string
+          description: 通知タイトル
+          example: "新しい通知"
+        content:
+          type: string
+          description: 通知内容
+          example: "テストユーザーへの通知です"
+        isRead:
+          type: boolean
+          description: 既読フラグ
+          example: false
+        createdAt:
+          type: string
+          format: date-time
+          description: 作成日時
+          example: "2025-12-25T18:21:17.902871Z"
