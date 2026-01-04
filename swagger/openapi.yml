@@ -652,6 +652,32 @@ paths:
           description: Invalid request
         '500':
           description: Internal server error
+  /github/calendars/{calendarId}/milestones:
+    get:
+      summary: Get milestones for a calendar
+      tags: [github]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: calendarId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Milestones retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/GithubMilestoneResponse'
+        '400':
+          description: Invalid request
+        '500':
+          description: Internal server error
 components:
   securitySchemes:
     bearerAuth:
@@ -1184,6 +1210,17 @@ components:
           type: string
           format: url
         assigned:
+          type: integer
+    GithubMilestoneResponse:
+      type: object
+      properties:
+        title:
+          type: string
+        progress:
+          type: integer
+        open:
+          type: integer
+        close:
           type: integer
     Member:
       type: object
