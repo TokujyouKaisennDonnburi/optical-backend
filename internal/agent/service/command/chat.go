@@ -10,6 +10,7 @@ import (
 	"github.com/TokujouKaisenDonburi/optical-backend/pkg/apperr"
 	"github.com/TokujouKaisenDonburi/optical-backend/pkg/openrouter"
 	"github.com/google/uuid"
+	"github.com/sirupsen/logrus"
 )
 
 const (
@@ -71,7 +72,10 @@ func (c *AgentCommand) Chat(ctx context.Context, input AgentCommandChatInput) er
 	}
 	return c.transactor.Transact(ctx, func(ctx context.Context) error {
 		// 生成中ステータスを送信
-		input.StreamingFn(ctx, []byte("{\"status\": \"analyzing\"}"))
+		err = input.StreamingFn(ctx, []byte("{\"status\": \"analyzing\"}"))
+		if err != nil {
+			logrus.WithError(err).Error("status streaming error")
+		}
 		_, err = c.openRouter.WithTools(tools).ChainStream(ctx, messages, input.StreamingFn)
 		return err
 	})
