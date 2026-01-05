@@ -19,7 +19,7 @@ go install github.com/air-verse/air@latest
 brew install minio/stable/mc
 
 # linux
-wget https://dl.min.io/client/mc/release/linux-amd64/mc
+curl -L https://dl.min.io/client/mc/release/linux-amd64/mc -o mc
 chmod +x mc
 sudo mv mc /usr/local/bin
 ```
