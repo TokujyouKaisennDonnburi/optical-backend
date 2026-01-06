@@ -10,19 +10,45 @@ import (
 
 type SchedulerCreateInput struct {
 	CalendarId uuid.UUID
-	UserId uuid.UUID
-	Title     string
-	Memo      string
-	StartTime time.Time
-	EndTime   time.Time
-	LimitTime time.Time
-	IsAllDay  bool
+	UserId     uuid.UUID
+	Title      string
+	Memo       string
+	StartTime  time.Time
+	EndTime    time.Time
+	LimitTime  time.Time
+	IsAllDay   bool
 }
 
-func (c *SchedulerCommand) CreateScheduler(ctx context.Context, input SchedulerCreateInput)(*scheduler.Scheduler, error){
-	scheduler, err := scheduler.NewScheduler(ctx, input.CalendarId, input.UserId, input.Title,input.Memo, input.StartTime, input.EndTime, input.LimitTime, input.IsAllDay)
+type SchedulerCreateOutput struct {
+	Id         uuid.UUID
+	CalendarId uuid.UUID
+	UserId     uuid.UUID
+	Title      string
+	Memo       string
+	StartTime  time.Time
+	EndTime    time.Time
+	LimitTime  time.Time
+	IsAllDay   bool
+}
+
+func (c *SchedulerCommand) CreateScheduler(ctx context.Context, input SchedulerCreateInput) (*scheduler.Scheduler, error) {
+	scheduler, err := scheduler.NewScheduler(ctx, input.CalendarId, input.UserId, input.Title, input.Memo, input.StartTime, input.EndTime, input.LimitTime, input.IsAllDay)
 	if err != nil {
 		return nil, err
 	}
+	result, err := c.schedulerRepository.CreateScheduler(ctx, scheduler.Id, scheduler.CalendarId, scheduler.Title, scheduler.Memo, scheduler.StartTime, scheduler.EndTime, scheduler.LimitTime, scheduler.IsAllDay)
+	if err != nil {
+		return nil, err
+	}
+	return &SchedulerCreateOutput{
+		Id: result.Id,
+		CalendarId: result.CalendarId,
+		UserId: result.UserId,
+		Title: result.Title,
+		Memo: result.Memo,
+		StartTime: result.StartTime,
+		EndTime: result.EndTime,
+		LimitTime: result.LimitTime,
+		IsAllDay: result.IsAllDay,
+	}, nil
 }
-
