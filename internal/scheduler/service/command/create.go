@@ -4,11 +4,13 @@ import (
 	"context"
 	"time"
 
-	"github.com/TokujouKaisenDonburi/optical-backend/internal/calendar"
 	"github.com/TokujouKaisenDonburi/optical-backend/internal/scheduler"
+	"github.com/google/uuid"
 )
 
 type SchedulerCreateInput struct {
+	CalendarId uuid.UUID
+	UserId uuid.UUID
 	Title     string
 	Memo      string
 	StartTime time.Time
@@ -18,11 +20,9 @@ type SchedulerCreateInput struct {
 }
 
 func (c *SchedulerCommand) CreateScheduler(ctx context.Context, input SchedulerCreateInput)(*scheduler.Scheduler, error){
-	// 予定時間を作成
-	scheduledTime, err := calendar.NewScheduledTime(input.IsAllDay, input.StartTime, input.EndTime)
+	scheduler, err := scheduler.NewScheduler(ctx, input.CalendarId, input.UserId, input.Title,input.Memo, input.StartTime, input.EndTime, input.LimitTime, input.IsAllDay)
 	if err != nil {
 		return nil, err
 	}
-	scheduler, err := scheduler.NewScheduler(ctx, input.CalendarId)
 }
 
