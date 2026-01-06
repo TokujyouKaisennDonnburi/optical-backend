@@ -102,12 +102,20 @@ func (s *Scheduler) SetStartEndTime(startTime, endTime time.Time) error {
 	s.EndTime = endTime
 	return nil
 }
+
 func (s *Scheduler) SetLimitTime(limitTime time.Time) error {
-	if limitTime.IsZero() {
-		return apperr.ValidationError("limit time is invalid")
-	}
-	s.LimitTime = limitTime
-	return nil
+    if limitTime.IsZero() {
+        return apperr.ValidationError("limit time is invalid")
+    }
+    now := time.Now()
+    if limitTime.After(s.StartTime) {
+        return apperr.ValidationError("limit time must be before or equal to startTime")
+    }
+    if limitTime.Before(now) || limitTime.Equal(now) {
+        return apperr.ValidationError("limit time must be after current time")
+    }
+    s.LimitTime = limitTime
+    return nil
 }
 
 func NewAttendance(id, schedulerId, userId uuid.UUID, comment string) (*SchedulerAttendance, error) {
