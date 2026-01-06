@@ -247,7 +247,12 @@ func (r OpenRouter) Stream(
 				},
 			}, nil
 		}
-		streamChunk := fmt.Sprintf("{\"content\":\"%s\"}", delta.Content)
+		jsonDelta, err := json.Marshal(delta.Content)
+		if err != nil {
+			logrus.WithError(err).Error("delta content json marshal error")
+			continue
+		}
+		streamChunk := fmt.Sprintf("{\"content\":%s}", string(jsonDelta))
 		if err := streamFn(ctx, []byte(streamChunk)); err != nil {
 			logrus.WithError(err).Error("chunk streamingFn error")
 			continue
