@@ -2,6 +2,7 @@
 CREATE TABLE scheduler(
     id UUID PRIMARY KEY,
     calendar_id UUID NOT NULL,
+    user_id UUID NOT NULL,
     title VARCHAR(255) NOT NULL,
     memo VARCHAR(255) NOT NULL,
     start_time TIMESTAMPTZ NOT NULL,
@@ -31,6 +32,7 @@ CREATE TABLE scheduler_status(
 -- scheduler
 COMMENT ON COLUMN scheduler.id IS 'スケジューラーID';
 COMMENT ON COLUMN scheduler.calendar_id IS 'カレンダーID';
+COMMENT ON COLUMN scheduler.user_id IS '作成ユーザーID';
 COMMENT ON COLUMN scheduler.title IS 'スケジューラータイトル';
 COMMENT ON COLUMN scheduler.memo IS 'メモ';
 COMMENT ON COLUMN scheduler.start_time IS '開始時間';

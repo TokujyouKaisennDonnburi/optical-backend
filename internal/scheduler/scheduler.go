@@ -21,6 +21,7 @@ const (
 type Scheduler struct {
 	Id         uuid.UUID
 	CalendarId uuid.UUID
+	UserId     uuid.UUID
 	Title      string
 	Memo       string
 	StartTime  time.Time
@@ -42,7 +43,7 @@ type SchedulerStatus struct {
 	Status       Status
 }
 
-func NewScheduler(userId, calendarId uuid.UUID, title, memo string, startTime, endTime, limitTime time.Time, isAllDay bool) (*Scheduler, error) {
+func NewScheduler(calendarId, userId uuid.UUID, title, memo string, startTime, endTime, limitTime time.Time, isAllDay bool) (*Scheduler, error) {
 	id, err := uuid.NewV7()
 	if err != nil {
 		return nil, err
@@ -50,9 +51,13 @@ func NewScheduler(userId, calendarId uuid.UUID, title, memo string, startTime, e
 	if calendarId == uuid.Nil {
 		return nil, errors.New("calendarId is nil")
 	}
+	if userId == uuid.Nil {
+		return nil, errors.New("userId is nil")
+	}
 	s, err := &Scheduler{
 		Id:         id,
 		CalendarId: calendarId,
+		UserId:     userId,
 		Title:      title,
 		Memo:       memo,
 		StartTime:  startTime,
@@ -104,18 +109,18 @@ func (s *Scheduler) SetStartEndTime(startTime, endTime time.Time) error {
 }
 
 func (s *Scheduler) SetLimitTime(limitTime time.Time) error {
-    if limitTime.IsZero() {
-        return apperr.ValidationError("limit time is invalid")
-    }
-    now := time.Now()
-    if limitTime.After(s.StartTime) {
-        return apperr.ValidationError("limit time must be before or equal to startTime")
-    }
-    if limitTime.Before(now) || limitTime.Equal(now) {
-        return apperr.ValidationError("limit time must be after current time")
-    }
-    s.LimitTime = limitTime
-    return nil
+	if limitTime.IsZero() {
+		return apperr.ValidationError("limit time is invalid")
+	}
+	now := time.Now()
+	if limitTime.After(s.StartTime) {
+		return apperr.ValidationError("limit time must be before or equal to startTime")
+	}
+	if limitTime.Before(now) || limitTime.Equal(now) {
+		return apperr.ValidationError("limit time must be after current time")
+	}
+	s.LimitTime = limitTime
+	return nil
 }
 
 func NewAttendance(id, schedulerId, userId uuid.UUID, comment string) (*SchedulerAttendance, error) {
