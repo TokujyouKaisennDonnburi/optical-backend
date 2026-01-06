@@ -98,7 +98,7 @@ func (t EventCreateTool) Parameters() map[string]any {
 							"format":      "date-time",
 						},
 					},
-					"required": []string{"title", "is_allday", "start_at", "end_at"},
+					"required": []string{"event_title", "is_allday", "start_at", "end_at"},
 					"additionalProperties": false,
 				},
 			},
@@ -171,52 +171,4 @@ func (t EventCreateTool) Call(ctx context.Context, input string) (string, error)
 	}
 	logrus.WithField("len", len(events)).Info("event create tool called")
 	return string(output), nil
-}
-
-func (t EventCreateTool) ParametersUserInput() map[string]any {
-	return map[string]any{
-		"type": "object",
-		"properties": map[string]any{
-			"calendar_id": map[string]any{
-				"type":   "string",
-				"format": "uuid",
-			},
-			"events": map[string]any{
-				"type": "array",
-				"properties": map[string]any{
-					"type": "object",
-					"properties": map[string]any{
-						"calendar_id": map[string]any{
-							"type":   "string",
-							"format": "uuid",
-						},
-						"title": map[string]any{
-							"type": "string",
-						},
-						"memo": map[string]any{
-							"type": "string",
-						},
-						"location": map[string]any{
-							"type": "string",
-						},
-						"is_allday": map[string]any{
-							"type": "boolean",
-						},
-						"start_at": map[string]any{
-							"type":        "string",
-							"description": "RFC3339",
-							"format":      "date-time",
-						},
-						"end_at": map[string]any{
-							"type":        "string",
-							"description": "RFC3339",
-							"format":      "date-time",
-						},
-					},
-					"required": []string{"title", "is_allday", "start_at", "end_at"},
-				},
-			},
-		},
-		"required": []string{"calendar_id", "events"},
-	}
 }
