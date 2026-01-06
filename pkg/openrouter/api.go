@@ -114,7 +114,7 @@ func (r *OpenRouter) Fetch(ctx context.Context, messages []Message) (*OpenRouter
 		if err == nil {
 			entry = entry.WithField("responseBody", body)
 		}
-		entry.Error("openRouter reqeuest error")
+		entry.Error("openRouter request error")
 		return nil, ErrChatCompletionFailed
 	}
 	var respBody OpenRouterResponse

@@ -44,7 +44,7 @@ func (h *AgentHandler) CalendarChat(w http.ResponseWriter, r *http.Request) {
 	}
 	calendarId, err := uuid.Parse(chi.URLParam(r, "calendarId"))
 	if err != nil {
-		logrus.WithError(err).Error("userId decrypt error")
+		logrus.WithError(err).Error("calendarId decrypt error")
 		return
 	}
 
