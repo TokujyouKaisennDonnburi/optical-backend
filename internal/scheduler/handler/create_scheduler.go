@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"net/http"
 	"time"
 
 	"github.com/google/uuid"
@@ -24,4 +25,7 @@ type SchedulerCreateResponse struct {
 	IsAllDay   bool      `json:"isAllDay"`
 }
 
-func SchedulerCreate
+func (h *SchedulerHttpHandler)SchedulerCreate(w http.ResponseWritter, r *http.Request) {
+	userId, err := auth.GetUser
+	
+}
