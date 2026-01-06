@@ -25,7 +25,7 @@ const (
 var (
 	ErrModelNotSet          = errors.New("openrouter model is not set")
 	ErrMessageNoContent     = errors.New("message content length is zero")
-	ErrResponseNoChoices    = errors.New("message content length is zero")
+	ErrResponseNoChoices    = errors.New("response choices length is zero")
 	ErrChatCompletionFailed = errors.New("completion api request failed")
 )
 
