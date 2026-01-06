@@ -54,7 +54,7 @@ func NewScheduler(calendarId, userId uuid.UUID, title, memo string, startTime, e
 	if userId == uuid.Nil {
 		return nil, errors.New("userId is nil")
 	}
-	s, err := &Scheduler{
+	s := &Scheduler{
 		Id:         id,
 		CalendarId: calendarId,
 		UserId:     userId,
@@ -64,7 +64,7 @@ func NewScheduler(calendarId, userId uuid.UUID, title, memo string, startTime, e
 		EndTime:    endTime,
 		LimitTime:  limitTime,
 		IsAllDay:   isAllDay,
-	}, nil
+	}
 	err = s.SetTitle(title)
 	if err != nil {
 		return nil, err
