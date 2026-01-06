@@ -21,14 +21,6 @@ type SchedulerCreateInput struct {
 
 type SchedulerCreateOutput struct {
 	Id         uuid.UUID
-	CalendarId uuid.UUID
-	UserId     uuid.UUID
-	Title      string
-	Memo       string
-	StartTime  time.Time
-	EndTime    time.Time
-	LimitTime  time.Time
-	IsAllDay   bool
 }
 
 func (c *SchedulerCommand) CreateScheduler(ctx context.Context, input SchedulerCreateInput) (*scheduler.Scheduler, error) {
@@ -42,13 +34,5 @@ func (c *SchedulerCommand) CreateScheduler(ctx context.Context, input SchedulerC
 	}
 	return &SchedulerCreateOutput{
 		Id: result.Id,
-		CalendarId: result.CalendarId,
-		UserId: result.UserId,
-		Title: result.Title,
-		Memo: result.Memo,
-		StartTime: result.StartTime,
-		EndTime: result.EndTime,
-		LimitTime: result.LimitTime,
-		IsAllDay: result.IsAllDay,
 	}, nil
 }
