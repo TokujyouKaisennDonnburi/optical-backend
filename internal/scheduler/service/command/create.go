@@ -4,8 +4,8 @@ import (
 	"context"
 	"time"
 
+	"github.com/TokujouKaisenDonburi/optical-backend/internal/calendar"
 	"github.com/TokujouKaisenDonburi/optical-backend/internal/scheduler"
-	"github.com/google/uuid"
 )
 
 type SchedulerCreateInput struct {
@@ -23,5 +23,6 @@ func (c *SchedulerCommand) CreateScheduler(ctx context.Context, input SchedulerC
 	if err != nil {
 		return nil, err
 	}
+	scheduler, err := scheduler.NewScheduler(ctx, input.CalendarId)
 }
 
