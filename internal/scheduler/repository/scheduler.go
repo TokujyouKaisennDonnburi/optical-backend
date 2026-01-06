@@ -8,6 +8,6 @@ import (
 	"github.com/google/uuid"
 )
 
-type SchedulerRepositoryh interface {
+type SchedulerRepository interface {
 	CreateScheduler(ctx context.Context, id, calendcarId uuid.UUID, title, memo string, startTime, endTime, limitTime time.Time, isAllDay bool)(scheduler.Scheduler, error)
 }
