@@ -25,6 +25,7 @@ type Scheduler struct {
 	Memo       string
 	StartTime  time.Time
 	EndTime    time.Time
+	LimitTime time.Time
 	IsAllDay   bool
 }
 
@@ -41,7 +42,7 @@ type SchedulerStatus struct {
 	Status       Status
 }
 
-func NewScheduler(userId, calendarId uuid.UUID, title, memo string, startTime, endTime time.Time, isAllDay bool) (*Scheduler, error) {
+func NewScheduler(userId, calendarId uuid.UUID, title, memo string, startTime, endTime, limitTime time.Time, isAllDay bool) (*Scheduler, error) {
 	id, err := uuid.NewV7()
 	if err != nil {
 		return nil, err
@@ -56,6 +57,7 @@ func NewScheduler(userId, calendarId uuid.UUID, title, memo string, startTime, e
 		Memo:       memo,
 		StartTime:  startTime,
 		EndTime:    endTime,
+		LimitTime: limitTime,
 		IsAllDay:   isAllDay,
 	}, nil
 	err = s.SetTitle(title)
@@ -67,6 +69,10 @@ func NewScheduler(userId, calendarId uuid.UUID, title, memo string, startTime, e
 		return nil, err
 	}
 	err = s.SetStartEndTime(startTime, endTime)
+	if err != nil {
+		return nil, err
+	}
+	err = s.SetLimitTime(limitTime)
 	if err != nil {
 		return nil, err
 	}
@@ -94,6 +100,12 @@ func (s *Scheduler) SetStartEndTime(startTime, endTime time.Time) error {
 	}
 	s.StartTime = startTime
 	s.EndTime = endTime
+	return nil
+}
+func (s *Scheduler) SetLimitTime(limitTime time.Time) error {
+	if limitTime.IsZero(){
+		return apperr.ValidationError("limit time is invalid")
+	}
 	return nil
 }
 
