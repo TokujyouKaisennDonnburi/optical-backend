@@ -123,7 +123,7 @@ func (s *Scheduler) SetLimitTime(limitTime time.Time) error {
 	return nil
 }
 
-func NewAttendance(id, schedulerId, userId uuid.UUID, comment string) (*SchedulerAttendance, error) {
+func NewAttendance(schedulerId, userId uuid.UUID, comment string) (*SchedulerAttendance, error) {
 	id, err := uuid.NewV7()
 	if err != nil {
 		return nil, err
