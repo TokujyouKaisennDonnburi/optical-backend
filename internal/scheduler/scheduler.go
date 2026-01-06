@@ -106,6 +106,7 @@ func (s *Scheduler) SetLimitTime(limitTime time.Time) error {
 	if limitTime.IsZero() {
 		return apperr.ValidationError("limit time is invalid")
 	}
+	s.LimitTime = limitTime
 	return nil
 }
 
