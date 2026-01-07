@@ -24,12 +24,15 @@ type Scheduler struct {
 	UserId     uuid.UUID
 	Title      string
 	Memo       string
-	StartTime  time.Time
-	EndTime    time.Time
 	LimitTime  time.Time
 	IsAllDay   bool
 }
 
+type Scheduler_possible_date struct {
+	SchedulerId uuid.UUID
+	StartTime   time.Time
+	EndTime     time.Time
+}
 type SchedulerAttendance struct {
 	Id          uuid.UUID
 	SchedulerId uuid.UUID
@@ -121,6 +124,9 @@ func (s *Scheduler) SetLimitTime(limitTime time.Time) error {
 	}
 	s.LimitTime = limitTime
 	return nil
+}
+
+func NewSchedulerPossibleDate(schedulerId uuid.UUID, startTime, endTime time.Time)(*SchedulerAttendance, error) {
 }
 
 func NewAttendance(schedulerId, userId uuid.UUID, comment string) (*SchedulerAttendance, error) {

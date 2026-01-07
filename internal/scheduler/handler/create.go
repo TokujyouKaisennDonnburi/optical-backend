@@ -30,19 +30,19 @@ func (h *SchedulerHttpHandler) SchedulerCreate(w http.ResponseWriter, r *http.Re
 	// body
 	err := json.NewDecoder(r.Body).Decode(&request)
 	if err != nil {
-		_ = render.Render(w, r, apperr.ErrInternalServerError(err))
+		_ = render.Render(w, r, apperr.ErrInvalidRequest(err))
 		return
 	}
 	// calendarId
 	calendarId, err := uuid.Parse(chi.URLParam(r, "calendarId"))
 	if err != nil {
-		_ = render.Render(w, r, apperr.ErrInternalServerError(err))
+		_ = render.Render(w, r, apperr.ErrInvalidRequest(err))
 		return
 	}
 	// userId
 	userId, err := auth.GetUserIdFromContext(r)
 	if err != nil {
-		_ = render.Render(w, r, apperr.ErrInternalServerError(err))
+		_ = render.Render(w, r, apperr.ErrUnauthorized(err))
 		return
 	}
 	// service
@@ -57,7 +57,7 @@ func (h *SchedulerHttpHandler) SchedulerCreate(w http.ResponseWriter, r *http.Re
 		IsAllDay:   request.IsAllDay,
 	})
 	if err != nil {
-		_ = render.Render(w, r, apperr.ErrUnauthorized(err))
+		apperr.HandleAppError(w, r, err)
 		return
 	}
 	// response

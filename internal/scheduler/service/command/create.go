@@ -22,7 +22,7 @@ type SchedulerCreateInput struct {
 }
 
 type SchedulerCreateOutput struct {
-	Id         uuid.UUID
+	Id uuid.UUID
 }
 
 func (c *SchedulerCommand) CreateScheduler(ctx context.Context, input SchedulerCreateInput) (*SchedulerCreateOutput, error) {
@@ -32,8 +32,8 @@ func (c *SchedulerCommand) CreateScheduler(ctx context.Context, input SchedulerC
 		return nil, err
 	}
 	hasOption := false
-	for _, x := range options{
-		if x.Id == option.OPTION_SCHEDULER{
+	for _, x := range options {
+		if x.Id == option.OPTION_SCHEDULER {
 			hasOption = true
 			break
 		}
@@ -42,12 +42,12 @@ func (c *SchedulerCommand) CreateScheduler(ctx context.Context, input SchedulerC
 		return nil, apperr.ForbiddenError("option not enabled")
 	}
 	// domain
-	scheduler, err := scheduler.NewScheduler(ctx, input.CalendarId, input.UserId, input.Title, input.Memo, input.StartTime, input.EndTime, input.LimitTime, input.IsAllDay)
+	scheduler, err := scheduler.NewScheduler(input.CalendarId, input.UserId, input.Title, input.Memo, input.StartTime, input.EndTime, input.LimitTime, input.IsAllDay)
 	if err != nil {
 		return nil, err
 	}
 	// repository
-	result, err := c.schedulerRepository.CreateScheduler(ctx, scheduler.Id, scheduler.CalendarId, scheduler.Title, scheduler.Memo, scheduler.StartTime, scheduler.EndTime, scheduler.LimitTime, scheduler.IsAllDay)
+	result, err := c.schedulerRepository.CreateScheduler(ctx, scheduler.Id, scheduler.CalendarId, scheduler.UserId, scheduler.Title, scheduler.Memo, scheduler.StartTime, scheduler.EndTime, scheduler.LimitTime, scheduler.IsAllDay)
 	if err != nil {
 		return nil, err
 	}

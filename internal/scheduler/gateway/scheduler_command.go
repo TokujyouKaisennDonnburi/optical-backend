@@ -25,7 +25,7 @@ func (r *SchedulerPsqlRepository) Create(ctx context.Context, id, calendarId, us
 	// create scheduler
 	sql := `
 		INSERT INTO scheduler(id,calendarId,userId,title,memo,start_time,end_time,limit_time,is_allday)
-		VALUES 
+		VALUES(:id, :calendarId, :userId, :title, memo, startTime, endTime, limitTime, isAllDay)
 	`
 	_, err := 
 }
