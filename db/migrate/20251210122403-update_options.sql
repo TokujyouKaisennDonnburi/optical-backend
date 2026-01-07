@@ -22,6 +22,9 @@ COMMENT ON COLUMN calendar_options.option_id IS 'オプションID';
 INSERT INTO options(id,name,deprecated)VALUES
 (1, 'pr_review_pending_count', FALSE),
 (2, 'review_load_status', FALSE);
+(3, 'invite_members', FALSE),
+(4, 'milestone_items', FALSE),
+(5, 'milestone_status', FALSE);
 
 -- +migrate Down
 
