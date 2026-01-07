@@ -131,7 +131,7 @@ paths:
       tags:
         - agents
       security:
-        - baererAuth: []
+        - bearerAuth: []
       requestBody:
         required: true
         content:

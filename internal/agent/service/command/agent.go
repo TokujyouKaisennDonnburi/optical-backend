@@ -23,7 +23,7 @@ func NewAgentCommand(
 		panic("openRouter is nil")
 	}
 	if transactor == nil {
-		panic("trasactor is nil")
+		panic("transactor is nil")
 	}
 	if agentQueryRepository == nil {
 		panic("agentQueryRepository is nil")
