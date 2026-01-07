@@ -28,6 +28,9 @@ type AgentQueryRepository interface {
 		ctx context.Context,
 		userId, calendarId uuid.UUID,
 	) (*agent.AnalyzableCalendar, error)
+	FindOptions(
+		ctx context.Context,
+	) ([]agent.AnalyzableOption, error)
 	FindOptionsByCalendarId(
 		ctx context.Context,
 		userId, calendarId uuid.UUID,

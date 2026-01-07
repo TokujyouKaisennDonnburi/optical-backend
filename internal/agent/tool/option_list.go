@@ -10,61 +10,59 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-type CalendarOptionListTool struct {
+type OptionListTool struct {
 	agentQueryRepository repository.AgentQueryRepository
 	userId               uuid.UUID
-	calendarId           uuid.UUID
 	streamFn             func(context.Context, []byte) error
 }
 
-func NewCalendarOptionListTool(
+func NewOptionListTool(
 	agentQueryRepository repository.AgentQueryRepository,
-	userId, calendarId uuid.UUID,
+	userId uuid.UUID,
 	streamFn func(context.Context, []byte) error,
-) (*CalendarOptionListTool, error) {
+) (*OptionListTool, error) {
 	if agentQueryRepository == nil {
 		return nil, errors.New("eventAgentRepository is nil")
 	}
-	return &CalendarOptionListTool{
+	return &OptionListTool{
 		agentQueryRepository: agentQueryRepository,
 		userId:               userId,
-		calendarId:           calendarId,
 		streamFn:             streamFn,
 	}, nil
 }
 
-func (t CalendarOptionListTool) Name() string {
-	return "list_calendar_option"
+func (t OptionListTool) Name() string {
+	return "list_option"
 }
 
-func (t CalendarOptionListTool) Description() string {
-	return "Retrieves all current options configured in the user's calendar."
+func (t OptionListTool) Description() string {
+	return "Retrieves all options can set to calendar."
 }
 
-func (t CalendarOptionListTool) Strict() bool {
+func (t OptionListTool) Strict() bool {
 	return false
 }
 
-type CalendarOptionListModel struct {
+type OptionListModel struct {
 	Id          int32  `json:"id"`
 	Name        string `json:"name"`
 	Description string `json:"description"`
 }
 
-func (t CalendarOptionListTool) Parameters() map[string]any {
+func (t OptionListTool) Parameters() map[string]any {
 	return map[string]any{
 		"type":       "object",
 		"properties": map[string]any{},
 	}
 }
 
-func (t CalendarOptionListTool) Call(ctx context.Context, input string) (string, error) {
-	logrus.WithField("user_input", input).Info("calendar option list tool called")
+func (t OptionListTool) Call(ctx context.Context, input string) (string, error) {
+	logrus.WithField("user_input", input).Info("option list tool called")
 	err := t.streamFn(ctx, statusChunk("fetching_options"))
 	if err != nil {
 		logrus.WithError(err).Error("progress streaming error")
 	}
-	options, err := t.agentQueryRepository.FindOptionsByCalendarId(ctx, t.userId, t.calendarId)
+	options, err := t.agentQueryRepository.FindOptions(ctx)
 	if err != nil {
 		return "", err
 	}

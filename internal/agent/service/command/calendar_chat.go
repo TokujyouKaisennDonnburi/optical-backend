@@ -65,11 +65,15 @@ func (c *AgentCommand) CalendarChat(ctx context.Context, input AgentCommandCalen
 	if err != nil {
 		return err
 	}
-	optionListTool, err := tool.NewCalendarOptionListTool(c.agentQueryRepository, input.UserId, input.CalendarId, input.StreamingFn)
+	optionListTool, err := tool.NewOptionListTool(c.agentQueryRepository, input.UserId, input.StreamingFn)
 	if err != nil {
 		return err
 	}
-	optionUpdateTool, err := tool.NewCalendarOptionUpdateTool(c.agentCommandRepository, input.UserId, input.CalendarId, input.StreamingFn)
+	calendarOptionListTool, err := tool.NewCalendarOptionListTool(c.agentQueryRepository, input.UserId, input.CalendarId, input.StreamingFn)
+	if err != nil {
+		return err
+	}
+	calendarOptionUpdateTool, err := tool.NewCalendarOptionUpdateTool(c.agentCommandRepository, input.UserId, input.CalendarId, input.StreamingFn)
 	if err != nil {
 		return err
 	}
@@ -79,7 +83,8 @@ func (c *AgentCommand) CalendarChat(ctx context.Context, input AgentCommandCalen
 		calendarDetailTool,
 		eventCreateTool,
 		optionListTool,
-		optionUpdateTool,
+		calendarOptionListTool,
+		calendarOptionUpdateTool,
 	}
 	systemPrompt := fmt.Sprintf(CALENDAR_CHAT_SYSTEM_PROMPT, input.CalendarId.String(), time.Now())
 	messages := []openrouter.Message{
