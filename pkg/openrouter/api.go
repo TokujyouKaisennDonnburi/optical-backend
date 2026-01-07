@@ -230,7 +230,9 @@ func (r OpenRouter) Stream(
 					)
 				}
 				deltaMessage.ToolCalls[tool.Index].Id += tool.Id
-				deltaMessage.ToolCalls[tool.Index].Type += tool.Type
+				if deltaMessage.ToolCalls[tool.Index].Type == "" {
+					deltaMessage.ToolCalls[tool.Index].Type = tool.Type
+				}
 				deltaMessage.ToolCalls[tool.Index].Function.Name += tool.Function.Name
 				deltaMessage.ToolCalls[tool.Index].Function.Arguments += tool.Function.Arguments
 			}
