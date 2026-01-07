@@ -2,10 +2,12 @@
 CREATE TABLE scheduler(
     id UUID PRIMARY KEY,
     calendar_id UUID NOT NULL,
+    user_id UUID NOT NULL,
     title VARCHAR(255) NOT NULL,
     memo VARCHAR(255) NOT NULL,
     start_time TIMESTAMPTZ NOT NULL,
     end_time TIMESTAMPTZ NOT NULL,
+    limit_time TIMESTAMPTZ NOT NULL,
     is_allday BOOLEAN NOT NULL,
     FOREIGN KEY (calendar_id) REFERENCES calendars(id) ON DELETE CASCADE
 );
@@ -30,10 +32,12 @@ CREATE TABLE scheduler_status(
 -- scheduler
 COMMENT ON COLUMN scheduler.id IS 'スケジューラーID';
 COMMENT ON COLUMN scheduler.calendar_id IS 'カレンダーID';
+COMMENT ON COLUMN scheduler.user_id IS '作成ユーザーID';
 COMMENT ON COLUMN scheduler.title IS 'スケジューラータイトル';
 COMMENT ON COLUMN scheduler.memo IS 'メモ';
 COMMENT ON COLUMN scheduler.start_time IS '開始時間';
 COMMENT ON COLUMN scheduler.end_time IS '終了時間';
+COMMENT ON COLUMN scheduler.limit_time IS '解答期限';
 COMMENT ON COLUMN scheduler.is_allday IS '終日チェック';
 -- attendance
 COMMENT ON COLUMN scheduler_attendance.id IS '調整ID';
