@@ -13,24 +13,29 @@ const (
 )
 
 type List struct {
-	Id     uuid.UUID
-	UserId uuid.UUID
-	Name   string
-	Items  []Item
+	Id         uuid.UUID
+	UserId     uuid.UUID
+	CalendarId uuid.UUID
+	Name       string
+	Items      []Item
 }
 
-func NewList(userId uuid.UUID, name string) (*List, error) {
+func NewList(userId, calendarId uuid.UUID, name string) (*List, error) {
 	if userId == uuid.Nil {
-		return nil, errors.New("userId is nil")
+		return nil, errors.New("todo list `userId` is nil")
+	}
+	if calendarId == uuid.Nil {
+		return nil, errors.New("todo list `calendarId` is nil")
 	}
 	id, err := uuid.NewV7()
 	if err != nil {
 		return nil, err
 	}
 	todoList := &List{
-		Id:     id,
-		UserId: userId,
-		Items:   []Item{},
+		Id:         id,
+		UserId:     userId,
+		CalendarId: calendarId,
+		Items:      []Item{},
 	}
 	err = todoList.SetName(name)
 	if err != nil {
