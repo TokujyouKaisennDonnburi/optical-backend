@@ -73,11 +73,12 @@ func (t CalendarOptionUpdateTool) Call(ctx context.Context, input string) (strin
 	}
 	var model OptionUpdateInputModel
 	if err := json.Unmarshal([]byte(input), &model); err != nil {
-		return "false", err
+		logrus.WithError(err).Error("json unmarshal error")
+		return "", err
 	}
 	err = t.agentCommandRepository.UpdateOptions(ctx, t.userId, t.calendarId, model.Options)
 	if err != nil {
-		return "false", err
+		return "", err
 	}
 	logrus.WithField("len", len(model.Options)).Info("event create tool called")
 	return "true", nil

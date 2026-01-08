@@ -18,7 +18,9 @@ type AgentQueryRepository interface {
 	FindCalendarEventByUserIdAndDate(
 		ctx context.Context,
 		userId, calendarId uuid.UUID,
+		title, location string,
 		startAt, endAt time.Time,
+		limit int16,
 	) ([]agent.AnalyzableEvent, error)
 	FindCalendarByUserId(
 		ctx context.Context,

@@ -81,7 +81,9 @@ func (r *AgentQueryPsqlRepository) FindEventByUserIdAndDate(
 func (r *AgentQueryPsqlRepository) FindCalendarEventByUserIdAndDate(
 	ctx context.Context,
 	userId, calendarId uuid.UUID,
+	title, location string,
 	startAt, endAt time.Time,
+	limit int16,
 ) ([]agent.AnalyzableEvent, error) {
 	events := []agent.AnalyzableEvent{}
 	err := transact.Transact(ctx, func(tx *sqlx.Tx) error {
@@ -99,17 +101,47 @@ func (r *AgentQueryPsqlRepository) FindCalendarEventByUserIdAndDate(
 				ON calendar_members.calendar_id = events.calendar_id
 			WHERE
 				events.deleted_at IS NULL 
-				AND calendars.id = $2
+				AND calendars.id = :calendarId
 				AND calendars.deleted_at IS NULL 
-				AND	calendar_members.user_id = $1
+				AND	calendar_members.user_id = :userId
 				AND	
 				(
-					events.start_at >= $3 AND events.start_at <= $4
-					OR events.end_at <= $4 AND events.end_at >= $3
-					OR events.start_at <= $3 AND events.end_at >= $4
+					events.start_at >= :startAt AND events.start_at <= :endAt
+					OR events.end_at <= :endAt AND events.end_at >= :startAt
+					OR events.start_at <= :startAt AND events.end_at >= :endAt
 				)
 		`
-		err := tx.SelectContext(ctx, &models, query, userId, calendarId, startAt, endAt)
+		queryParams := map[string]any{
+			"userId":     userId,
+			"calendarId": calendarId,
+			"startAt":    startAt,
+			"endAt":      endAt,
+		}
+		if title != "" {
+			query += `
+				AND events.title LIKE :title
+			`
+			queryParams["title"] = title + "%"
+		}
+		if location != "" {
+			query += `
+				AND events.location LIKE :location
+			`
+			queryParams["location"] = location + "%"
+		}
+		if limit != 0 {
+			query += `
+				LIMIT :limit
+			`
+			queryParams["limit"] = limit
+		}
+		logrus.WithField("queryParams", queryParams).Info("preparing named statement")
+		nstmt, err := tx.PrepareNamedContext(ctx, query)
+		if err != nil {
+			logrus.WithError(err).Error("prepare named statement error")
+			return err
+		}
+		err = nstmt.SelectContext(ctx, &models, queryParams)
 		if err != nil {
 			logrus.WithError(err).Error("events query error")
 			return err
