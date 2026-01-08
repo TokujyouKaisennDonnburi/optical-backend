@@ -50,3 +50,18 @@ func FindCalendarByUserIdAndId(ctx context.Context, tx *sqlx.Tx, userId, calenda
 		},
 	}, nil
 }
+
+func IsUserInCalendarMembers(ctx context.Context, tx *sqlx.Tx, userId, calendarId uuid.UUID) (bool, error) {
+	exists := false
+	query := `
+		SELECT 1
+		FROM calendar_members
+		WHERE calendar_members.calendar_id = $2
+			AND calendar_members.user_id = $1
+	`
+	err := tx.SelectContext(ctx, &exists, query, userId, calendarId)
+	if err != nil {
+		return false, err
+	}
+	return exists, nil
+}
