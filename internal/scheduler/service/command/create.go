@@ -15,10 +15,15 @@ type SchedulerCreateInput struct {
 	UserId     uuid.UUID
 	Title      string
 	Memo       string
-	StartTime  time.Time
-	EndTime    time.Time
 	LimitTime  time.Time
 	IsAllDay   bool
+	Dates      []SchedulerCreateDateInput
+}
+
+type SchedulerCreateDateInput struct {
+	Date      time.Time
+	StartTime time.Time
+	EndTime   time.Time
 }
 
 type SchedulerCreateOutput struct {
@@ -41,13 +46,34 @@ func (c *SchedulerCommand) CreateScheduler(ctx context.Context, input SchedulerC
 	if !hasOption {
 		return nil, apperr.ForbiddenError("option not enabled")
 	}
+	if len(input.Dates) == 0 {
+		return nil, apperr.ValidationError("dates is empty")
+	}
 	// domain
-	scheduler, err := scheduler.NewScheduler(input.CalendarId, input.UserId, input.Title, input.Memo, input.StartTime, input.EndTime, input.LimitTime, input.IsAllDay)
+	schedulerEntity, err := scheduler.NewScheduler(input.CalendarId, input.UserId, input.Title, input.Memo, input.LimitTime, input.IsAllDay)
 	if err != nil {
 		return nil, err
 	}
+	possibleDates := make([]scheduler.PossibleDate, len(input.Dates))
+	for i, date := range input.Dates {
+		possibleDate, err := scheduler.NewPossibleDate(date.Date, date.StartTime, date.EndTime, input.IsAllDay)
+		if err != nil {
+			return nil, err
+		}
+		possibleDates[i] = *possibleDate
+	}
 	// repository
-	result, err := c.schedulerRepository.CreateScheduler(ctx, scheduler.Id, scheduler.CalendarId, scheduler.UserId, scheduler.Title, scheduler.Memo, scheduler.StartTime, scheduler.EndTime, scheduler.LimitTime, scheduler.IsAllDay)
+	result, err := c.schedulerRepository.CreateScheduler(
+		ctx,
+		schedulerEntity.Id,
+		schedulerEntity.CalendarId,
+		schedulerEntity.UserId,
+		schedulerEntity.Title,
+		schedulerEntity.Memo,
+		possibleDates,
+		schedulerEntity.LimitTime,
+		schedulerEntity.IsAllDay,
+	)
 	if err != nil {
 		return nil, err
 	}

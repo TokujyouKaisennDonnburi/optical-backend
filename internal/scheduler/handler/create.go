@@ -16,10 +16,15 @@ import (
 type SchedulerCreateRequest struct {
 	Title     string    `json:"title"`
 	Memo      string    `json:"memo"`
-	StartTime time.Time `json:"startTime"`
-	EndTime   time.Time `json:"endTime"`
 	LimitTime time.Time `json:"limitTime"`
 	IsAllDay  bool      `json:"isAllDay"`
+	Dates     []SchedulerCreateDateRequest `json:"dates"`
+}
+
+type SchedulerCreateDateRequest struct {
+	Date      time.Time `json:"date"`
+	StartTime time.Time `json:"startTime"`
+	EndTime   time.Time `json:"endTime"`
 }
 type SchedulerCreateResponse struct {
 	Id uuid.UUID `json:"schedulerId"`
@@ -45,16 +50,24 @@ func (h *SchedulerHttpHandler) SchedulerCreate(w http.ResponseWriter, r *http.Re
 		_ = render.Render(w, r, apperr.ErrUnauthorized(err))
 		return
 	}
+	// array
+	dates := make([]command.SchedulerCreateDateInput, len(request.Dates))
+	for i, date := range request.Dates {
+		dates[i] = command.SchedulerCreateDateInput{
+			Date:      date.Date,
+			StartTime: date.StartTime,
+			EndTime:   date.EndTime,
+		}
+	}
 	// service
 	result, err := h.schedulerCommand.CreateScheduler(r.Context(), command.SchedulerCreateInput{
 		CalendarId: calendarId,
 		UserId:     userId,
 		Title:      request.Title,
 		Memo:       request.Memo,
-		StartTime:  request.StartTime,
-		EndTime:    request.EndTime,
 		LimitTime:  request.LimitTime,
 		IsAllDay:   request.IsAllDay,
+		Dates:      dates,
 	})
 	if err != nil {
 		apperr.HandleAppError(w, r, err)
