@@ -59,6 +59,11 @@ COMMENT ON COLUMN scheduler_status.attendance_id IS '調整ID';
 COMMENT ON COLUMN scheduler_status.date IS '日付';
 COMMENT ON COLUMN scheduler_status.status IS '参加確認';
 
+-- option
+INSERT INTO options(id, name, deprecated)
+VALUES (6, 'scheduler', FALSE)
+ON CONFLICT (id) DO NOTHING;
+
 -- +migrate Down
 
 DROP TABLE IF EXISTS scheduler_status;
