@@ -1,18 +1,26 @@
-# Setup
+# Setup用ドキュメント
 
-## sql-migrateのインストール
+## 前提条件
+
+- go 1.24.4
+- docker
+- docker-cli
+
+## Setup
+
+### sql-migrateのインストール
 
 ```bash
 go install github.com/rubenv/sql-migrate/...@latest
 ```
 
-## airのインストール
+### airのインストール
 
 ```bash
 go install github.com/air-verse/air@latest
 ```
 
-## MinioMCのインストール
+### MinioMCのインストール
 
 ```bash
 # macOS
@@ -24,7 +32,7 @@ chmod +x mc
 sudo mv mc /usr/local/bin
 ```
 
-## 環境変数の設定
+### 環境変数の設定
 
 ```bash
 cp .env.example .env
@@ -36,12 +44,12 @@ cp .env.example .env
 - `GITHUB_CLIENT_SECRET`には`Client secrets`を生成して設定する
 - 設定ページの`Private keys`タブからプライベートキーを作成し、`optical-github.private-key.pem`に名前を変更しリポジトリのルートに配置する
 
-## データベース立ち上げ
+### データベース立ち上げ
 ```bash
 docker compose up -d
 ```
 
-## マイグレーション
+### マイグレーション
 
 ```bash
 ./migrate.sh
