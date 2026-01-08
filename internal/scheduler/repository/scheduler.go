@@ -9,5 +9,5 @@ import (
 )
 
 type SchedulerRepository interface {
-	CreateScheduler(ctx context.Context, id, calendarId, userId uuid.UUID, title, memo string, possibleDates []scheduler.PossibleDate, limitTime time.Time, isAllDay bool) (scheduler.Scheduler, error)
+	CreateScheduler(ctx context.Context, id, calendarId, userId uuid.UUID, title, memo string, possibleDates []scheduler.PossibleDate, limitTime time.Time, isAllDay bool)error
 }

@@ -31,16 +31,7 @@ func (r *SchedulerPsqlRepository) CreateScheduler(
 	possibleDates []scheduler.PossibleDate,
 	limitTime time.Time,
 	isAllDay bool,
-) (scheduler.Scheduler, error) {
-	s := scheduler.Scheduler{
-		Id:         id,
-		CalendarId: calendarId,
-		UserId:     userId,
-		Title:      title,
-		Memo:       memo,
-		LimitTime:  limitTime,
-		IsAllDay:   isAllDay,
-	}
+) error {
 	err := db.RunInTx(r.db, func(tx *sqlx.Tx) error {
 		query := `
 			INSERT INTO scheduler(id, calendar_id, user_id, title, memo, limit_time, is_allday)
@@ -76,7 +67,7 @@ func (r *SchedulerPsqlRepository) CreateScheduler(
 		return nil
 	})
 	if err != nil {
-		return scheduler.Scheduler{}, err
+		return err
 	}
-	return s, nil
+	return nil
 }

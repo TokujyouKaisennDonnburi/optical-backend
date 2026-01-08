@@ -63,7 +63,7 @@ func (c *SchedulerCommand) CreateScheduler(ctx context.Context, input SchedulerC
 		possibleDates[i] = *possibleDate
 	}
 	// repository
-	result, err := c.schedulerRepository.CreateScheduler(
+	err = c.schedulerRepository.CreateScheduler(
 		ctx,
 		schedulerEntity.Id,
 		schedulerEntity.CalendarId,
@@ -79,6 +79,6 @@ func (c *SchedulerCommand) CreateScheduler(ctx context.Context, input SchedulerC
 	}
 	// output
 	return &SchedulerCreateOutput{
-		Id: result.Id,
+		Id: schedulerEntity.Id,
 	}, nil
 }

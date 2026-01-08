@@ -24,6 +24,9 @@ import (
 	optionGateway "github.com/TokujouKaisenDonburi/optical-backend/internal/option/gateway"
 	optionHandler "github.com/TokujouKaisenDonburi/optical-backend/internal/option/handler"
 	optionQuery "github.com/TokujouKaisenDonburi/optical-backend/internal/option/service/query"
+	schedulerGateway "github.com/TokujouKaisenDonburi/optical-backend/internal/scheduler/gateway"
+	schedulerHandler "github.com/TokujouKaisenDonburi/optical-backend/internal/scheduler/handler"
+	schedulerCommand "github.com/TokujouKaisenDonburi/optical-backend/internal/scheduler/service/command"
 	userGateway "github.com/TokujouKaisenDonburi/optical-backend/internal/user/gateway"
 	userHandler "github.com/TokujouKaisenDonburi/optical-backend/internal/user/handler"
 	userCommand "github.com/TokujouKaisenDonburi/optical-backend/internal/user/service/command"
@@ -120,6 +123,9 @@ func main() {
 	noticeRepository := noticeRepository.NewNoticePsqlRepository(db)
 	noticeQueryService := noticeQuery.NewNoticeQuery(noticeRepository)
 	noticeHttpHandler := noticeHandler.NewNoticeHttpHandler(noticeQueryService)
+	schedulerRepository := schedulerGateway.NewSchedulerPsqlRepository(db)
+	schedulerCommand := schedulerCommand.NewSchedulerCommand(schedulerRepository, optionRepository)
+	schedulerHandler := schedulerHandler.NewSchedulerHttpHandler(schedulerCommand)
 
 	// Unprotected Routes
 	r.Group(func(r chi.Router) {
@@ -178,6 +184,9 @@ func main() {
 
 		// Notices
 		r.Get("/notices", noticeHttpHandler.GetNotices)
+
+		// Scheduler
+		r.Post("/calendars/{calendarId}/scheduler", schedulerHandler.SchedulerCreate)
 	})
 
 	// Start Serving
