@@ -125,6 +125,27 @@ paths:
         '400':
           description: Invalid request
         '500':
+  /agents/chat:
+    post:
+      summary: Chat with an AI Agent
+      tags:
+        - agents
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AgentChatRequest"
+      responses:
+        '200':
+          description: messages from AI Agent
+          content:
+            text/event-stream:
+              schema:
+                type: string
+                example: "data: {\"content\":\"来週の\"}"
   /agents/options:
     post:
       summary: Suggest options based on message
@@ -299,6 +320,12 @@ paths:
           schema:
             type: string
             format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EventCreateRequest"
       responses:
         "200":
           description: Events retrieved successfully
@@ -1280,3 +1307,9 @@ components:
           format: date-time
           description: 作成日時
           example: "2025-12-25T18:21:17.902871Z"
+    AgentChatRequest:
+      type: object
+      properties:
+        message:
+          type: string
+          example: "来週の予定を教えて"

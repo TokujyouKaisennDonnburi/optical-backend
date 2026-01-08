@@ -1,6 +1,8 @@
 package db
 
-import "github.com/jmoiron/sqlx"
+import (
+	"github.com/jmoiron/sqlx"
+)
 
 func RunInTx(db *sqlx.DB, txFn func(tx *sqlx.Tx) error) error {
 	// トランザクション開始
@@ -20,3 +22,4 @@ func RunInTx(db *sqlx.DB, txFn func(tx *sqlx.Tx) error) error {
 	// コミット
 	return tx.Commit()
 } 
+
