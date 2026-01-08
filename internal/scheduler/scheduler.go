@@ -19,20 +19,20 @@ const (
 )
 
 type Scheduler struct {
-	Id         uuid.UUID
-	CalendarId uuid.UUID
-	UserId     uuid.UUID
-	Title      string
-	Memo       string
-	LimitTime  time.Time
-	IsAllDay   bool
+	Id            uuid.UUID
+	CalendarId    uuid.UUID
+	UserId        uuid.UUID
+	Title         string
+	Memo          string
+	LimitTime     time.Time
+	IsAllDay      bool
+}
+type PossibleDate struct {
+	Date      time.Time
+	StartTime time.Time
+	EndTime   time.Time
 }
 
-type Scheduler_possible_date struct {
-	SchedulerId uuid.UUID
-	StartTime   time.Time
-	EndTime     time.Time
-}
 type SchedulerAttendance struct {
 	Id          uuid.UUID
 	SchedulerId uuid.UUID
@@ -46,14 +46,17 @@ type SchedulerStatus struct {
 	Status       Status
 }
 
-func NewScheduler(calendarId, userId uuid.UUID, title, memo string, startTime, endTime, limitTime time.Time, isAllDay bool) (*Scheduler, error) {
+func NewScheduler(calendarId, userId uuid.UUID, title, memo string, limitTime time.Time, isAllDay bool) (*Scheduler, error) {
+	// id
 	id, err := uuid.NewV7()
 	if err != nil {
 		return nil, err
 	}
+	// calendarId
 	if calendarId == uuid.Nil {
 		return nil, errors.New("calendarId is nil")
 	}
+	// userId
 	if userId == uuid.Nil {
 		return nil, errors.New("userId is nil")
 	}
@@ -63,9 +66,6 @@ func NewScheduler(calendarId, userId uuid.UUID, title, memo string, startTime, e
 		UserId:     userId,
 		Title:      title,
 		Memo:       memo,
-		StartTime:  startTime,
-		EndTime:    endTime,
-		LimitTime:  limitTime,
 		IsAllDay:   isAllDay,
 	}
 	err = s.SetTitle(title)
@@ -73,10 +73,6 @@ func NewScheduler(calendarId, userId uuid.UUID, title, memo string, startTime, e
 		return nil, err
 	}
 	err = s.SetMemo(memo)
-	if err != nil {
-		return nil, err
-	}
-	err = s.SetStartEndTime(startTime, endTime)
 	if err != nil {
 		return nil, err
 	}
@@ -102,23 +98,11 @@ func (s *Scheduler) SetMemo(memo string) error {
 	s.Memo = memo
 	return nil
 }
-func (s *Scheduler) SetStartEndTime(startTime, endTime time.Time) error {
-	if startTime.After(endTime) {
-		return apperr.ValidationError("start time before must be end time")
-	}
-	s.StartTime = startTime
-	s.EndTime = endTime
-	return nil
-}
-
 func (s *Scheduler) SetLimitTime(limitTime time.Time) error {
 	if limitTime.IsZero() {
 		return apperr.ValidationError("limit time is invalid")
 	}
 	now := time.Now()
-	if limitTime.After(s.StartTime) {
-		return apperr.ValidationError("limit time must be before or equal to startTime")
-	}
 	if limitTime.Before(now) || limitTime.Equal(now) {
 		return apperr.ValidationError("limit time must be after current time")
 	}
@@ -126,7 +110,46 @@ func (s *Scheduler) SetLimitTime(limitTime time.Time) error {
 	return nil
 }
 
-func NewSchedulerPossibleDate(schedulerId uuid.UUID, startTime, endTime time.Time)(*SchedulerAttendance, error) {
+func NewPossibleDate(date, startTime, endTime time.Time, isAllDay bool) (*PossibleDate, error) {
+	if date.IsZero() {
+		return nil, apperr.ValidationError("date is invalid")
+	}
+	if isAllDay {
+		if !isStartOfDay(startTime) {
+			return nil, apperr.ValidationError("start time must be start of day")
+		}
+		if !isEndOfDay(endTime) {
+			return nil, apperr.ValidationError("end time must be end of day")
+		}
+		return &PossibleDate{
+			Date:      date,
+			StartTime: startTime,
+			EndTime:   endTime,
+		}, nil
+	}
+	if startTime.IsZero() {
+		return nil, apperr.ValidationError("start time is invalid")
+	}
+	if endTime.IsZero() {
+		return nil, apperr.ValidationError("end time is invalid")
+	}
+	if !startTime.Before(endTime) {
+		return nil, apperr.ValidationError("start time must be before end time")
+	}
+	return &PossibleDate{
+		Date:      date,
+		StartTime: startTime,
+		EndTime:   endTime,
+	}, nil
+}
+
+func isStartOfDay(t time.Time) bool {
+	h, m, s := t.Clock()
+	return h == 0 && m == 0 && s == 0 && t.Nanosecond() == 0
+}
+func isEndOfDay(t time.Time) bool {
+	h, m, s := t.Clock()
+	return h == 23 && m == 59 && s == 59 && t.Nanosecond() == 0
 }
 
 func NewAttendance(schedulerId, userId uuid.UUID, comment string) (*SchedulerAttendance, error) {
@@ -140,25 +163,25 @@ func NewAttendance(schedulerId, userId uuid.UUID, comment string) (*SchedulerAtt
 	if userId == uuid.Nil {
 		return nil, errors.New("userId is nil")
 	}
-	s := &SchedulerAttendance{
+	a := &SchedulerAttendance{
 		Id:          id,
 		SchedulerId: schedulerId,
 		UserId:      userId,
 		Comment:     comment,
 	}
-	err = s.SetComment(comment)
+	err = a.SetComment(comment)
 	if err != nil {
 		return nil, err
 	}
-	return s, nil
+	return a, nil
 }
 
-func (s *SchedulerAttendance) SetComment(comment string) error {
+func (a *SchedulerAttendance) SetComment(comment string) error {
 	commentLength := len(comment)
 	if commentLength > 255 {
 		return apperr.ValidationError("comment length error")
 	}
-	s.Comment = comment
+	a.Comment = comment
 	return nil
 }
 func NewStatus(attendanceId uuid.UUID, time time.Time, status int8) (*SchedulerStatus, error) {
