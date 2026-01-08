@@ -77,8 +77,8 @@ func (c *SchedulerCommand) CreateScheduler(ctx context.Context, input SchedulerC
 	if err != nil {
 		return nil, err
 	}
-	// output
-	return &SchedulerCreateOutput{
+	output := &SchedulerCreateOutput{
 		Id: schedulerEntity.Id,
-	}, nil
+	}
+	return output, err
 }
