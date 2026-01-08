@@ -214,6 +214,7 @@ func main() {
 
 		// Todos
 		r.Post("/calendars/{calendarId}/todos", todoHandler.CreateList)
+		r.Post("/todos/lists", todoHandler.CreateList)
 	})
 
 	// Start Serving
