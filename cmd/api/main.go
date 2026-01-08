@@ -24,6 +24,9 @@ import (
 	optionGateway "github.com/TokujouKaisenDonburi/optical-backend/internal/option/gateway"
 	optionHandler "github.com/TokujouKaisenDonburi/optical-backend/internal/option/handler"
 	optionQuery "github.com/TokujouKaisenDonburi/optical-backend/internal/option/service/query"
+	todoGateway "github.com/TokujouKaisenDonburi/optical-backend/internal/todo/gateway"
+	todoHandler "github.com/TokujouKaisenDonburi/optical-backend/internal/todo/handler"
+	todoCommand "github.com/TokujouKaisenDonburi/optical-backend/internal/todo/service/command"
 	userGateway "github.com/TokujouKaisenDonburi/optical-backend/internal/user/gateway"
 	userHandler "github.com/TokujouKaisenDonburi/optical-backend/internal/user/handler"
 	userCommand "github.com/TokujouKaisenDonburi/optical-backend/internal/user/service/command"
@@ -120,19 +123,22 @@ func main() {
 	noticeRepository := noticeRepository.NewNoticePsqlRepository(db)
 	noticeQueryService := noticeQuery.NewNoticeQuery(noticeRepository)
 	noticeHttpHandler := noticeHandler.NewNoticeHttpHandler(noticeQueryService)
+	todoRepository := todoGateway.NewTodoPsqlRepository(db)
+	todoCommand := todoCommand.NewTodoCommand(todoRepository)
+	todoHandler := todoHandler.NewTodoHttpHandler(todoCommand)
 
-	// Unprotected Routes
-	r.Group(func(r chi.Router) {
-		// Users
-		r.Post("/register", userHandler.Create)
-		r.Post("/login", userHandler.Login)
-		r.Post("/refresh", userHandler.Refresh)
+		// Unprotected Routes
+		r.Group(func(r chi.Router) {
+			// Users
+			r.Post("/register", userHandler.Create)
+			r.Post("/login", userHandler.Login)
+			r.Post("/refresh", userHandler.Refresh)
 
-		// Github
-		r.Post("/github/apps/install", githubHandler.InstallToCalendar)
-		r.Post("/github/oauth/link", githubHandler.LinkUser)
-		r.Post("/github/oauth/create", githubHandler.CreateNewUserOauthState)
-	})
+			// Github
+			r.Post("/github/apps/install", githubHandler.InstallToCalendar)
+			r.Post("/github/oauth/link", githubHandler.LinkUser)
+			r.Post("/github/oauth/create", githubHandler.CreateNewUserOauthState)
+		})
 
 	// Protected Routes
 	r.Group(func(r chi.Router) {
@@ -178,6 +184,9 @@ func main() {
 
 		// Notices
 		r.Get("/notices", noticeHttpHandler.GetNotices)
+
+		// Todos
+		r.Post("/todos/lists", todoHandler.CreateList)
 	})
 
 	// Start Serving
