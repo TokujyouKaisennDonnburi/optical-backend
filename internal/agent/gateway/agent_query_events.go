@@ -83,7 +83,7 @@ func (r *AgentQueryPsqlRepository) FindCalendarEventByUserIdAndDate(
 	userId, calendarId uuid.UUID,
 	title, location string,
 	startAt, endAt time.Time,
-	limit int16,
+	limit uint16,
 ) ([]agent.AnalyzableEvent, error) {
 	events := []agent.AnalyzableEvent{}
 	err := transact.Transact(ctx, func(tx *sqlx.Tx) error {

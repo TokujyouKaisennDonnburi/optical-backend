@@ -87,7 +87,7 @@ type CalendarEventSearchInput struct {
 	Location string    `json:"location"`
 	StartAt  time.Time `json:"start_at"`
 	EndAt    time.Time `json:"end_at"`
-	Limit    int16    `json:"limit"`
+	Limit    uint16    `json:"limit"`
 }
 
 func (t CalendarEventSearchTool) Call(ctx context.Context, input string) (string, error) {
