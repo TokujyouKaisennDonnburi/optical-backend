@@ -42,7 +42,7 @@ func (r *AvatarPsqlAndMinioRepository) Upload(ctx context.Context, file multipar
 	if err != nil {
 		return "", err
 	}
-	return r.bucketName + "/" + filePath + header.Filename, nil
+	return filePath + header.Filename, nil
 }
 
 func (r *AvatarPsqlAndMinioRepository) Save(ctx context.Context, userId uuid.UUID, avatar *user.Avatar) error {

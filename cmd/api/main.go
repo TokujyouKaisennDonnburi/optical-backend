@@ -12,8 +12,6 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/rubenv/sql-migrate"
-
 	agentGateway "github.com/TokujouKaisenDonburi/optical-backend/internal/agent/gateway"
 	agentHandler "github.com/TokujouKaisenDonburi/optical-backend/internal/agent/handler"
 	agentCommand "github.com/TokujouKaisenDonburi/optical-backend/internal/agent/service/command"
