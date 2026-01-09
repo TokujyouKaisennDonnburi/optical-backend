@@ -23,23 +23,6 @@ func NewSchedulerPsqlRepository(db *sqlx.DB) *SchedulerPsqlRepository {
 	}
 }
 
-type schedulerCreateParams struct {
-	Id         uuid.UUID `db:"id"`
-	CalendarId uuid.UUID `db:"calendarId"`
-	UserId     uuid.UUID `db:"userId"`
-	Title      string    `db:"title"`
-	Memo       string    `db:"memo"`
-	LimitTime  time.Time `db:"limitTime"`
-	IsAllDay   bool      `db:"isAllDay"`
-}
-
-type possibleDateParams struct {
-	SchedulerId uuid.UUID `db:"schedulerId"`
-	Date        time.Time `db:"date"`
-	StartTime   time.Time `db:"startTime"`
-	EndTime     time.Time `db:"endTime"`
-}
-
 // create
 func (r *SchedulerPsqlRepository) CreateScheduler(
 	ctx context.Context,
@@ -55,16 +38,15 @@ func (r *SchedulerPsqlRepository) CreateScheduler(
 		INSERT INTO scheduler(id, calendar_id, user_id, title, memo, limit_time, is_allday)
 		VALUES(:id, :calendarId, :userId, :title, :memo, :limitTime, :isAllDay)
 	`
-		schedulerParams := schedulerCreateParams{
-			Id:         id,
-			CalendarId: calendarId,
-			UserId:     userId,
-			Title:      title,
-			Memo:       memo,
-			LimitTime:  limitTime,
-			IsAllDay:   isAllDay,
-		}
-		_, err := tx.NamedExecContext(ctx, sql, schedulerParams)
+		_, err := tx.NamedExecContext(ctx, sql, map[string]any{
+			"id":         id,
+			"calendarId": calendarId,
+			"userId":     userId,
+			"title":      title,
+			"memo":       memo,
+			"limitTime":  limitTime,
+			"isAllDay":   isAllDay,
+		})
 		if err != nil {
 			return err
 		}
@@ -74,22 +56,16 @@ func (r *SchedulerPsqlRepository) CreateScheduler(
 		INSERT INTO scheduler_possible_date(scheduler_id, date, start_time, end_time)
 		VALUES(:schedulerId, :date, :startTime, :endTime)
 	`
-		possibleDateParamsList := make([]possibleDateParams, len(possibleDates))
-		for i, possibleDate := range possibleDates {
-			possibleDateParamsList[i] = possibleDateParams{
-				SchedulerId: id,
-				Date:        possibleDate.Date,
-				StartTime:   possibleDate.StartTime,
-				EndTime:     possibleDate.EndTime,
+		for _, db := range possibleDates {
+			_, err = tx.NamedExecContext(ctx, sql, map[string]any{
+				"SchedulerId": id,
+				"Date":        db.Date,
+				"StartTime":   db.StartTime,
+				"EndTime":     db.EndTime,
+			})
+			if err != nil {
+				return err
 			}
-		}
-
-		if len(possibleDateParamsList) == 0 {
-			return nil
-		}
-		_, err = tx.NamedExecContext(ctx, sql, possibleDateParamsList)
-		if err != nil {
-			return err
 		}
 		return nil
 	})
