@@ -1,0 +1,12 @@
+app = "optical-backend"
+primary_region = "nrt"
+
+[build]
+  dockerfile = "Dockerfile"
+
+[http_service]
+internal_port = 8000
+force_https = true
+auto_stop_machines = true  # オプション：トラフィックがない場合にマシンを停止
+auto_start_machines = true
+min_machines_running = 0   # オプション：最小稼働マシン数
