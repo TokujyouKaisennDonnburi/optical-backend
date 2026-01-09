@@ -5,11 +5,18 @@ CREATE TABLE scheduler(
     user_id UUID NOT NULL,
     title VARCHAR(255) NOT NULL,
     memo VARCHAR(255) NOT NULL,
-    start_time TIMESTAMPTZ NOT NULL,
-    end_time TIMESTAMPTZ NOT NULL,
     limit_time TIMESTAMPTZ NOT NULL,
     is_allday BOOLEAN NOT NULL,
     FOREIGN KEY (calendar_id) REFERENCES calendars(id) ON DELETE CASCADE
+);
+
+CREATE TABLE scheduler_possible_date(
+    scheduler_id UUID NOT NULL,
+    date DATE NOT NULL,
+    start_time TIME NOT NULL,
+    end_time TIME NOT NULL,
+    PRIMARY KEY (scheduler_id, date),
+    FOREIGN KEY (scheduler_id) REFERENCES scheduler(id) ON DELETE CASCADE
 );
 
 CREATE TABLE scheduler_attendance(
@@ -35,10 +42,13 @@ COMMENT ON COLUMN scheduler.calendar_id IS 'カレンダーID';
 COMMENT ON COLUMN scheduler.user_id IS '作成ユーザーID';
 COMMENT ON COLUMN scheduler.title IS 'スケジューラータイトル';
 COMMENT ON COLUMN scheduler.memo IS 'メモ';
-COMMENT ON COLUMN scheduler.start_time IS '開始時間';
-COMMENT ON COLUMN scheduler.end_time IS '終了時間';
 COMMENT ON COLUMN scheduler.limit_time IS '解答期限';
 COMMENT ON COLUMN scheduler.is_allday IS '終日チェック';
+-- scheduler_possible_date
+COMMENT ON COLUMN scheduler_possible_date.scheduler_id IS 'スケジューラーID';
+COMMENT ON COLUMN scheduler_possible_date.date IS '日付';
+COMMENT ON COLUMN scheduler_possible_date.start_time IS '開始時間';
+COMMENT ON COLUMN scheduler_possible_date.end_time IS '終了時間';
 -- attendance
 COMMENT ON COLUMN scheduler_attendance.id IS '調整ID';
 COMMENT ON COLUMN scheduler_attendance.scheduler_id IS 'スケジューラーID';
@@ -49,8 +59,14 @@ COMMENT ON COLUMN scheduler_status.attendance_id IS '調整ID';
 COMMENT ON COLUMN scheduler_status.date IS '日付';
 COMMENT ON COLUMN scheduler_status.status IS '参加確認';
 
+-- option
+INSERT INTO options(id, name, deprecated)
+VALUES (6, 'scheduler', FALSE)
+ON CONFLICT (id) DO NOTHING;
+
 -- +migrate Down
 
 DROP TABLE IF EXISTS scheduler_status;
+DROP TABLE IF EXISTS scheduler_possible_date;
 DROP TABLE IF EXISTS scheduler_attendance;
 DROP TABLE IF EXISTS scheduler;

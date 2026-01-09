@@ -14,6 +14,8 @@ tags:
     description: Member management
   - name: events
     description: Events management
+  - name: schedulers
+    description: Scheduler management
   - name: options
     description: Options management
   - name: agents
@@ -365,6 +367,41 @@ paths:
           description: Event updated successfully
         "400":
           description: Invalid request
+        "500":
+          description: Internal server error
+  /calendars/{calendarId}/scheduler:
+    post:
+      summary: Create a new scheduler
+      tags:
+        - schedulers
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: calendarId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SchedulerCreateRequest"
+      responses:
+        "200":
+          description: Scheduler created successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SchedulerCreateResponse"
+        "400":
+          description: Invalid request
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden - Scheduler option not enabled
         "500":
           description: Internal server error
   /calendars/images:
@@ -945,6 +982,57 @@ components:
       properties:
         id:
           type: string
+    SchedulerCreateRequest:
+      type: object
+      required:
+        - title
+        - memo
+        - limitTime
+        - isAllDay
+        - dates
+      properties:
+        title:
+          type: string
+          example: "scheduler title"
+        memo:
+          type: string
+          example: "memo"
+        limitTime:
+          type: string
+          format: date-time
+          example: "2026-03-15T12:00:00Z"
+        isAllDay:
+          type: boolean
+          example: false
+        dates:
+          type: array
+          items:
+            $ref: "#/components/schemas/SchedulerCreateDateRequest"
+    SchedulerCreateDateRequest:
+      type: object
+      required:
+        - date
+        - startTime
+        - endTime
+      properties:
+        date:
+          type: string
+          format: date-time
+          example: "2026-03-20T00:00:00Z"
+        startTime:
+          type: string
+          format: date-time
+          example: "2026-03-20T09:00:00Z"
+        endTime:
+          type: string
+          format: date-time
+          example: "2026-03-20T10:00:00Z"
+    SchedulerCreateResponse:
+      type: object
+      properties:
+        schedulerId:
+          type: string
+          format: uuid
     EventListResponse:
       type: object
       properties:
