@@ -21,4 +21,5 @@ COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 COPY --from=builder /usr/local/bin/go_app /app/go_app
 COPY --from=builder /app/db /app/db
 
+EXPOSE 8000
 ENTRYPOINT ["./go_app"]
