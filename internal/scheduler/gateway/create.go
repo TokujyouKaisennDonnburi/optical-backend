@@ -58,10 +58,10 @@ func (r *SchedulerPsqlRepository) CreateScheduler(
 	`
 		for _, db := range possibleDates {
 			_, err = tx.NamedExecContext(ctx, sql, map[string]any{
-				"SchedulerId": id,
-				"Date":        db.Date,
-				"StartTime":   db.StartTime,
-				"EndTime":     db.EndTime,
+				"schedulerId": id,
+				"date":        db.Date,
+				"startTime":   db.StartTime,
+				"endTime":     db.EndTime,
 			})
 			if err != nil {
 				return err
