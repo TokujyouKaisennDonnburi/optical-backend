@@ -37,7 +37,7 @@ type OpenRouterRequest struct {
 	Stream         bool           `json:"stream,omitempty"`
 	Tools          []ToolRequest  `json:"tools,omitempty"`
 	ToolChoice     string         `json:"tool_choice,omitempty"`
-	Reasoning      string         `json:"reasoning,omitempty"`
+	Reasoning      Reasoning      `json:"reasoning"`
 	ResponseFormat map[string]any `json:"response_format,omitempty"`
 }
 
@@ -78,7 +78,7 @@ func (r *OpenRouter) Fetch(ctx context.Context, messages []Message) (*OpenRouter
 		return nil, ErrMessageNoContent
 	}
 	sendingMessages := make([]Message, len(messages))
-	for i, message := range messages{
+	for i, message := range messages {
 		message.Reasoning = ""
 		sendingMessages[i] = message
 	}
@@ -147,7 +147,7 @@ func (r OpenRouter) Stream(
 		return nil, ErrMessageNoContent
 	}
 	sendingMessages := make([]Message, len(messages))
-	for i, message := range messages{
+	for i, message := range messages {
 		message.Reasoning = ""
 		sendingMessages[i] = message
 	}
