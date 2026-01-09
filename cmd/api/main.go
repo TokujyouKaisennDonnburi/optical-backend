@@ -127,18 +127,18 @@ func main() {
 	todoCommand := todoCommand.NewTodoCommand(todoRepository)
 	todoHandler := todoHandler.NewTodoHttpHandler(todoCommand)
 
-		// Unprotected Routes
-		r.Group(func(r chi.Router) {
-			// Users
-			r.Post("/register", userHandler.Create)
-			r.Post("/login", userHandler.Login)
-			r.Post("/refresh", userHandler.Refresh)
+	// Unprotected Routes
+	r.Group(func(r chi.Router) {
+		// Users
+		r.Post("/register", userHandler.Create)
+		r.Post("/login", userHandler.Login)
+		r.Post("/refresh", userHandler.Refresh)
 
-			// Github
-			r.Post("/github/apps/install", githubHandler.InstallToCalendar)
-			r.Post("/github/oauth/link", githubHandler.LinkUser)
-			r.Post("/github/oauth/create", githubHandler.CreateNewUserOauthState)
-		})
+		// Github
+		r.Post("/github/apps/install", githubHandler.InstallToCalendar)
+		r.Post("/github/oauth/link", githubHandler.LinkUser)
+		r.Post("/github/oauth/create", githubHandler.CreateNewUserOauthState)
+	})
 
 	// Protected Routes
 	r.Group(func(r chi.Router) {
@@ -187,6 +187,7 @@ func main() {
 
 		// Todos
 		r.Post("/todos/lists", todoHandler.CreateList)
+		r.Post("/todos/lists/{todoListId}/items", todoHandler.AddItem)
 	})
 
 	// Start Serving
