@@ -12,34 +12,34 @@ import (
 	"github.com/google/uuid"
 )
 
-type CreateTodoListRequest struct {
+type CreateTodoItemRequest struct {
 	Name string `json:"name"`
 }
 
-type CreateTodoListResponse struct {
+type CreateTodoItemResponse struct {
 	Id uuid.UUID `json:"id"`
 }
 
-func (h *TodoHttpHandler) AddItem(w http.ResponseWriter, r *http.Request) {
+func (h *TodoHttpHandler) CreateList(w http.ResponseWriter, r *http.Request) {
 	userId, err := auth.GetUserIdFromContext(r)
 	if err != nil {
 		_ = render.Render(w, r, apperr.ErrInternalServerError(err))
 		return
 	}
-	calendarId, err := uuid.Parse(chi.URLParam(r, "calendarId"))
+	todoListId, err := uuid.Parse(chi.URLParam(r, "todoListId"))
 	if err != nil {
 		_ = render.Render(w, r, apperr.ErrInternalServerError(err))
 		return
 	}
-	var request CreateTodoListRequest
+	var request CreateTodoItemRequest
 	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
 		_ = render.Render(w, r, apperr.ErrInvalidRequest(err))
 		return
 	}
-	output, err := h.todoCommand.CreateList(r.Context(), command.TodoCreateInput{
-		UserId:     userId,
-		CalendarId: calendarId,
-		Name:       request.Name,
+	output, err := h.todoCommand.AddItem(r.Context(), command.TodoCreateItemInput{
+		UserId: userId,
+		ListId: todoListId,
+		Name:   request.Name,
 	})
 	if err != nil {
 		apperr.HandleAppError(w, r, err)
