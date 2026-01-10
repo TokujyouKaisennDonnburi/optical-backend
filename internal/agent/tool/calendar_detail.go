@@ -45,7 +45,7 @@ func (t CalendarDetailTool) Description() string {
 }
 
 func (t CalendarDetailTool) Strict() bool {
-	return true
+	return false
 }
 
 func (t CalendarDetailTool) Parameters() map[string]any {

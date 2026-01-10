@@ -68,6 +68,13 @@ func (h *AgentHandler) CalendarChat(w http.ResponseWriter, r *http.Request) {
 	})
 	if err != nil {
 		logrus.WithError(err).Error("agent exec error")
+		jsonMessage, err := json.Marshal(err.Error())
+		if err != nil {
+			logrus.WithError(err).Error("agent exec json marshal error")
+			return
+		}
+		errorMessage := `{"error":%s}`
+		fmt.Fprintf(w, "data: %s\n\n", fmt.Sprintf(errorMessage, jsonMessage))
 		return
 	}
 }

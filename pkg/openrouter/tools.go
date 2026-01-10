@@ -15,7 +15,7 @@ type Tool interface {
 type FunctionCall struct {
 	Id       string `json:"id"`
 	Index    int    `json:"index"`
-	Type     string `json:"string"`
+	Type     string `json:"type"`
 	Function struct {
 		Name      string `json:"name"`
 		Arguments string `json:"arguments"`

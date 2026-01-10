@@ -69,7 +69,7 @@ type EventSearchInput struct {
 }
 
 func (t EventSearchTool) Call(ctx context.Context, input string) (string, error) {
-	logrus.WithField("user_input", input).Debug("event search called")
+	logrus.WithField("user_input", input).Info("event search called")
 	var inputModel EventSearchInput
 	if err := json.Unmarshal([]byte(input), &inputModel); err != nil {
 		return "", err
