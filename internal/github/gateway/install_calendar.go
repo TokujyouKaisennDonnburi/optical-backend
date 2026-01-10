@@ -41,6 +41,11 @@ func (r *GithubApiRepository) InstallToCalendar(
 		if err != nil {
 			return err
 		}
+		// codeがある場合のみユーザー紐づけを行う
+		// code作成者と別の人がインストールした場合はcodeが発行されないため
+		if code == "" {
+			return nil
+		}
 		accessToken, err := api.PostOauthAccessToken(code)
 		if err != nil {
 			return err
@@ -52,7 +57,7 @@ func (r *GithubApiRepository) InstallToCalendar(
 		query = `
 			INSERT INTO user_githubs(user_id, github_id, github_name, github_email, sso_login, created_at, updated_at)
 				VALUES(:userId, :githubId, :githubName, :githubEmail, false, :createdAt, :updatedAt)
-			ON CONFLICT(user_id) 
+			ON CONFLICT(user_id)
 			DO UPDATE SET
 				github_id = :githubId,
 				github_name = :githubName,

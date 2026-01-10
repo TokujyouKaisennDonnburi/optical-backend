@@ -17,9 +17,7 @@ type GithubCalendarInstallInput struct {
 }
 
 func (c *GithubCommand) InstallToCalendar(ctx context.Context, input GithubCalendarInstallInput) error {
-	if input.Code == "" {
-		return apperr.ValidationError("invalid code")
-	}
+	// codeはオプショナル（code作成者と別の人がインストールした場合は発行されない）
 	if input.State == "" {
 		return apperr.ValidationError("invalid state")
 	}
