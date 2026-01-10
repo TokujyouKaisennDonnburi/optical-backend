@@ -31,6 +31,7 @@ import (
 	schedulerGateway "github.com/TokujouKaisenDonburi/optical-backend/internal/scheduler/gateway"
 	schedulerHandler "github.com/TokujouKaisenDonburi/optical-backend/internal/scheduler/handler"
 	schedulerCommand "github.com/TokujouKaisenDonburi/optical-backend/internal/scheduler/service/command"
+	schedulerQuery "github.com/TokujouKaisenDonburi/optical-backend/internal/scheduler/service/query"
 	userGateway "github.com/TokujouKaisenDonburi/optical-backend/internal/user/gateway"
 	userHandler "github.com/TokujouKaisenDonburi/optical-backend/internal/user/handler"
 	userCommand "github.com/TokujouKaisenDonburi/optical-backend/internal/user/service/command"
@@ -125,7 +126,8 @@ func main() {
 	noticeHttpHandler := noticeHandler.NewNoticeHttpHandler(noticeQueryService)
 	schedulerRepository := schedulerGateway.NewSchedulerPsqlRepository(db)
 	schedulerCommand := schedulerCommand.NewSchedulerCommand(schedulerRepository, optionRepository)
-	schedulerHandler := schedulerHandler.NewSchedulerHttpHandler(schedulerCommand)
+	schedulerQuery := schedulerQuery.NewSchedulerQuery(schedulerRepository)
+	schedulerHandler := schedulerHandler.NewSchedulerHttpHandler(schedulerCommand, schedulerQuery)
 
 	r.Use(logs.HttpLogger)
 	r.Use(cors.Handler(cors.Options{

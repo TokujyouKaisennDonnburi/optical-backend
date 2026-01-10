@@ -31,7 +31,7 @@ type PossibleDateResponse struct {
 	EndTime   time.Time `json:"endTime"`
 }
 
-func (h *SchedulerHttpHandler)GetAttendance(w http.ResponseWriter, r *http.Request){
+func (h *SchedulerHttpHandler) GetAttendance(w http.ResponseWriter, r *http.Request) {
 	// userId
 	userId, err := auth.GetUserIdFromContext(r)
 	if err != nil {
@@ -44,9 +44,13 @@ func (h *SchedulerHttpHandler)GetAttendance(w http.ResponseWriter, r *http.Reque
 		_ = render.Render(w, r, apperr.ErrInvalidRequest(err))
 		return
 	}
-	result, err := h.schedulerQuery.AttendanceQuery(ctx,query.AttendanceQueryInput{
-		SchedulerId: AttendanceQueryRequest.SchedulerId,
-		UserId: userId,
-		CalendarId: calendarId,
+	// result
+	var request AttendanceQueryRequest
+	result, err := h.schedulerQuery.AttendanceQuery(r.Context(), query.AttendanceQueryInput{
+		SchedulerId: request.SchedulerId,
+		UserId:      userId,
+		CalendarId:  calendarId,
 	})
+	// response
+	render.JSON(w, r, result)
 }
