@@ -404,6 +404,39 @@ paths:
           description: Forbidden - Scheduler option not enabled
         "500":
           description: Internal server error
+  /calendars/{calendarId}/scheduler/attendance:
+    post:
+      summary: Get scheduler attendance
+      tags:
+        - schedulers
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: calendarId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SchedulerAttendanceQueryRequest"
+      responses:
+        "200":
+          description: Scheduler attendance retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SchedulerAttendanceQueryResponse"
+        "400":
+          description: Invalid request
+        "401":
+          description: Unauthorized
+        "500":
+          description: Internal server error
   /calendars/images:
     post:
       summary: Upload an image
@@ -1033,6 +1066,64 @@ components:
         schedulerId:
           type: string
           format: uuid
+    SchedulerAttendanceQueryRequest:
+      type: object
+      required:
+        - schedulerId
+      properties:
+        schedulerId:
+          type: string
+          format: uuid
+    SchedulerAttendanceQueryResponse:
+      type: object
+      required:
+        - schedulerId
+        - calendarId
+        - userId
+        - title
+        - memo
+        - limitTime
+        - isAllDay
+        - possibleDate
+      properties:
+        schedulerId:
+          type: string
+          format: uuid
+        calendarId:
+          type: string
+          format: uuid
+        userId:
+          type: string
+          format: uuid
+        title:
+          type: string
+        memo:
+          type: string
+        limitTime:
+          type: string
+          format: date-time
+        isAllDay:
+          type: boolean
+        possibleDate:
+          type: array
+          items:
+            $ref: "#/components/schemas/SchedulerPossibleDateResponse"
+    SchedulerPossibleDateResponse:
+      type: object
+      required:
+        - date
+        - startTime
+        - endTime
+      properties:
+        date:
+          type: string
+          format: date-time
+        startTime:
+          type: string
+          format: date-time
+        endTime:
+          type: string
+          format: date-time
     EventListResponse:
       type: object
       properties:
