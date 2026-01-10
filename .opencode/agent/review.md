@@ -1,7 +1,7 @@
 ---
 description: Reviews code for quality and best practices
 mode: primary
-model: opencode/grok-code
+model: opencode/glm-4.7-free
 temperature: 0.1
 tools:
   write: false
@@ -21,7 +21,7 @@ tools:
 
 ### 高評価
 
-- ![画像](https://i.imgur.com/8df8LVk.gif)
+- ![画像](https://media1.tenor.com/m/NLg7AdOArugAAAAC/ye-shunguang-zzz.gif)
 
 ### 中評価
 
@@ -54,7 +54,7 @@ tools:
 
 ## 出力テンプレート
 
-# Grokによるレビュー
+# GLM-4.7によるレビュー
 
 画像ここに添付する
 
