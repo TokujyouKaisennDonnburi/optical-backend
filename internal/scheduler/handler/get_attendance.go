@@ -52,6 +52,10 @@ func (h *SchedulerHttpHandler) GetAttendance(w http.ResponseWriter, r *http.Requ
 		UserId:      userId,
 		CalendarId:  calendarId,
 	})
+	if err != nil {
+		_ = render.Render(w, r, apperr.ErrInternalServerError(err))
+		return
+	}
 	// response
 	render.JSON(w, r, result)
 }

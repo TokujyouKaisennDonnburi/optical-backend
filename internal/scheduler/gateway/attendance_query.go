@@ -39,7 +39,7 @@ func (r *SchedulerPsqlRepository) FindById(
 		return output.SchedulerAttendanceQuery{}, err
 	}
 	if len(row) == 0 {
-		return output.SchedulerAttendanceQuery{}, errors.New("scheduler possible date is not found")
+		return output.SchedulerAttendanceQuery{}, errors.New("scheduler not found")
 	}
 	dates := make([]output.PossibleDateOutput, len(row))
 	for i, v := range row {
