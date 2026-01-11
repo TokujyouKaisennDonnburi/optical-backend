@@ -369,7 +369,7 @@ paths:
           description: Invalid request
         "500":
           description: Internal server error
-  /calendars/{calendarId}/scheduler:
+  /calendars/{calendarId}/schedulers:
     post:
       summary: Create a new scheduler
       tags:
@@ -404,9 +404,10 @@ paths:
           description: Forbidden - Scheduler option not enabled
         "500":
           description: Internal server error
-  /calendars/{calendarId}/scheduler/attendance:
-    post:
-      summary: Get scheduler attendance
+  /calendars/{calendarId}/schedulers/{schedulerId}:
+    get:
+      summary: Get scheduler attendance information
+      description: Retrieve attendance information for a specific scheduler in a calendar
       tags:
         - schedulers
       security:
@@ -415,28 +416,31 @@ paths:
         - name: calendarId
           in: path
           required: true
+          description: Calendar ID (UUID format)
           schema:
             type: string
             format: uuid
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/SchedulerAttendanceQueryRequest"
+        - name: schedulerId
+          in: path
+          required: true
+          description: Scheduler ID (UUID format)
+          schema:
+            type: string
+            format: uuid
       responses:
         "200":
-          description: Scheduler attendance retrieved successfully
+          description: Scheduler attendance information retrieved successfully
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/SchedulerAttendanceQueryResponse"
+                $ref: "#/components/schemas/AttendanceQueryResponse"
         "400":
-          description: Invalid request
+          description: Invalid request - Invalid calendarId or schedulerId format
         "401":
           description: Unauthorized
         "500":
           description: Internal server error
+
   /calendars/images:
     post:
       summary: Upload an image
@@ -1066,15 +1070,7 @@ components:
         schedulerId:
           type: string
           format: uuid
-    SchedulerAttendanceQueryRequest:
-      type: object
-      required:
-        - schedulerId
-      properties:
-        schedulerId:
-          type: string
-          format: uuid
-    SchedulerAttendanceQueryResponse:
+    AttendanceQueryResponse:
       type: object
       required:
         - schedulerId
@@ -1089,25 +1085,33 @@ components:
         schedulerId:
           type: string
           format: uuid
+          description: Scheduler ID
         calendarId:
           type: string
           format: uuid
+          description: Calendar ID
         userId:
           type: string
           format: uuid
+          description: User ID who created the scheduler
         title:
           type: string
+          description: Scheduler title
         memo:
           type: string
+          description: Scheduler memo/description
         limitTime:
           type: string
           format: date-time
+          description: Deadline for responses
         isAllDay:
           type: boolean
+          description: Whether this is an all-day scheduler
         possibleDate:
           type: array
+          description: List of possible dates for the scheduler
           items:
-            $ref: "#/components/schemas/SchedulerPossibleDateResponse"
+            $ref: "#/components/schemas/PossibleDateResponse"
     SchedulerPossibleDateResponse:
       type: object
       required:
@@ -1124,6 +1128,25 @@ components:
         endTime:
           type: string
           format: date-time
+    PossibleDateResponse:
+      type: object
+      required:
+        - date
+        - startTime
+        - endTime
+      properties:
+        date:
+          type: string
+          format: date-time
+          description: The date of the possible time slot
+        startTime:
+          type: string
+          format: date-time
+          description: Start time of the possible time slot
+        endTime:
+          type: string
+          format: date-time
+          description: End time of the possible time slot
     EventListResponse:
       type: object
       properties:

@@ -12,10 +12,7 @@ import (
 	"github.com/google/uuid"
 )
 
-type AttendanceQueryRequest struct {
-	SchedulerId uuid.UUID `json:"schedulerId"`
-}
-type AttendanceQueryRespons struct {
+type AttendanceQueryResponse struct {
 	Id           uuid.UUID              `json:"schedulerId"`
 	CalendarId   uuid.UUID              `json:"calendarId"`
 	UserId       uuid.UUID              `json:"userId"`
@@ -44,10 +41,14 @@ func (h *SchedulerHttpHandler) GetAttendance(w http.ResponseWriter, r *http.Requ
 		_ = render.Render(w, r, apperr.ErrInvalidRequest(err))
 		return
 	}
-	// result
-	var request AttendanceQueryRequest
+	// schedulerId
+	schedulerId, err := uuid.Parse(chi.URLParam(r, "schedulerId"))
+	if err != nil {
+		_ = render.Render(w, r, apperr.ErrInvalidRequest(err))
+		return
+	}
 	result, err := h.schedulerQuery.AttendanceQuery(r.Context(), query.AttendanceQueryInput{
-		SchedulerId: request.SchedulerId,
+		SchedulerId: schedulerId,
 		UserId:      userId,
 		CalendarId:  calendarId,
 	})
