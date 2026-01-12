@@ -13,7 +13,6 @@ import (
 )
 
 type AddAttendanceRequest struct {
-	SchedulerId uuid.UUID       `json:"scheduler_id"`
 	UserId      uuid.UUID       `json:"user_id"`
 	Comment     string          `json:"comment"`
 	Status      []StatusRequest `json:"status"`
@@ -34,13 +33,13 @@ func (h *SchedulerHttpHandler) AddAttendanceHandler(w http.ResponseWriter, r *ht
 		return
 	}
 	// calendarId
-	calendarId, err := uuid.Parse(chi.URLParam(r, "calendar_id"))
+	calendarId, err := uuid.Parse(chi.URLParam(r, "calendarId"))
 	if err != nil {
 		_ = render.Render(w, r, apperr.ErrInvalidRequest(err))
 		return
 	}
 	// schedulerId
-	schedulerId, err := uuid.Parse(chi.URLParam(r, "scheduler_id"))
+	schedulerId, err := uuid.Parse(chi.URLParam(r, "schedulerId"))
 	if err != nil {
 		_ = render.Render(w, r, apperr.ErrInvalidRequest(err))
 		return

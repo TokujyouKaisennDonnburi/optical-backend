@@ -462,8 +462,13 @@ paths:
             schema:
               $ref: "#/components/schemas/AddAttendanceRequest"
       responses:
-        "204":
+        "200":
           description: Attendance added successfully
+          content:
+            application/json:
+              schema:
+                type: "null"
+              example: null
         "400":
           description: Invalid request
         "401":
@@ -1155,15 +1160,10 @@ components:
     AddAttendanceRequest:
       type: object
       required:
-        - scheduler_id
         - user_id
         - comment
         - status
       properties:
-        scheduler_id:
-          type: string
-          format: uuid
-          example: "019b1ffe-efd5-7d9b-a13f-f636cfc89c4d"
         user_id:
           type: string
           format: uuid
