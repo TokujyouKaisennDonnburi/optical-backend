@@ -23,7 +23,7 @@ func (*AgentCommandPsqlRepository) UpdateOptions(
 				calendar_members.calendar_id = $1
 				AND calendar_members.user_id = $2
 		`
-		err := tx.SelectContext(ctx, &exists, query, calendarId, userId)
+		err := tx.GetContext(ctx, &exists, query, calendarId, userId)
 		if err != nil {
 			return err
 		}
