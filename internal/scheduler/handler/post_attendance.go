@@ -46,9 +46,9 @@ func (h *SchedulerHttpHandler) AddAttendanceHandler(w http.ResponseWriter, r *ht
 		return
 	}
 	// array bind
-	Status := make([]command.StatusInput, len(request.Status))
+	status := make([]command.StatusInput, len(request.Status))
 	for i, v := range request.Status {
-		Status[i] = command.StatusInput{
+		status[i] = command.StatusInput{
 			Date:   v.Date,
 			Status: v.Status,
 		}
@@ -59,7 +59,7 @@ func (h *SchedulerHttpHandler) AddAttendanceHandler(w http.ResponseWriter, r *ht
 		SchedulerId: schedulerId,
 		UserId:      request.UserId,
 		Comment:     request.Comment,
-		Status:      Status,
+		Status:      status,
 	})
 	if err != nil {
 		render.Render(w, r, apperr.ErrInternalServerError(err))
