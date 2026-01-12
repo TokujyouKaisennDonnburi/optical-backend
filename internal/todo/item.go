@@ -14,14 +14,18 @@ const (
 
 type Item struct {
 	Id     uuid.UUID
+	ListId uuid.UUID
 	UserId uuid.UUID
 	Name   string
 	IsDone bool
 }
 
-func NewItem(userId uuid.UUID, name string) (*Item, error) {
+func NewItem(listId, userId uuid.UUID, name string) (*Item, error) {
 	if userId == uuid.Nil {
-		return nil, errors.New("userId is nil")
+		return nil, errors.New("todo item `userId` is nil")
+	}
+	if listId == uuid.Nil {
+		return nil, errors.New("todo item `listId` is nil")
 	}
 	id, err := uuid.NewV7()
 	if err != nil {
@@ -29,6 +33,7 @@ func NewItem(userId uuid.UUID, name string) (*Item, error) {
 	}
 	todoItem := &Item{
 		Id:     id,
+		ListId: listId,
 		UserId: userId,
 		IsDone: false,
 	}

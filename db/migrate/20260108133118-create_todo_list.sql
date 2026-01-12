@@ -10,6 +10,7 @@ CREATE TABLE todo_lists(
 );
 
 CREATE TABLE todo_items(
+    id UUID PRIMARY KEY,
     todo_list_id UUID NOT NULL REFERENCES todo_lists(id) ON DELETE CASCADE,
     user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     name VARCHAR(255) NOT NULL,
