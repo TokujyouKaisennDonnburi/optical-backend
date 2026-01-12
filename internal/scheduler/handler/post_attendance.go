@@ -30,19 +30,19 @@ func (h *SchedulerHttpHandler) AddAttendanceHandler(w http.ResponseWriter, r *ht
 	// body
 	err := json.NewDecoder(r.Body).Decode(&request)
 	if err != nil {
-		render.Render(w, r, apperr.ErrInvalidRequest(err))
+		_ = render.Render(w, r, apperr.ErrInvalidRequest(err))
 		return
 	}
 	// calendarId
 	calendarId, err := uuid.Parse(chi.URLParam(r, "calendar_id"))
 	if err != nil {
-		render.Render(w, r, apperr.ErrInvalidRequest(err))
+		_ = render.Render(w, r, apperr.ErrInvalidRequest(err))
 		return
 	}
 	// schedulerId
 	schedulerId, err := uuid.Parse(chi.URLParam(r, "scheduler_id"))
 	if err != nil {
-		render.Render(w, r, apperr.ErrInvalidRequest(err))
+		_ = render.Render(w, r, apperr.ErrInvalidRequest(err))
 		return
 	}
 	// array bind
@@ -62,7 +62,7 @@ func (h *SchedulerHttpHandler) AddAttendanceHandler(w http.ResponseWriter, r *ht
 		Status:      status,
 	})
 	if err != nil {
-		render.Render(w, r, apperr.ErrInternalServerError(err))
+		_ = render.Render(w, r, apperr.ErrInternalServerError(err))
 		return
 	}
 	render.JSON(w, r, nil)
