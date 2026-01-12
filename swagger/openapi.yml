@@ -913,7 +913,7 @@ paths:
           description: Invalid request
         '500':
           description: Internal server error
-  /todos/lists:
+  /calendars/{calendarId}/todos:
     post:
       summary: Create a new todo list
       tags:

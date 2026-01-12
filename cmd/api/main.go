@@ -213,7 +213,7 @@ func main() {
 		r.Post("/calendars/{calendarId}/scheduler", schedulerHandler.SchedulerCreate)
 
 		// Todos
-		r.Post("/todos/lists", todoHandler.CreateList)
+		r.Post("/calendars/{calendarId}/todos", todoHandler.CreateList)
 	})
 
 	// Start Serving
