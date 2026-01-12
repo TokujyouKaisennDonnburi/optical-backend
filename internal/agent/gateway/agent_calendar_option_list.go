@@ -25,8 +25,8 @@ func (r *AgentQueryPsqlRepository) FindOptionsByCalendarId(
 				JOIN calendar_members
 					ON calendar_members.calendar_id = calendar_options.calendar_id
 				WHERE 
-					calendar_options.calendar_id = $1
-					AND calendar_members.user_id = $2
+					calendar_options.calendar_id = $2
+					AND calendar_members.user_id = $1
 			)
 		`
 		var models []OptionModel
