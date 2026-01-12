@@ -22,15 +22,6 @@ func (q *SchedulerQuery) AttendanceQuery(
 	if err != nil {
 		return nil, err
 	}
-	// array
-	array := make([]output.PossibleDateOutput, len(result.PossibleDate))
-	for i, v := range result.PossibleDate {
-		array[i] = output.PossibleDateOutput{
-			Date:      v.Date,
-			StartTime: v.StartTime,
-			EndTime:   v.EndTime,
-		}
-	}
 	// assign
 	return &output.SchedulerAttendanceQuery{
 		Id:           result.Id,
@@ -40,6 +31,6 @@ func (q *SchedulerQuery) AttendanceQuery(
 		Memo:         result.Memo,
 		LimitTime:    result.LimitTime,
 		IsAllDay:     result.IsAllDay,
-		PossibleDate: array,
+		PossibleDate: result.PossibleDate,
 	}, nil
 }
