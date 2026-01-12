@@ -18,7 +18,9 @@ type AgentQueryRepository interface {
 	FindCalendarEventByUserIdAndDate(
 		ctx context.Context,
 		userId, calendarId uuid.UUID,
+		title, location string,
 		startAt, endAt time.Time,
+		limit uint16,
 	) ([]agent.AnalyzableEvent, error)
 	FindCalendarByUserId(
 		ctx context.Context,
@@ -28,6 +30,13 @@ type AgentQueryRepository interface {
 		ctx context.Context,
 		userId, calendarId uuid.UUID,
 	) (*agent.AnalyzableCalendar, error)
+	FindOptions(
+		ctx context.Context,
+	) ([]agent.AnalyzableOption, error)
+	FindOptionsByCalendarId(
+		ctx context.Context,
+		userId, calendarId uuid.UUID,
+	) ([]agent.AnalyzableOption, error)
 }
 
 type AgentCommandRepository interface {
@@ -35,5 +44,10 @@ type AgentCommandRepository interface {
 		ctx context.Context,
 		userId, calendarId uuid.UUID,
 		createFn func(*calendar.Calendar) ([]calendar.Event, error),
+	) error
+	UpdateOptions(
+		ctx context.Context,
+		userId, calendarId uuid.UUID,
+		optionIds []int32,
 	) error
 }

@@ -33,6 +33,7 @@ type AnalyzableMember struct {
 }
 
 type AnalyzableOption struct {
-	Id   int32  `json:"option_id"`
-	Name string `json:"option_name"`
+	Id          int32  `json:"option_id"`
+	Name        string `json:"option_name"`
+	Description string `json:"option_description"`
 }

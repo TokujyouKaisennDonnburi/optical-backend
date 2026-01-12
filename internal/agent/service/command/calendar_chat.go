@@ -65,11 +65,26 @@ func (c *AgentCommand) CalendarChat(ctx context.Context, input AgentCommandCalen
 	if err != nil {
 		return err
 	}
+	optionListTool, err := tool.NewOptionListTool(c.agentQueryRepository, input.UserId, input.StreamingFn)
+	if err != nil {
+		return err
+	}
+	calendarOptionListTool, err := tool.NewCalendarOptionListTool(c.agentQueryRepository, input.UserId, input.CalendarId, input.StreamingFn)
+	if err != nil {
+		return err
+	}
+	calendarOptionUpdateTool, err := tool.NewCalendarOptionUpdateTool(c.agentCommandRepository, input.UserId, input.CalendarId, input.StreamingFn)
+	if err != nil {
+		return err
+	}
 	// ツール定義
 	tools := []openrouter.Tool{
 		calendarEventSearchTool,
 		calendarDetailTool,
 		eventCreateTool,
+		optionListTool,
+		calendarOptionListTool,
+		calendarOptionUpdateTool,
 	}
 	systemPrompt := fmt.Sprintf(CALENDAR_CHAT_SYSTEM_PROMPT, input.CalendarId.String(), time.Now())
 	messages := []openrouter.Message{
