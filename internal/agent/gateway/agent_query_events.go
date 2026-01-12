@@ -141,6 +141,8 @@ func (r *AgentQueryPsqlRepository) FindCalendarEventByUserIdAndDate(
 			logrus.WithError(err).Error("prepare named statement error")
 			return err
 		}
+		defer nstmt.Close()
+
 		err = nstmt.SelectContext(ctx, &models, queryParams)
 		if err != nil {
 			logrus.WithError(err).Error("events query error")
