@@ -183,9 +183,9 @@ func (a *SchedulerAttendance) SetComment(comment string) error {
 	a.Comment = comment
 	return nil
 }
-func NewStatus(Date time.Time, status int8) (*SchedulerStatus, error) {
+func NewStatus(date time.Time, status int8) (*SchedulerStatus, error) {
 	s := &SchedulerStatus{
-		Date:   Date,
+		Date:   date,
 		Status: Status(status),
 	}
 	err := s.SetStatus(status)

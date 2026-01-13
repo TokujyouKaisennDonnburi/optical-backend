@@ -69,5 +69,5 @@ func (h *SchedulerHttpHandler) AddAttendanceHandler(w http.ResponseWriter, r *ht
 		apperr.HandleAppError(w, r, err)
 		return
 	}
-	render.JSON(w, r, nil)
+	w.WriteHeader(http.StatusNoContent)
 }
