@@ -43,7 +43,7 @@ type EventRepository interface {
 	SearchEvents(
 		ctx context.Context,
 		params SearchEventsParams,
-	) (*output.CalendarListQueryOutput, error)
+	) (*output.EventSearchQueryOutput, error)
 }
 
 // イベント検索用パラメータ
