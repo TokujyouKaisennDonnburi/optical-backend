@@ -24,6 +24,26 @@ type EventSearchQueryModel struct {
 	IsAllDay      bool      `db:"all_day"`
 }
 
+// 検索ロジック
+const eventSearchBaseSQL = `
+    FROM events
+    LEFT JOIN event_locations ON events.id = event_locations.event_id
+    JOIN calendars ON events.calendar_id = calendars.id
+    JOIN calendar_members ON calendar_members.calendar_id = events.calendar_id
+    WHERE
+        events.deleted_at IS NULL
+        AND calendars.deleted_at IS NULL
+        AND calendar_members.user_id = :user_id
+        AND calendar_members.joined_at IS NOT NULL
+        AND events.start_at >= :start_from
+        AND events.start_at <= :start_to
+        AND (
+	    events @@@ paradedb.parse(:query)
+            OR
+            COALESCE(event_locations.location, '') ILIKE '%' || :query || '%'
+        )
+	`
+
 // pg_searchを使ったイベント検索
 func (r *EventPsqlRepository) SearchEvents(
 	ctx context.Context,
@@ -32,39 +52,23 @@ func (r *EventPsqlRepository) SearchEvents(
 	// デフォルト値適用
 	params.ApplyDefaults()
 
-	// 検索クエリ
+	// 検索クエリ（pg_search版）
 	query := `
-		SELECT
-			calendars.id AS calendar_id,
-			calendars.name AS calendar_name,
-			calendars.color AS calendar_color,
-			events.id AS event_id,
-			events.title AS event_title,
-			COALESCE(event_locations.location, '') AS location,
-			COALESCE(events.memo, '') AS memo,
-			events.start_at,
-			events.end_at,
-			events.all_day
-		FROM events
-		LEFT JOIN event_locations ON events.id = event_locations.event_id
-		JOIN calendars ON events.calendar_id = calendars.id
-		JOIN calendar_members ON calendar_members.calendar_id = events.calendar_id
-		WHERE
-			events.deleted_at IS NULL
-			AND calendars.deleted_at IS NULL
-			AND calendar_members.user_id = :user_id
-			AND calendar_members.joined_at IS NOT NULL
-			AND events.start_at >= :start_from
-			AND events.start_at <= :start_to
-			AND (
-				to_tsvector('japanese', COALESCE(events.title, '') || ' ' || COALESCE(events.memo, ''))
-				@@ plainto_tsquery('japanese', :query)
-				OR
-				COALESCE(event_locations.location, '') ILIKE '%' || :query || '%'
-			)
-		ORDER BY events.start_at DESC
-		LIMIT :limit OFFSET :offset
-	`
+    SELECT
+        calendars.id AS calendar_id,
+        calendars.name AS calendar_name,
+        calendars.color AS calendar_color,
+        events.id AS event_id,
+        events.title AS event_title,
+        COALESCE(event_locations.location, '') AS location,
+        COALESCE(events.memo, '') AS memo,
+        events.start_at,
+        events.end_at,
+        events.all_day
+	` + eventSearchBaseSQL + `
+       ORDER BY events.start_at DESC
+    LIMIT :limit OFFSET :offset
+`
 
 	rows, err := r.db.NamedQueryContext(ctx, query, map[string]any{
 		"user_id":    params.UserId,
@@ -126,26 +130,7 @@ func (r *EventPsqlRepository) countSearchEvents(
 	ctx context.Context,
 	params repository.SearchEventsParams,
 ) (int, error) {
-	query := `
-		SELECT COUNT(DISTINCT events.id)
-		FROM events
-		LEFT JOIN event_locations ON events.id = event_locations.event_id
-		JOIN calendars ON events.calendar_id = calendars.id
-		JOIN calendar_members ON calendar_members.calendar_id = events.calendar_id
-		WHERE
-			events.deleted_at IS NULL
-			AND calendars.deleted_at IS NULL
-			AND calendar_members.user_id = :user_id
-			AND calendar_members.joined_at IS NOT NULL
-			AND events.start_at >= :start_from
-			AND events.start_at <= :start_to
-			AND (
-				to_tsvector('japanese', COALESCE(events.title, '') || ' ' || COALESCE(events.memo, ''))
-				@@ plainto_tsquery('japanese', :query)
-				OR
-				COALESCE(event_locations.location, '') ILIKE '%' || :query || '%'
-			)
-	`
+	query := `SELECT COUNT(DISTINCT events.id) ` + eventSearchBaseSQL
 
 	rows, err := r.db.NamedQueryContext(ctx, query, map[string]any{
 		"user_id":    params.UserId,
