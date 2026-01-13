@@ -4,6 +4,7 @@ import (
 	"context"
 	"time"
 
+	"github.com/TokujouKaisenDonburi/optical-backend/internal/calendar/repository"
 	"github.com/TokujouKaisenDonburi/optical-backend/internal/calendar/service/query/output"
 	"github.com/google/uuid"
 )
@@ -23,46 +24,10 @@ type EventSearchQueryModel struct {
 	IsAllDay      bool      `db:"all_day"`
 }
 
-// 検索パラメータ
-type SearchEventsParams struct {
-	UserId    uuid.UUID
-	Query     string     // クエリパラメータ
-	StartFrom *time.Time // nil = デフォルト（3年前）
-	StartTo   *time.Time // nil = デフォルト（3年後）
-	Limit     int
-	Offset    int
-}
-
-// デフォルト値の適用
-func (p *SearchEventsParams) ApplyDefaults() {
-	now := time.Now()
-
-	// 検索範囲のデフォルト
-	if p.StartFrom == nil {
-		from := now.AddDate(-3, 0, 0) // 3年前
-		p.StartFrom = &from
-	}
-	if p.StartTo == nil {
-		to := now.AddDate(3, 0, 0) // 3年後
-		p.StartTo = &to
-	}
-
-	// ページネーションのデフォルト
-	if p.Limit <= 0 {
-		p.Limit = 20
-	}
-	if p.Limit > 100 {
-		p.Limit = 100
-	}
-	if p.Offset < 0 {
-		p.Offset = 0
-	}
-}
-
 // pg_searchを使ったイベント検索
 func (r *EventPsqlRepository) SearchEvents(
 	ctx context.Context,
-	params SearchEventsParams,
+	params repository.SearchEventsParams,
 ) (*output.EventSearchQueryOutput, error) {
 	// デフォルト値適用
 	params.ApplyDefaults()
@@ -159,7 +124,7 @@ func (r *EventPsqlRepository) SearchEvents(
 // 検索結果の総件数を取得
 func (r *EventPsqlRepository) countSearchEvents(
 	ctx context.Context,
-	params SearchEventsParams,
+	params repository.SearchEventsParams,
 ) (int, error) {
 	query := `
 		SELECT COUNT(DISTINCT events.id)

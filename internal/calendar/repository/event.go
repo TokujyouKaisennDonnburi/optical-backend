@@ -49,9 +49,9 @@ type EventRepository interface {
 // イベント検索用パラメータ
 type SearchEventsParams struct {
 	UserId    uuid.UUID
-	Query     string     // クエリパラメータ
-	StartFrom *time.Time // nil = デフォルト（3年前）
-	StartTo   *time.Time // nil = デフォルト（3年後）
+	Query     string    // クエリパラメータ
+	StartFrom time.Time // ゼロ値 = デフォルト（3年前）
+	StartTo   time.Time // ゼロ値 = デフォルト（3年後）
 	Limit     int
 	Offset    int
 }
@@ -61,13 +61,11 @@ func (p *SearchEventsParams) ApplyDefaults() {
 	now := time.Now()
 
 	// 検索範囲のデフォルト
-	if p.StartFrom == nil {
-		from := now.AddDate(-3, 0, 0) // 3年前
-		p.StartFrom = &from
+	if p.StartFrom.IsZero() {
+		p.StartFrom = now.AddDate(-3, 0, 0) // 3年前
 	}
-	if p.StartTo == nil {
-		to := now.AddDate(3, 0, 0) // 3年後
-		p.StartTo = &to
+	if p.StartTo.IsZero() {
+		p.StartTo = now.AddDate(3, 0, 0) // 3年後
 	}
 
 	// ページネーションのデフォルト
