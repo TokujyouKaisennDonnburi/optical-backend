@@ -1160,14 +1160,9 @@ components:
     AddAttendanceRequest:
       type: object
       required:
-        - user_id
         - comment
         - status
       properties:
-        user_id:
-          type: string
-          format: uuid
-          example: "019b1ffe-99a2-7b4b-b013-64596fbbdb70"
         comment:
           type: string
           example: "参加します"

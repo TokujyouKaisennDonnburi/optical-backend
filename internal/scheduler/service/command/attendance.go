@@ -40,19 +40,21 @@ func (c *SchedulerCommand) AddAttendanceCommand(ctx context.Context, input Atten
 		return apperr.ForbiddenError("option not enabled")
 	}
 	// domain
-	domain, err := scheduler.NewAttendance(input.SchedulerId, input.UserId, input.Comment)
+	attendance, err := scheduler.NewAttendance(input.SchedulerId, input.UserId, input.Comment)
 	if err != nil {
 		return err
 	}
-	domains := make([]scheduler.SchedulerStatus, 0, len(input.Status))
+	// domains
+	attendanceStatuses := make([]scheduler.SchedulerStatus, 0, len(input.Status))
 	for _, v := range input.Status {
 		status, err := scheduler.NewStatus(v.Date, v.Status)
 		if err != nil {
 			return err
 		}
-		domains = append(domains, *status)
+		attendanceStatuses = append(attendanceStatuses, *status)
 	}
-	err = c.schedulerRepository.AddAttendance(ctx, domain.Id, domain.SchedulerId, domain.UserId, domain.Comment,domains)
+	// service
+	err = c.schedulerRepository.AddAttendance(ctx, attendance.Id, attendance.SchedulerId, attendance.UserId, attendance.Comment,attendanceStatuses)
 	if err != nil {
 		return err
 	}

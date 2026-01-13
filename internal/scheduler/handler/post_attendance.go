@@ -7,15 +7,15 @@ import (
 
 	"github.com/TokujouKaisenDonburi/optical-backend/internal/scheduler/service/command"
 	"github.com/TokujouKaisenDonburi/optical-backend/pkg/apperr"
+	"github.com/TokujouKaisenDonburi/optical-backend/pkg/auth"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
 	"github.com/google/uuid"
 )
 
 type AddAttendanceRequest struct {
-	UserId      uuid.UUID       `json:"user_id"`
-	Comment     string          `json:"comment"`
-	Status      []StatusRequest `json:"status"`
+	Comment string          `json:"comment"`
+	Status  []StatusRequest `json:"status"`
 }
 
 type StatusRequest struct {
@@ -24,7 +24,6 @@ type StatusRequest struct {
 }
 
 func (h *SchedulerHttpHandler) AddAttendanceHandler(w http.ResponseWriter, r *http.Request) {
-	ctx := r.Context()
 	var request AddAttendanceRequest
 	// body
 	err := json.NewDecoder(r.Body).Decode(&request)
@@ -44,6 +43,12 @@ func (h *SchedulerHttpHandler) AddAttendanceHandler(w http.ResponseWriter, r *ht
 		_ = render.Render(w, r, apperr.ErrInvalidRequest(err))
 		return
 	}
+	// userId
+	userId, err := auth.GetUserIdFromContext(r)
+	if err != nil {
+		_ = render.Render(w, r, apperr.ErrUnauthorized(err))
+		return
+	}
 	// array bind
 	status := make([]command.StatusInput, len(request.Status))
 	for i, v := range request.Status {
@@ -53,15 +58,15 @@ func (h *SchedulerHttpHandler) AddAttendanceHandler(w http.ResponseWriter, r *ht
 		}
 	}
 	// service
-	err = h.schedulerCommand.AddAttendanceCommand(ctx, command.AttendanceInput{
+	err = h.schedulerCommand.AddAttendanceCommand(r.Context(), command.AttendanceInput{
 		CalendarId:  calendarId,
 		SchedulerId: schedulerId,
-		UserId:      request.UserId,
+		UserId:      userId,
 		Comment:     request.Comment,
 		Status:      status,
 	})
 	if err != nil {
-		_ = render.Render(w, r, apperr.ErrInternalServerError(err))
+		apperr.HandleAppError(w, r, err)
 		return
 	}
 	render.JSON(w, r, nil)
