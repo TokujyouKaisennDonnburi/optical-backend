@@ -404,16 +404,9 @@ paths:
           description: Forbidden - Scheduler option not enabled
         "500":
           description: Internal server error
-<<<<<<< HEAD
-  /calendars/{calendarId}/schedulers/{schedulerId}:
-    get:
-      summary: Get scheduler attendance information
-      description: Retrieve attendance information for a specific scheduler in a calendar
-=======
   /calendars/{calendarId}/scheduler/{schedulerId}:
     post:
       summary: Add Attendance to Scheduler
->>>>>>> b7e5867 (feat:handler周り #231)
       tags:
         - schedulers
       security:
@@ -422,17 +415,13 @@ paths:
         - name: calendarId
           in: path
           required: true
-<<<<<<< HEAD
           description: Calendar ID (UUID format)
-=======
->>>>>>> b7e5867 (feat:handler周り #231)
           schema:
             type: string
             format: uuid
         - name: schedulerId
           in: path
           required: true
-<<<<<<< HEAD
           description: Scheduler ID (UUID format)
           schema:
             type: string

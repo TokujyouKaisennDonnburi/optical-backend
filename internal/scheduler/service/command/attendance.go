@@ -54,7 +54,7 @@ func (c *SchedulerCommand) AddAttendanceCommand(ctx context.Context, input Atten
 		attendanceStatuses = append(attendanceStatuses, *status)
 	}
 	// service
-	err = c.schedulerRepository.AddAttendance(ctx, attendance.Id, attendance.SchedulerId, attendance.UserId, attendance.Comment,attendanceStatuses)
+	err = c.schedulerRepository.AddAttendance(ctx, attendance.Id, attendance.SchedulerId, attendance.UserId, attendance.Comment, attendanceStatuses)
 	if err != nil {
 		return err
 	}
