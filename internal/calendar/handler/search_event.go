@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"fmt"
 	"net/http"
 	"strconv"
 	"time"
@@ -41,6 +42,10 @@ func (h *CalendarHttpHandler) SearchEvents(w http.ResponseWriter, r *http.Reques
 	// クエリパラメータ取得
 	q := r.URL.Query()
 	searchQuery := q.Get("query")
+	if searchQuery == "" {
+		_ = render.Render(w, r, apperr.ErrInvalidRequest(fmt.Errorf("query parameter is required")))
+		return
+	}
 
 	// 日時パラメータのパース
 	var startFrom, startTo time.Time
