@@ -26,6 +26,7 @@ type Scheduler struct {
 	Memo       string
 	LimitTime  time.Time
 	IsAllDay   bool
+	IsDone     bool
 }
 type PossibleDate struct {
 	Date      time.Time
