@@ -50,10 +50,20 @@ func (h *CalendarHttpHandler) SearchEvents(w http.ResponseWriter, r *http.Reques
 	// 日時パラメータのパース
 	var startFrom, startTo time.Time
 	if v := q.Get("start_from"); v != "" {
-		startFrom, _ = time.Parse(time.RFC3339, v)
+		var err error
+		startFrom, err = time.Parse(time.RFC3339, v)
+		if err != nil {
+			_ = render.Render(w, r, apperr.ErrInvalidRequest(fmt.Errorf("start_from must be RFC3339 format")))
+			return
+		}
 	}
 	if v := q.Get("start_to"); v != "" {
-		startTo, _ = time.Parse(time.RFC3339, v)
+		var err error
+		startTo, err = time.Parse(time.RFC3339, v)
+		if err != nil {
+			_ = render.Render(w, r, apperr.ErrInvalidRequest(fmt.Errorf("start_to must be RFC3339 format")))
+			return
+		}
 	}
 
 	// ページネーションパラメータ
