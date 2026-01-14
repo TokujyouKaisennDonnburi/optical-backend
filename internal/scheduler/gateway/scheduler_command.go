@@ -46,6 +46,7 @@ func (r *SchedulerPsqlRepository) CreateScheduler(
 			"memo":       memo,
 			"limitTime":  limitTime,
 			"isAllDay":   isAllDay,
+			"isDone":     false,
 		})
 		if err != nil {
 			return err

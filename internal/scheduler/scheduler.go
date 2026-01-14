@@ -26,6 +26,7 @@ type Scheduler struct {
 	Memo       string
 	LimitTime  time.Time
 	IsAllDay   bool
+	IsDone     bool
 }
 type PossibleDate struct {
 	Date      time.Time
@@ -66,6 +67,7 @@ func NewScheduler(calendarId, userId uuid.UUID, title, memo string, limitTime ti
 		Title:      title,
 		Memo:       memo,
 		IsAllDay:   isAllDay,
+		IsDone:     false,
 	}
 	err = s.SetTitle(title)
 	if err != nil {

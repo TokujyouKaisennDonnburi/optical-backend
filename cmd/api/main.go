@@ -206,7 +206,7 @@ func main() {
 		r.Get("/notices", noticeHttpHandler.GetNotices)
 
 		// Scheduler
-		r.Post("/calendars/{calendarId}/scheduler", schedulerHandler.SchedulerCreate)
+		r.Post("/calendars/{calendarId}/schedulers", schedulerHandler.SchedulerCreate)
 		r.Post("/calendars/{calendarId}/schedulers/{schedulerId}", schedulerHandler.AddAttendanceHandler)
 		r.Get("/calendars/{calendarId}/schedulers/{schedulerId}", schedulerHandler.GetAttendance)
 	})
