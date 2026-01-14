@@ -22,3 +22,24 @@ type PossibleDateOutput struct {
 	StartTime time.Time
 	EndTime   time.Time
 }
+
+type SchedulerResultOutput struct {
+	UserId    uuid.UUID
+	Title     string
+	Memo      string
+	LimitTime time.Time
+	IsAllDay  bool
+	Members   []MemberOutput
+	Date      []DateOutput
+}
+
+type MemberOutput struct {
+	UserId   uuid.UUID
+	UserName uuid.UUID
+}
+
+type DateOutput struct {
+	Date      time.Time
+	StartTime time.Time
+	EndTime   time.Time
+}
