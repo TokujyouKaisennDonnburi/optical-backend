@@ -2,6 +2,7 @@ package handler
 
 import (
 	"net/http"
+	"time"
 
 	"github.com/TokujouKaisenDonburi/optical-backend/internal/scheduler/service/query"
 	"github.com/TokujouKaisenDonburi/optical-backend/pkg/apperr"
@@ -10,6 +11,25 @@ import (
 	"github.com/go-chi/render"
 	"github.com/google/uuid"
 )
+
+type SchedulerResultResponse struct {
+	OwnerId   uuid.UUID        `json:"owner_id"`
+	Title     string           `json:"title"`
+	Memo      string           `json:"memo"`
+	LimitTime time.Time        `json:"limit_time"`
+	IsAllDay  bool             `json:"is_allday"`
+	Members   []MemberResponse `json:"members"`
+	Date      []DateResponse   `json:"date"`
+}
+type MemberResponse struct {
+	UserId   uuid.UUID `json:"user_id"`
+	UserName string    `json:"user_name"`
+}
+type DateResponse struct {
+	Date      time.Time `json:"date"`
+	StartTime time.Time `json:"start_time"`
+	EndTime   time.Time `json:"end_time"`
+}
 
 func (h *SchedulerHttpHandler) SchedulerResultHandler(w http.ResponseWriter, r *http.Request) {
 	// calendarId

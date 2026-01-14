@@ -208,8 +208,8 @@ func main() {
 		// Scheduler
 		r.Post("/calendars/{calendarId}/schedulers", schedulerHandler.SchedulerCreate)
 		r.Post("/calendars/{calendarId}/schedulers/{schedulerId}", schedulerHandler.AddAttendanceHandler)
-		r.Get("/calendars/{calendarId}/schedulers/{schedulerId}", schedulerHandler.GetAttendance)
-		r.Get("/calendars/{calendarId}/schedulers/{schedulerId}", schedulerHandler.SchedulerResultHandler)
+		r.Get("/calendars/{calendarId}/schedulers/{schedulerId}/attendance", schedulerHandler.GetAttendance)
+		r.Get("/calendars/{calendarId}/schedulers/{schedulerId}/result", schedulerHandler.SchedulerResultHandler)
 	})
 
 	// Start Serving

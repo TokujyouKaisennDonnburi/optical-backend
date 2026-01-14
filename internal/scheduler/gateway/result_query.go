@@ -14,9 +14,9 @@ type ResultModel struct {
 	Title     string    `db:"title"`
 	Memo      string    `db:"memo"`
 	LimitTime time.Time `db:"limit_time"`
-	IsAllDay  bool      `db:"is_allDay"`
+	IsAllDay  bool      `db:"is_allday"`
 	UserId    uuid.UUID `db:"user_id"`
-	UserName  uuid.UUID `db:"user_name"`
+	UserName  string    `db:"user_name"`
 }
 type DateModel struct {
 	Date      time.Time `db:"date"`
@@ -34,12 +34,12 @@ func (r *SchedulerPsqlRepository) FindByMemberId(
 	cm.user_id, cm.joined_at,
 	u.name AS user_name
 	FROM scheduler s
-	LEFT JOIN calendar_members cm ON cm.calendar_id = $1
-	LEFT JOIN users u ON u.id = cm.id
-	WHERE s.id = $2
+	LEFT JOIN calendar_members cm ON cm.calendar_id = s.calendar_id
+	LEFT JOIN users u ON u.id = cm.user_id
+	WHERE s.id = $2 AND cm.user_id = $1
 		`
 	var resultModels []ResultModel
-	err := r.db.SelectContext(ctx, &resultModels, sql, calendarId, schedulerId)
+	err := r.db.SelectContext(ctx, &resultModels, sql, userId, schedulerId)
 	if err != nil {
 		return nil, err
 	}
@@ -57,7 +57,8 @@ func (r *SchedulerPsqlRepository) FindByMemberId(
 	// date
 	sql = `
 	SELECT pd.date, pd.start_time, pd.end_time
-	FROM scheduler_possible_date pd ON pd.scheduler_id = $1
+	FROM scheduler_possible_date pd
+	WHERE pd.scheduler_id = $1
 	`
 	var dateModels []DateModel
 	err = r.db.SelectContext(ctx, &dateModels, sql, schedulerId)

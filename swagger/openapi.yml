@@ -438,7 +438,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/AttendanceQueryResponse"
+                $ref: "#/components/schemas/SchedulerResultResponse"
         "400":
           description: Invalid request
         "401":
@@ -1075,6 +1075,76 @@ components:
         schedulerId:
           type: string
           format: uuid
+    SchedulerResultResponse:
+      type: object
+      required:
+        - owner_id
+        - title
+        - memo
+        - limit_time
+        - is_allday
+        - members
+        - date
+      properties:
+        owner_id:
+          type: string
+          format: uuid
+          description: Owner user ID
+        title:
+          type: string
+          description: Scheduler title
+        memo:
+          type: string
+          description: Scheduler memo/description
+        limit_time:
+          type: string
+          format: date-time
+          description: Deadline for responses
+        is_allday:
+          type: boolean
+          description: Whether this is an all-day scheduler
+        members:
+          type: array
+          description: List of members
+          items:
+            $ref: "#/components/schemas/SchedulerMemberResponse"
+        date:
+          type: array
+          description: List of possible dates
+          items:
+            $ref: "#/components/schemas/SchedulerDateResponse"
+    SchedulerMemberResponse:
+      type: object
+      required:
+        - user_id
+        - user_name
+      properties:
+        user_id:
+          type: string
+          format: uuid
+          description: User ID
+        user_name:
+          type: string
+          description: User name
+    SchedulerDateResponse:
+      type: object
+      required:
+        - date
+        - start_time
+        - end_time
+      properties:
+        date:
+          type: string
+          format: date-time
+          description: The date of the possible time slot
+        start_time:
+          type: string
+          format: date-time
+          description: Start time of the possible time slot
+        end_time:
+          type: string
+          format: date-time
+          description: End time of the possible time slot
     AttendanceQueryResponse:
       type: object
       required:

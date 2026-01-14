@@ -19,14 +19,5 @@ func (q *SchedulerQuery) SchedulerResult(ctx context.Context, input SchedulerRes
 	if err != nil {
 		return nil, err
 	}
-	// assign
-	return &output.SchedulerResultOutput{
-		OwnerId:   result.OwnerId,
-		Title:     result.Title,
-		Memo:      result.Memo,
-		LimitTime: result.LimitTime,
-		IsAllDay:  result.IsAllDay,
-		Members:   result.Members,
-		Date:      result.Date,
-	}, nil
+	return result, nil
 }
