@@ -1066,6 +1066,47 @@ paths:
           description: Unauthorized
         "500":
           description: Internal server error
+  /calendars/{calendarId}/todos/{todoListId}/items/{todoItemId}:
+    patch:
+      summary: Update a todo item
+      tags:
+        - todos
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: calendarId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: todoListId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: todoItemId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateTodoItemRequest"
+      responses:
+        "204":
+          description: Todo item updated successfully
+        "400":
+          description: Invalid request
+        "401":
+          description: Unauthorized
+        "500":
+          description: Internal server error
 components:
   securitySchemes:
     bearerAuth:
@@ -2101,6 +2142,15 @@ components:
           type: string
           nullable: true
           example: "http://localhost/avatars/images/icon.png"
+    UpdateTodoItemRequest:
+      type: object
+      required:
+        - name
+        - isDone
+      properties:
+        name:
+          type: string
+          example: "Buy groceries"
         isDone:
           type: boolean
           example: false
