@@ -29,5 +29,5 @@ func NewMember(userId uuid.UUID, name string) (*Member, error) {
 }
 
 func (m *Member) SetAsJoined() {
-	m.JoinedAt = time.Now()
+	m.JoinedAt = time.Now().UTC()
 }

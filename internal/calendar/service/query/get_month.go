@@ -17,7 +17,7 @@ func (q *EventQuery) GetThisMonth(
 	ctx context.Context,
 	input EventThisMonthQueryInput,
 ) (*output.EventMonthQueryOutput, error) {
-	now := time.Now()
+	now := time.Now().UTC()
 	outputs, err := q.eventRepository.GetEventsByMonth(ctx, input.UserId, now)
 	if err != nil {
 		return nil, err

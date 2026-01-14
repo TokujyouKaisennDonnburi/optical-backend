@@ -103,7 +103,7 @@ func (s *Scheduler) SetLimitTime(limitTime time.Time) error {
 	if limitTime.IsZero() {
 		return apperr.ValidationError("limit time is invalid")
 	}
-	now := time.Now()
+	now := time.Now().UTC()
 	if limitTime.Before(now) || limitTime.Equal(now) {
 		return apperr.ValidationError("limit time must be after current time")
 	}

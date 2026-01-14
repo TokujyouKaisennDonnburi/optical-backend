@@ -35,7 +35,7 @@ func (r NoticePsqlRepository) CreateNotice(
 		"title":      notice.Title,
 		"content":    notice.Content,
 		"isRead":     notice.IsRead,
-		"createdAt":  time.Now(),
+		"createdAt":  time.Now().UTC(),
 	})
 	return err
 }

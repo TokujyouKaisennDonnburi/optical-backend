@@ -22,7 +22,7 @@ type AccessToken struct {
 }
 
 func NewAccessToken(userId uuid.UUID, userName string) (*AccessToken, error) {
-	exp := time.Now().Add(time.Second * time.Duration(ACCESS_TOKEN_EXPIRE))
+	exp := time.Now().UTC().Add(time.Second * time.Duration(ACCESS_TOKEN_EXPIRE))
 	claims := jwt.MapClaims{
 		"sub":  userId.String(),
 		"name": userName,
@@ -92,7 +92,7 @@ type RefreshToken struct {
 
 func NewRefreshToken(user *User) (*RefreshToken, error) {
 	tokenId := uuid.New()
-	exp := time.Now().Add(time.Second * REFRESH_TOKEN_EXPIRE)
+	exp := time.Now().UTC().Add(time.Second * REFRESH_TOKEN_EXPIRE)
 	claims := jwt.MapClaims{
 		"sub":  user.Id.String(),
 		"name": user.Name,
@@ -114,7 +114,7 @@ func NewRefreshToken(user *User) (*RefreshToken, error) {
 }
 
 func (rt *RefreshToken) IsExpired() bool {
-	return rt.ExpiresIn.Before(time.Now())
+	return rt.ExpiresIn.Before(time.Now().UTC())
 }
 
 // トークンをデコードして情報を取得する

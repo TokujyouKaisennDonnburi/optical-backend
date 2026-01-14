@@ -16,7 +16,7 @@ func (q *EventQuery) GetToday(
 	ctx context.Context,
 	input EventTodayQueryInput,
 ) (*output.EventTodayQueryOutput, error) {
-	now := time.Now()
+	now := time.Now().UTC()
 	outputs, err := q.eventRepository.GetEventsByDate(ctx, input.UserId, now)
 	if err != nil {
 		return nil, err
