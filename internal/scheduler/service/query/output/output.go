@@ -24,7 +24,7 @@ type PossibleDateOutput struct {
 }
 
 type SchedulerResultOutput struct {
-	UserId    uuid.UUID
+	OwnerId    uuid.UUID
 	Title     string
 	Memo      string
 	LimitTime time.Time
