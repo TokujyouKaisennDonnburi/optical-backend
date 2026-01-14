@@ -23,7 +23,7 @@ func (q *GithubQuery) GetReviewRequests(ctx context.Context, input GithubReviewR
 	}
 	hasOption := false
 	for _, opt := range options {
-		if opt.Id == option.OPTION_PR_REVIEW_PENDING_COUNT {
+		if opt.Id == option.OPTION_PULL_REQUEST_REVIEW_WAIT_COUNT {
 			hasOption = true
 			break
 		}

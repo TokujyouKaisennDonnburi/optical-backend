@@ -39,7 +39,7 @@ func (q *GithubQuery) GetReviewLoadStatus(ctx context.Context, input ReviewLoadS
 	}
 	hasOption := false
 	for _, opt := range options {
-		if opt.Id == option.OPTION_REVIEW_LOAD_STATUS {
+		if opt.Id == option.OPTION_TEAM_REVIEW_LOAD {
 			hasOption = true
 			break
 		}
