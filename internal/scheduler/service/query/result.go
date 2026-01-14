@@ -8,14 +8,13 @@ import (
 )
 
 type SchedulerResultInput struct {
-	CalendarId  uuid.UUID
 	SchedulerId uuid.UUID
 	UserId      uuid.UUID
 }
 
 func (q *SchedulerQuery) SchedulerResult(ctx context.Context, input SchedulerResultInput) (*output.SchedulerResultOutput, error) {
 	// repository
-	result, err := q.schedulerRepository.FindByMemberId(ctx, input.CalendarId, input.SchedulerId, input.UserId)
+	result, err := q.schedulerRepository.FindByMemberId(ctx, input.SchedulerId, input.UserId)
 	if err != nil {
 		return nil, err
 	}

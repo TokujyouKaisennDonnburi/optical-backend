@@ -32,12 +32,6 @@ type DateResponse struct {
 }
 
 func (h *SchedulerHttpHandler) SchedulerResultHandler(w http.ResponseWriter, r *http.Request) {
-	// calendarId
-	calendarId, err := uuid.Parse(chi.URLParam(r, "calendarId"))
-	if err != nil {
-		_ = render.Render(w, r, apperr.ErrInvalidRequest(err))
-		return
-	}
 	// schedulerId
 	schedulerId, err := uuid.Parse(chi.URLParam(r, "schedulerId"))
 	if err != nil {
@@ -51,7 +45,6 @@ func (h *SchedulerHttpHandler) SchedulerResultHandler(w http.ResponseWriter, r *
 		return
 	}
 	result, err := h.schedulerQuery.SchedulerResult(r.Context(), query.SchedulerResultInput{
-		CalendarId:  calendarId,
 		SchedulerId: schedulerId,
 		UserId:      userId,
 	})

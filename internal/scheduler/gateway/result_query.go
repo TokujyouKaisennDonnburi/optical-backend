@@ -26,7 +26,7 @@ type DateModel struct {
 
 func (r *SchedulerPsqlRepository) FindByMemberId(
 	ctx context.Context,
-	calendarId, schedulerId, userId uuid.UUID,
+	schedulerId, userId uuid.UUID,
 ) (*output.SchedulerResultOutput, error) {
 	// result
 	sql := `
@@ -73,7 +73,7 @@ func (r *SchedulerPsqlRepository) FindByMemberId(
 			EndTime:   v.EndTime,
 		}
 	}
-	output := output.SchedulerResultOutput{
+	result := output.SchedulerResultOutput{
 		OwnerId:   resultModels[0].OwnerId,
 		Title:     resultModels[0].Title,
 		Memo:      resultModels[0].Memo,
@@ -82,5 +82,5 @@ func (r *SchedulerPsqlRepository) FindByMemberId(
 		Members:   members,
 		Date:      dates,
 	}
-	return &output, nil
+	return &result, nil
 }
