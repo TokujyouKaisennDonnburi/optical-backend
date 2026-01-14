@@ -227,7 +227,7 @@ func main() {
 		r.Get("/calendars/{calendarId}/todos", todoHandler.GetList)
 		r.Post("/calendars/{calendarId}/todos", todoHandler.CreateList)
 		r.Post("/calendars/{calendarId}/todos/{todoListId}/items", todoHandler.AddItem)
-		r.Post("/todos/lists", todoHandler.CreateList)
+		r.Patch("/calendars/{calendarId}/todos/{todoListId}/items/{todoItemId}", todoHandler.UpdateItem)
 	})
 
 	// Start Serving
