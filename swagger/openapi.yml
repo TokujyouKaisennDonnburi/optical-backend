@@ -410,83 +410,115 @@ paths:
           description: Forbidden - Scheduler option not enabled
         "500":
           description: Internal server error
-  /calendars/{calendarId}/schedulers/{schedulerId}:
-    get:
-      summary: Get scheduler result
-      tags:
-        - schedulers
-      security:
-        - bearerAuth: []
-      parameters:
-        - name: calendarId
-          in: path
-          required: true
-          description: Calendar ID (UUID format)
-          schema:
-            type: string
-            format: uuid
-        - name: schedulerId
-          in: path
-          required: true
-          description: Scheduler ID (UUID format)
-          schema:
-            type: string
-            format: uuid
-      responses:
-        "200":
-          description: Scheduler result retrieved successfully
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/SchedulerResultResponse"
-        "400":
-          description: Invalid request
-        "401":
-          description: Unauthorized
-        "403":
-          description: Forbidden
-        "404":
-          description: Scheduler not found
-        "500":
-          description: Internal server error
-    post:
-      summary: Add Attendance to Scheduler
-      tags:
-        - schedulers
-      security:
-        - bearerAuth: []
-      parameters:
-        - name: calendarId
-          in: path
-          required: true
-          description: Calendar ID (UUID format)
-          schema:
-            type: string
-            format: uuid
-        - name: schedulerId
-          in: path
-          required: true
-          description: Scheduler ID (UUID format)
-          schema:
-            type: string
-            format: uuid
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/AddAttendanceRequest"
-      responses:
-        "204":
-          description: Attendance added successfully
-        "400":
-          description: Invalid request
-        "401":
-          description: Unauthorized
-        "403":
-          description: Forbidden - Scheduler option not enabled
-        "500":
-          description: Internal server error
+  /schedulers/{schedulerId}:
+     get:
+       summary: Get scheduler result
+       tags:
+         - schedulers
+       security:
+         - bearerAuth: []
+       parameters:
+         - name: schedulerId
+           in: path
+           required: true
+           description: Scheduler ID (UUID format)
+           schema:
+             type: string
+             format: uuid
+       responses:
+         "200":
+           description: Scheduler result retrieved successfully
+           content:
+             application/json:
+               schema:
+                 $ref: "#/components/schemas/SchedulerResultResponse"
+         "400":
+           description: Invalid request
+         "401":
+           description: Unauthorized
+         "403":
+           description: Forbidden
+         "404":
+           description: Scheduler not found
+         "500":
+           description: Internal server error
+  /calendars/{calendarId}/schedulers/{schedulerId}/attendance:
+     post:
+       summary: Add Attendance to Scheduler
+       tags:
+         - schedulers
+       security:
+         - bearerAuth: []
+       parameters:
+         - name: calendarId
+           in: path
+           required: true
+           description: Calendar ID (UUID format)
+           schema:
+             type: string
+             format: uuid
+         - name: schedulerId
+           in: path
+           required: true
+           description: Scheduler ID (UUID format)
+           schema:
+             type: string
+             format: uuid
+       requestBody:
+         required: true
+         content:
+           application/json:
+             schema:
+               $ref: "#/components/schemas/AddAttendanceRequest"
+       responses:
+         "204":
+           description: Attendance added successfully
+         "400":
+           description: Invalid request
+         "401":
+           description: Unauthorized
+         "403":
+           description: Forbidden - Scheduler option not enabled
+         "500":
+           description: Internal server error
+     get:
+       summary: Get Attendance for Scheduler
+       tags:
+         - schedulers
+       security:
+         - bearerAuth: []
+       parameters:
+         - name: calendarId
+           in: path
+           required: true
+           description: Calendar ID (UUID format)
+           schema:
+             type: string
+             format: uuid
+         - name: schedulerId
+           in: path
+           required: true
+           description: Scheduler ID (UUID format)
+           schema:
+             type: string
+             format: uuid
+       responses:
+         "200":
+           description: Attendance retrieved successfully
+           content:
+             application/json:
+               schema:
+                 $ref: "#/components/schemas/AttendanceQueryResponse"
+         "400":
+           description: Invalid request
+         "401":
+           description: Unauthorized
+         "403":
+           description: Forbidden
+         "404":
+           description: Scheduler not found
+         "500":
+           description: Internal server error
   /calendars/images:
     post:
       summary: Upload an image
