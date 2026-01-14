@@ -19,13 +19,13 @@ const (
 )
 
 type Scheduler struct {
-	Id            uuid.UUID
-	CalendarId    uuid.UUID
-	UserId        uuid.UUID
-	Title         string
-	Memo          string
-	LimitTime     time.Time
-	IsAllDay      bool
+	Id         uuid.UUID
+	CalendarId uuid.UUID
+	UserId     uuid.UUID
+	Title      string
+	Memo       string
+	LimitTime  time.Time
+	IsAllDay   bool
 }
 type PossibleDate struct {
 	Date      time.Time
@@ -41,9 +41,8 @@ type SchedulerAttendance struct {
 }
 
 type SchedulerStatus struct {
-	AttendanceId uuid.UUID
-	Time         time.Time
-	Status       Status
+	Date   time.Time
+	Status Status
 }
 
 func NewScheduler(calendarId, userId uuid.UUID, title, memo string, limitTime time.Time, isAllDay bool) (*Scheduler, error) {
@@ -184,14 +183,10 @@ func (a *SchedulerAttendance) SetComment(comment string) error {
 	a.Comment = comment
 	return nil
 }
-func NewStatus(attendanceId uuid.UUID, time time.Time, status int8) (*SchedulerStatus, error) {
-	if attendanceId == uuid.Nil {
-		return nil, errors.New("attendanceId is nil")
-	}
+func NewStatus(date time.Time, status int8) (*SchedulerStatus, error) {
 	s := &SchedulerStatus{
-		AttendanceId: attendanceId,
-		Time:         time,
-		Status:       Status(status),
+		Date:   date,
+		Status: Status(status),
 	}
 	err := s.SetStatus(status)
 	if err != nil {
