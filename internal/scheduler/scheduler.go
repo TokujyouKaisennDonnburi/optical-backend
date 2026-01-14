@@ -67,6 +67,7 @@ func NewScheduler(calendarId, userId uuid.UUID, title, memo string, limitTime ti
 		Title:      title,
 		Memo:       memo,
 		IsAllDay:   isAllDay,
+		IsDone:     false,
 	}
 	err = s.SetTitle(title)
 	if err != nil {
