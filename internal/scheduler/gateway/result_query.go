@@ -24,7 +24,7 @@ type DateModel struct {
 	EndTime   time.Time `db:"end_time"`
 }
 
-func (r *SchedulerPsqlRepository) ResultGateway(
+func (r *SchedulerPsqlRepository) FindByMemberId(
 	ctx context.Context,
 	calendarId, schedulerId, userId uuid.UUID,
 ) (*output.SchedulerResultOutput, error) {

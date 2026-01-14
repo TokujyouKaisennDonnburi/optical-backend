@@ -21,7 +21,7 @@ func (q *SchedulerQuery) SchedulerResult(ctx context.Context, input SchedulerRes
 	}
 	// assign
 	return &output.SchedulerResultOutput{
-		UserId:    result.UserId,
+		OwnerId:   result.OwnerId,
 		Title:     result.Title,
 		Memo:      result.Memo,
 		LimitTime: result.LimitTime,

@@ -209,6 +209,7 @@ func main() {
 		r.Post("/calendars/{calendarId}/schedulers", schedulerHandler.SchedulerCreate)
 		r.Post("/calendars/{calendarId}/schedulers/{schedulerId}", schedulerHandler.AddAttendanceHandler)
 		r.Get("/calendars/{calendarId}/schedulers/{schedulerId}", schedulerHandler.GetAttendance)
+		r.Get("/calendars/{calendarId}/schedulers/{schedulerId}", schedulerHandler.SchedulerResultHandler)
 	})
 
 	// Start Serving
