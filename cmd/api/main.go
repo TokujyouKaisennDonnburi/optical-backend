@@ -300,8 +300,10 @@ func getPostgresDB() *sqlx.DB {
 	)
 	db, err := sqlx.Connect("postgres", dsn)
 	if err != nil {
+		logrus.WithField("host", host).Info("psql connection failed")
 		panic(err.Error())
 	}
+	logrus.WithField("host", host).Info("psql connected")
 	return db
 }
 
@@ -346,8 +348,10 @@ func GetMinIOClient() *minio.Client {
 		Secure: useSsl == "1",
 	})
 	if err != nil {
+		logrus.WithField("address", endpoint).Info("minio client connection failed")
 		panic(err.Error())
 	}
+	logrus.WithField("address", endpoint).Info("minio client connected")
 	return client
 }
 
@@ -394,8 +398,10 @@ func GetRedisClient() *redis.Client {
 	client := redis.NewClient(opts)
 	_, err := client.Ping(context.Background()).Result()
 	if err != nil {
+		logrus.WithError(err).Error("redis connection error")
 		panic("redis connection failed")
 	}
+	logrus.WithField("address", endpoint).Info("redis connected")
 	return client
 }
 
