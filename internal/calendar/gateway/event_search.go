@@ -22,6 +22,7 @@ type EventSearchQueryModel struct {
 	StartAt       time.Time `db:"start_at"`
 	EndAt         time.Time `db:"end_at"`
 	IsAllDay      bool      `db:"all_day"`
+	TotalCount    int       `db:"total_count"`
 }
 
 // 検索ロジック
@@ -52,21 +53,24 @@ func (r *EventPsqlRepository) SearchEvents(
 	// デフォルト値適用
 	params.ApplyDefaults()
 
-	// 検索クエリ（pg_search版）
+	// 検索クエリ（pg_search版）- ウィンドウ関数で総件数も同時取得
 	query := `
-    SELECT
-        calendars.id AS calendar_id,
-        calendars.name AS calendar_name,
-        calendars.color AS calendar_color,
-        events.id AS event_id,
-        events.title AS event_title,
-        COALESCE(event_locations.location, '') AS location,
-        COALESCE(events.memo, '') AS memo,
-        events.start_at,
-        events.end_at,
-        events.all_day
+    SELECT * FROM (
+        SELECT
+            calendars.id AS calendar_id,
+            calendars.name AS calendar_name,
+            calendars.color AS calendar_color,
+            events.id AS event_id,
+            events.title AS event_title,
+            COALESCE(event_locations.location, '') AS location,
+            COALESCE(events.memo, '') AS memo,
+            events.start_at,
+            events.end_at,
+            events.all_day,
+            COUNT(*) OVER () AS total_count
 	` + eventSearchBaseSQL + `
-       ORDER BY events.start_at DESC
+        ORDER BY events.start_at DESC
+    ) t
     LIMIT :limit OFFSET :offset
 `
 
@@ -95,10 +99,10 @@ func (r *EventPsqlRepository) SearchEvents(
 		return nil, err
 	}
 
-	// 総件数取得
-	totalCount, err := r.countSearchEvents(ctx, params)
-	if err != nil {
-		return nil, err
+	// 総件数を最初の行から取得（全行に同じ値が入っている）
+	var totalCount int
+	if len(models) > 0 {
+		totalCount = models[0].TotalCount
 	}
 
 	// 出力形式に変換
@@ -125,30 +129,3 @@ func (r *EventPsqlRepository) SearchEvents(
 	}, nil
 }
 
-// 検索結果の総件数を取得
-func (r *EventPsqlRepository) countSearchEvents(
-	ctx context.Context,
-	params repository.SearchEventsParams,
-) (int, error) {
-	query := `SELECT COUNT(DISTINCT events.id) ` + eventSearchBaseSQL
-
-	rows, err := r.db.NamedQueryContext(ctx, query, map[string]any{
-		"user_id":    params.UserId,
-		"query":      params.Query,
-		"start_from": params.StartFrom,
-		"start_to":   params.StartTo,
-	})
-	if err != nil {
-		return 0, err
-	}
-	defer rows.Close()
-
-	var count int
-	if rows.Next() {
-		if err := rows.Scan(&count); err != nil {
-			return 0, err
-		}
-	}
-
-	return count, nil
-}
