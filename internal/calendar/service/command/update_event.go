@@ -13,7 +13,6 @@ type EventUpdateInput struct {
 	EventId   uuid.UUID
 	Title     string
 	Memo      string
-	Color     string
 	Location  string
 	StartTime time.Time
 	EndTime   time.Time
@@ -29,10 +28,6 @@ func (c *EventCommand) UpdateEvent(ctx context.Context, input EventUpdateInput) 
 	}
 	err = c.eventRepository.Update(ctx, input.UserId, input.EventId, func(event *calendar.Event) (*calendar.Event, error) {
 		err = event.SetTitle(input.Title)
-		if err != nil {
-			return nil, err
-		}
-		err = event.SetColor(input.Color)
 		if err != nil {
 			return nil, err
 		}

@@ -8,16 +8,16 @@ import (
 
 // イベント取得で渡す出力データ
 type EventQueryOutput struct {
-	Id         uuid.UUID
-	CalendarId uuid.UUID
-	Title      string
-	Memo       string
-	Color      string
-	Location   string
-	IsAllDay   bool
-	StartAt    string
-	EndAt      string
-	CreatedAt  string
+	Id            uuid.UUID
+	CalendarId    uuid.UUID
+	CalendarColor string
+	Title         string
+	Memo          string
+	Location      string
+	IsAllDay      bool
+	StartAt       string
+	EndAt         string
+	CreatedAt     string
 }
 
 type EventTodayQueryOutput struct {
@@ -49,7 +49,6 @@ type EventMonthQueryOutputItem struct {
 	CalendarColor string
 	Id            uuid.UUID
 	Title         string
-	Color         string
 	Location      string
 	Memo          string
 	StartAt       time.Time

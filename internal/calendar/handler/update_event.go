@@ -16,7 +16,6 @@ import (
 type EventUpdateRequest struct {
 	Title     string    `json:"title"`
 	Memo      string    `json:"memo"`
-	Color     string    `json:"color"`
 	Location  string    `json:"location"`
 	StartTime time.Time `json:"startTime"`
 	EndTime   time.Time `json:"endTime"`
@@ -46,7 +45,6 @@ func (h *CalendarHttpHandler) UpdateEvent(w http.ResponseWriter, r *http.Request
 		EventId:   eventId,
 		Title:     request.Title,
 		Memo:      request.Memo,
-		Color:     request.Color,
 		Location:  request.Location,
 		StartTime: request.StartTime,
 		EndTime:   request.EndTime,

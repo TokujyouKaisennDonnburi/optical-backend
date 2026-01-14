@@ -21,7 +21,6 @@ type EventTodayResponseItem struct {
 	CalendarColor string    `json:"calendarColor"`
 	Id            string    `json:"id"`
 	Title         string    `json:"title"`
-	Color         string    `json:"color"`
 	Location      string    `json:"location"`
 	Memo          string    `json:"memo"`
 	StartAt       time.Time `json:"startAt"`
