@@ -375,7 +375,7 @@ paths:
           description: Invalid request
         "500":
           description: Internal server error
-  /calendars/{calendarId}/scheduler:
+  /calendars/{calendarId}/schedulers:
     post:
       summary: Create a new scheduler
       tags:
