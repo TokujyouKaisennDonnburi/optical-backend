@@ -31,12 +31,12 @@ func (r *SchedulerPsqlRepository) FindByMemberId(
 	// result
 	sql := `
 	SELECT s.user_id AS owner_id, s.title, s.memo, s.limit_time, s.is_allday,
-	cm.user_id, cm.joined_at,
+	cm.user_id,
 	u.name AS user_name
 	FROM scheduler s
 	LEFT JOIN calendar_members cm ON cm.calendar_id = s.calendar_id
 	LEFT JOIN users u ON u.id = cm.user_id
-	WHERE s.id = $2 AND cm.user_id = $1
+	WHERE s.id = $2 AND cm.user_id = $1 AND cm.joined_at IS NOT NULL
 		`
 	var resultModels []ResultModel
 	err := r.db.SelectContext(ctx, &resultModels, sql, userId, schedulerId)
