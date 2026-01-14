@@ -10,3 +10,8 @@ force_https = true
 auto_stop_machines = true  # オプション：トラフィックがない場合にマシンを停止
 auto_start_machines = true
 min_machines_running = 0   # オプション：最小稼働マシン数
+
+[[files]]
+guest_path = "/optical-github.private-key.pem"
+secret_name = "GITHUB_PRIVATE_KEY_PEM"
+mode = 0o400   # 読み取り専用・rootのみ (重要！)
