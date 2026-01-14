@@ -42,40 +42,11 @@ type EventRepository interface {
 	// イベント検索
 	SearchEvents(
 		ctx context.Context,
-		params SearchEventsParams,
+		userId uuid.UUID,
+		query string,
+		startFrom time.Time,
+		startTo time.Time,
+		limit int,
+		offset int,
 	) (*output.EventSearchQueryOutput, error)
-}
-
-// イベント検索用パラメータ
-type SearchEventsParams struct {
-	UserId    uuid.UUID
-	Query     string    // クエリパラメータ
-	StartFrom time.Time // ゼロ値 = デフォルト（3年前）
-	StartTo   time.Time // ゼロ値 = デフォルト（3年後）
-	Limit     int
-	Offset    int
-}
-
-// デフォルト値の適用
-func (p *SearchEventsParams) ApplyDefaults() {
-	now := time.Now()
-
-	// 検索範囲のデフォルト
-	if p.StartFrom.IsZero() {
-		p.StartFrom = now.AddDate(-3, 0, 0) // 3年前
-	}
-	if p.StartTo.IsZero() {
-		p.StartTo = now.AddDate(3, 0, 0) // 3年後
-	}
-
-	// ページネーションのデフォルト
-	if p.Limit <= 0 {
-		p.Limit = 20
-	}
-	if p.Limit > 100 {
-		p.Limit = 100
-	}
-	if p.Offset < 0 {
-		p.Offset = 0
-	}
 }

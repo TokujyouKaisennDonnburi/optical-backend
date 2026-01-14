@@ -4,7 +4,6 @@ import (
 	"context"
 	"time"
 
-	"github.com/TokujouKaisenDonburi/optical-backend/internal/calendar/repository"
 	"github.com/TokujouKaisenDonburi/optical-backend/internal/calendar/service/query/output"
 	"github.com/google/uuid"
 )
@@ -48,11 +47,13 @@ const eventSearchBaseSQL = `
 // pg_searchを使ったイベント検索
 func (r *EventPsqlRepository) SearchEvents(
 	ctx context.Context,
-	params repository.SearchEventsParams,
+	userId uuid.UUID,
+	searchQuery string,
+	startFrom time.Time,
+	startTo time.Time,
+	limit int,
+	offset int,
 ) (*output.EventSearchQueryOutput, error) {
-	// デフォルト値適用
-	params.ApplyDefaults()
-
 	// 検索クエリ（pg_search版）- ウィンドウ関数で総件数も同時取得
 	query := `
     SELECT * FROM (
@@ -75,12 +76,12 @@ func (r *EventPsqlRepository) SearchEvents(
 `
 
 	rows, err := r.db.NamedQueryContext(ctx, query, map[string]any{
-		"user_id":    params.UserId,
-		"query":      params.Query,
-		"start_from": params.StartFrom,
-		"start_to":   params.StartTo,
-		"limit":      params.Limit,
-		"offset":     params.Offset,
+		"user_id":    userId,
+		"query":      searchQuery,
+		"start_from": startFrom,
+		"start_to":   startTo,
+		"limit":      limit,
+		"offset":     offset,
 	})
 	if err != nil {
 		return nil, err
@@ -125,7 +126,7 @@ func (r *EventPsqlRepository) SearchEvents(
 	return &output.EventSearchQueryOutput{
 		Items: items,
 		Total: totalCount,
-		Limit: params.Limit,
+		Limit: limit,
 	}, nil
 }
 
