@@ -38,8 +38,8 @@ func (*AgentCommandPsqlRepository) CreateEvents(
 				"allDay":     event.ScheduledTime.AllDay,
 				"startAt":    event.ScheduledTime.StartTime,
 				"endAt":      event.ScheduledTime.EndTime,
-				"createdAt":  time.Now(),
-				"updatedAt":  time.Now(),
+				"createdAt":  time.Now().UTC(),
+				"updatedAt":  time.Now().UTC(),
 			}
 		}
 		query := `

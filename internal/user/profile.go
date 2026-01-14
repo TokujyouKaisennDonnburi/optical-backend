@@ -16,7 +16,7 @@ type Profile struct {
 
 // NewProfile
 func NewProfile(userId uuid.UUID, imageUrl string) (*Profile, error) {
-	now := time.Now()
+	now := time.Now().UTC()
 	id, err := uuid.NewV7()
 	if err != nil {
 		return nil, err

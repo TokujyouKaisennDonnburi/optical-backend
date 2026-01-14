@@ -36,8 +36,8 @@ func (r *GithubApiRepository) LinkUser(
 		"githubId":    githubUser.Id,
 		"githubName":  githubUser.Name,
 		"githubEmail": githubUser.Email,
-		"createdAt":   time.Now(),
-		"updatedAt":   time.Now(),
+		"createdAt":   time.Now().UTC(),
+		"updatedAt":   time.Now().UTC(),
 	})
 	return err
 }

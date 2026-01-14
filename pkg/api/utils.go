@@ -42,7 +42,7 @@ func getGithubAppBearerToken() (string, error) {
 	if err != nil {
 		return "", err
 	}
-	now := time.Now()
+	now := time.Now().UTC()
 	token := jwt.NewWithClaims(jwt.SigningMethodRS256, jwt.MapClaims{
 		"iat": now.Unix(),
 		"exp": now.Add(5 * time.Minute).Unix(),
