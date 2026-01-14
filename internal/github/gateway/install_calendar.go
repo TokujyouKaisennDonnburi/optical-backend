@@ -35,8 +35,8 @@ func (r *GithubApiRepository) InstallToCalendar(
 			"githubId":       response.Account.Id,
 			"githubName":     response.Account.Login,
 			"installationId": installationId,
-			"createdAt":      time.Now(),
-			"updatedAt":      time.Now(),
+			"createdAt":      time.Now().UTC(),
+			"updatedAt":      time.Now().UTC(),
 		})
 		if err != nil {
 			return err
@@ -69,8 +69,8 @@ func (r *GithubApiRepository) InstallToCalendar(
 			"githubId":    githubUser.Id,
 			"githubName":  githubUser.Name,
 			"githubEmail": githubUser.Email,
-			"createdAt":   time.Now(),
-			"updatedAt":   time.Now(),
+			"createdAt":   time.Now().UTC(),
+			"updatedAt":   time.Now().UTC(),
 		})
 		return err
 	})

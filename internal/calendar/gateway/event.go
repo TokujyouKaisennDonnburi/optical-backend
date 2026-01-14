@@ -48,8 +48,8 @@ func (r *EventPsqlRepository) Create(
 			"allDay":     event.ScheduledTime.AllDay,
 			"startAt":    event.ScheduledTime.StartTime,
 			"endAt":      event.ScheduledTime.EndTime,
-			"createdAt":  time.Now(),
-			"updatedAt":  time.Now(),
+			"createdAt":  time.Now().UTC(),
+			"updatedAt":  time.Now().UTC(),
 		})
 		if err != nil {
 			return err
@@ -100,7 +100,7 @@ func (r *EventPsqlRepository) Update(
 			"allDay":    event.ScheduledTime.AllDay,
 			"startAt":   event.ScheduledTime.StartTime,
 			"endAt":     event.ScheduledTime.EndTime,
-			"updatedAt": time.Now(),
+			"updatedAt": time.Now().UTC(),
 		})
 		if err != nil {
 			return err

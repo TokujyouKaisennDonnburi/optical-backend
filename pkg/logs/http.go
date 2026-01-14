@@ -58,7 +58,7 @@ func HttpLogger(next http.Handler) http.Handler {
 			ResponseWriter: w,
 			statusCode:     http.StatusOK,
 		}
-		now := time.Now()
+		now := time.Now().UTC()
 		defer func() {
 			log(now, sw.statusCode, r)
 		}()

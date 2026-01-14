@@ -60,8 +60,8 @@ func createGithubUser(ctx context.Context, tx *sqlx.Tx, newUser *user.User, avat
 		"name":      newUser.Name,
 		"email":     newUser.Email,
 		"password":  newUser.Password,
-		"createdAt": time.Now(),
-		"updatedAt": time.Now(),
+		"createdAt": time.Now().UTC(),
+		"updatedAt": time.Now().UTC(),
 	})
 	if err != nil {
 		return err
@@ -75,8 +75,8 @@ func createGithubUser(ctx context.Context, tx *sqlx.Tx, newUser *user.User, avat
 		"githubId":    githubUser.Id,
 		"githubName":  githubUser.Name,
 		"githubEmail": githubUser.Email,
-		"createdAt":   time.Now(),
-		"updatedAt":   time.Now(),
+		"createdAt":   time.Now().UTC(),
+		"updatedAt":   time.Now().UTC(),
 	})
 	if err != nil {
 		return err
@@ -122,8 +122,8 @@ func updateGithubUser(ctx context.Context, tx *sqlx.Tx, userId uuid.UUID, github
 		"githubId":    githubUser.Id,
 		"githubName":  githubUser.Name,
 		"githubEmail": githubUser.Email,
-		"createdAt":   time.Now(),
-		"updatedAt":   time.Now(),
+		"createdAt":   time.Now().UTC(),
+		"updatedAt":   time.Now().UTC(),
 	})
 	return err
 }

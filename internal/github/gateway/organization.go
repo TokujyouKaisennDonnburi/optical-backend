@@ -48,7 +48,7 @@ func (r *StateRedisRepository) GetOrganization(
 	}
 	// キャッシュ処理を行い失敗した場合エラーのみ出力
 	cacheFunc := func() error {
-		now := time.Now()
+		now := time.Now().UTC()
 		if organization.TokenExpiresAt.Before(now) {
 			return errors.New("cache error: invalid time")
 		}

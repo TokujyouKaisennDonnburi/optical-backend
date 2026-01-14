@@ -86,7 +86,7 @@ func (c *AgentCommand) CalendarChat(ctx context.Context, input AgentCommandCalen
 		calendarOptionListTool,
 		calendarOptionUpdateTool,
 	}
-	systemPrompt := fmt.Sprintf(CALENDAR_CHAT_SYSTEM_PROMPT, input.CalendarId.String(), time.Now())
+	systemPrompt := fmt.Sprintf(CALENDAR_CHAT_SYSTEM_PROMPT, input.CalendarId.String(), time.Now().UTC())
 	messages := []openrouter.Message{
 		openrouter.SystemMessage(systemPrompt),
 		openrouter.UserMessage(userPrompt),

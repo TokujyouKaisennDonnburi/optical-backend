@@ -48,7 +48,7 @@ func NewUser(name, email, password string) (*User, error) {
 		return nil, err
 	}
 
-	now := time.Now()
+	now := time.Now().UTC()
 	id, err := uuid.NewV7()
 	if err != nil {
 		return nil, err
@@ -70,7 +70,7 @@ func (u *User) SetName(name string) error {
 		return err
 	}
 	u.Name = name
-	u.UpdatedAt = time.Now()
+	u.UpdatedAt = time.Now().UTC()
 	return nil
 }
 
@@ -81,7 +81,7 @@ func (u *User) SetEmail(email string) error {
 		return err
 	}
 	u.Email = newEmail
-	u.UpdatedAt = time.Now()
+	u.UpdatedAt = time.Now().UTC()
 	return nil
 }
 
@@ -95,13 +95,13 @@ func (u *User) UpdatePassword(newPassword string) error {
 		return err
 	}
 	u.Password = hashedPassword
-	u.UpdatedAt = time.Now()
+	u.UpdatedAt = time.Now().UTC()
 	return nil
 }
 
 // delete user
 func (u *User) Delete() {
-	now := time.Now()
+	now := time.Now().UTC()
 	u.DeletedAt = now
 	u.UpdatedAt = now
 }

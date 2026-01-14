@@ -34,7 +34,7 @@ func (c *GithubCommand) InstallToCalendar(ctx context.Context, input GithubCalen
 		if err != nil {
 			return err
 		}
-		now := time.Now()
+		now := time.Now().UTC()
 		if organization.TokenExpiresAt.Before(now) {
 			return errors.New("cache error: invalid time")
 		}

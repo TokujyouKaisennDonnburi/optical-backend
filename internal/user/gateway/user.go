@@ -70,7 +70,7 @@ func (r *UserPsqlRepository) Update(
 			"id":        user.Id,
 			"name":      user.Name,
 			"email":     user.Email.String(),
-			"updatedAt": time.Now(),
+			"updatedAt": time.Now().UTC(),
 		})
 		if err != nil {
 			return err
