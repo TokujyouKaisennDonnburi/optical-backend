@@ -38,7 +38,7 @@ func (h *SchedulerHttpHandler) GetUserStatus(w http.ResponseWriter, r *http.Requ
 	// userId
 	userId, err := auth.GetUserIdFromContext(r)
 	if err != nil {
-		_ = render.Render(w, r, apperr.ErrInternalServerError(err))
+		_ = render.Render(w, r, apperr.ErrUnauthorized(err))
 		return
 	}
 	// service

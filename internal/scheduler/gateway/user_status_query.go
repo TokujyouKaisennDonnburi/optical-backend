@@ -40,8 +40,9 @@ func (r *SchedulerPsqlRepository) FindStatusById(ctx context.Context, calendarId
 		}
 	}
 	result := output.SchedulerUserOutput{
-		UserId: rows[0].UserId,
-		Status: statuses,
+		UserId:  rows[0].UserId,
+		Comment: rows[0].Comment,
+		Status:  statuses,
 	}
 	return result, nil
 }
