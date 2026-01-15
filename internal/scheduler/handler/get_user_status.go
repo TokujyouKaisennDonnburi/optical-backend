@@ -13,8 +13,9 @@ import (
 )
 
 type UserStatusResponse struct {
-	UserId uuid.UUID        `json:"user_id"`
-	Status []StatusResponse `json:"status"`
+	UserId  uuid.UUID        `json:"user_id"`
+	Comment string           `json:"comment"`
+	Status  []StatusResponse `json:"status"`
 }
 type StatusResponse struct {
 	Date   time.Time `json:"date"`
@@ -34,6 +35,7 @@ func (h *SchedulerHttpHandler) SchedulerHandler(w http.ResponseWriter, r *http.R
 		_ = render.Render(w, r, apperr.ErrInternalServerError(err))
 		return
 	}
+	// service
 	service, err := h.schedulerQuery.UserStatusQuery(r.Context(), query.SchedulerUserStatusInput{
 		SchedulerId: schedulerId,
 		UserId:      userId,
@@ -41,6 +43,7 @@ func (h *SchedulerHttpHandler) SchedulerHandler(w http.ResponseWriter, r *http.R
 	if err != nil {
 		apperr.HandleAppError(w, r, err)
 	}
+	// array bind
 	statuses := make([]StatusResponse, len(service.Status))
 	for i, v := range service.Status {
 		statuses[i] = StatusResponse{
@@ -48,9 +51,12 @@ func (h *SchedulerHttpHandler) SchedulerHandler(w http.ResponseWriter, r *http.R
 			Status: v.Status,
 		}
 	}
+	// bind
 	response := UserStatusResponse{
-		UserId: service.UserId,
-		Status: statuses,
+		UserId:  service.UserId,
+		Comment: service.Comment,
+		Status:  statuses,
 	}
+	// response
 	render.JSON(w, r, response)
 }

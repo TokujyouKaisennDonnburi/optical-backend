@@ -45,8 +45,9 @@ type DateOutput struct {
 	EndTime   time.Time
 }
 type SchedulerUserOutput struct {
-	UserId uuid.UUID
-	Status []UserStatus
+	UserId  uuid.UUID
+	Comment string
+	Status  []UserStatus
 }
 type UserStatus struct {
 	Date   time.Time
