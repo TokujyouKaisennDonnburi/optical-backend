@@ -21,7 +21,7 @@ func (r *SchedulerPsqlRepository) FindStatusById(ctx context.Context, calendarId
 	SELECT sa.user_id, sa.comment, ss.date, ss.status
 	FROM scheduler_attendance sa
 	LEFT JOIN scheduler_status ss ON ss.attendance_id = sa.id
-	LEFT JOIN calendar_members cm ON cm.calendar_id = $1
+	INNER JOIN calendar_members cm ON cm.calendar_id = $1
 	WHERE sa.scheduler_id = $2 AND cm.user_id = $3 AND cm.joined_at IS NOT NULL
 	`
 	var rows []UserStatusModel
