@@ -52,6 +52,30 @@ func (h *SchedulerHttpHandler) SchedulerResultHandler(w http.ResponseWriter, r *
 		apperr.HandleAppError(w, r, err)
 		return
 	}
+	responseMembers := make([]MemberResponse, len(result.Members))
+	for i, v := range result.Members {
+		responseMembers[i] = MemberResponse{
+			UserId:   v.UserId,
+			UserName: v.UserName,
+		}
+	}
+	responseDates := make([]DateResponse, len(result.Date))
+	for i, v := range result.Date {
+		responseDates[i] = DateResponse{
+			Date:      v.Date,
+			StartTime: v.StartTime,
+			EndTime:   v.EndTime,
+		}
+	}
+	responseResult := SchedulerResultResponse{
+		OwnerId:   result.OwnerId,
+		Title:     result.Title,
+		Memo:      result.Memo,
+		LimitTime: result.LimitTime,
+		IsAllDay:  result.IsAllDay,
+		Members:   responseMembers,
+		Date:      responseDates,
+	}
 	// response
-	render.JSON(w, r, result)
+	render.JSON(w, r, responseResult)
 }
