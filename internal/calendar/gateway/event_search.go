@@ -24,26 +24,6 @@ type EventSearchQueryModel struct {
 	TotalCount    int       `db:"total_count"`
 }
 
-// 検索ロジック
-const eventSearchBaseSQL = `
-    FROM events
-    LEFT JOIN event_locations ON events.id = event_locations.event_id
-    JOIN calendars ON events.calendar_id = calendars.id
-    JOIN calendar_members ON calendar_members.calendar_id = events.calendar_id
-    WHERE
-        events.deleted_at IS NULL
-        AND calendars.deleted_at IS NULL
-        AND calendar_members.user_id = :user_id
-        AND calendar_members.joined_at IS NOT NULL
-        AND events.start_at >= :start_from
-        AND events.start_at <= :start_to
-        AND (
-	    events @@@ paradedb.parse(:query)
-            OR
-            COALESCE(event_locations.location, '') ILIKE '%' || :query || '%'
-        )
-	`
-
 // pg_searchを使ったイベント検索
 func (r *EventPsqlRepository) SearchEvents(
 	ctx context.Context,
@@ -69,7 +49,23 @@ func (r *EventPsqlRepository) SearchEvents(
             events.end_at,
             events.all_day,
             COUNT(*) OVER () AS total_count
-	` + eventSearchBaseSQL + `
+	FROM events
+	    LEFT JOIN event_locations ON events.id = event_locations.event_id
+	    JOIN calendars ON events.calendar_id = calendars.id
+	    JOIN calendar_members ON calendar_members.calendar_id = events.calendar_id
+	    WHERE
+		events.deleted_at IS NULL
+		AND calendars.deleted_at IS NULL
+		AND calendar_members.user_id = :user_id
+		AND calendar_members.joined_at IS NOT NULL
+		AND events.start_at >= :start_from
+		AND events.start_at <= :start_to
+		AND (
+		    events @@@ paradedb.parse(:query)
+		    OR
+		    COALESCE(event_locations.location, '') ILIKE '%' || :query || '%'
+		)
+
         ORDER BY events.start_at DESC
     ) t
     LIMIT :limit OFFSET :offset
@@ -129,4 +125,3 @@ func (r *EventPsqlRepository) SearchEvents(
 		Limit: limit,
 	}, nil
 }
-
