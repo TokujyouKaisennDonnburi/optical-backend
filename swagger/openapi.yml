@@ -606,7 +606,6 @@ paths:
           schema:
             type: string
             format: uuid
-            example: "019b1ffe-efd5-7d9b-a13f-f636cfc89c4d"
         - name: schedulerId
           in: path
           required: true
@@ -614,7 +613,6 @@ paths:
           schema:
             type: string
             format: uuid
-            example: "019b1ffe-efd5-7d9b-a13f-f636cfc89c4e"
       responses:
         "200":
           description: User status retrieved successfully
@@ -1427,25 +1425,6 @@ components:
         status:
           type: integer
           format: int8
-    UserStatusResponse:
-      type: object
-      required:
-        - user_id
-        - answer
-        - date
-      properties:
-        user_id:
-          type: string
-          format: uuid
-          example: "019b1ffe-efd5-7d9b-a13f-f636cfc89c4f"
-        answer:
-          type: string
-          enum: [pending, ok, ng]
-          example: "ok"
-        date:
-          type: string
-          format: date-time
-          example: "2026-01-15T12:00:00Z"
     PossibleDateResponse:
       type: object
       required:

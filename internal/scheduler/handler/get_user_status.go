@@ -49,6 +49,7 @@ func (h *SchedulerHttpHandler) GetUserStatus(w http.ResponseWriter, r *http.Requ
 	})
 	if err != nil {
 		apperr.HandleAppError(w, r, err)
+		return
 	}
 	// array bind
 	statuses := make([]StatusResponse, len(service.Status))
