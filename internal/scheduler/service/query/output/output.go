@@ -43,3 +43,4 @@ type DateOutput struct {
 	StartTime time.Time
 	EndTime   time.Time
 }
+type Scheduler
