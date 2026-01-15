@@ -310,6 +310,39 @@ paths:
         '500':
           description: Internal server error
   /calendars/{calendarId}/events:
+    get:
+      summary: Get events list by calendar ID
+      description: 指定されたカレンダーのイベント一覧を取得します。ユーザーはカレンダーのメンバーである必要があります。
+      tags:
+        - events
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: calendarId
+          in: path
+          required: true
+          description: カレンダーID (UUID形式)
+          schema:
+            type: string
+            format: uuid
+            example: "019b1ffe-efd5-7d9b-a13f-f636cfc89c4d"
+      responses:
+        "200":
+          description: Events retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/EventListResponse"
+        "400":
+          description: Invalid request
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden - User is not a member of this calendar
+        "500":
+          description: Internal server error
     post:
       summary: Create a new event
       tags:
