@@ -23,28 +23,11 @@ func (q *EventQuery) SearchEvents(
 	ctx context.Context,
 	input SearchEventQueryInput,
 ) (*output.EventSearchQueryOutput, error) {
-	// デフォルト値の適用
-	startFrom, startTo, limit, offset := applySearchDefaults(
-		input.StartFrom,
-		input.StartTo,
-		input.Limit,
-		input.Offset,
-	)
-
-	return q.eventRepository.SearchEvents(
-		ctx,
-		input.UserId,
-		input.Query,
-		startFrom,
-		startTo,
-		limit,
-		offset,
-	)
-}
-
-// 検索パラメータのデフォルト値を適用
-func applySearchDefaults(startFrom, startTo time.Time, limit, offset int) (time.Time, time.Time, int, int) {
-	now := time.Now()
+	now := time.Now().UTC()
+	startFrom := input.StartFrom
+	startTo := input.StartTo
+	limit := input.Limit
+	offset := input.Offset
 
 	// 検索範囲のデフォルト
 	if startFrom.IsZero() {
@@ -65,5 +48,13 @@ func applySearchDefaults(startFrom, startTo time.Time, limit, offset int) (time.
 		offset = 0
 	}
 
-	return startFrom, startTo, limit, offset
+	return q.eventRepository.SearchEvents(
+		ctx,
+		input.UserId,
+		input.Query,
+		startFrom,
+		startTo,
+		limit,
+		offset,
+	)
 }
