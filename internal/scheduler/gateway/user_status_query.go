@@ -2,6 +2,7 @@ package gateway
 
 import (
 	"context"
+	"errors"
 	"time"
 
 	"github.com/TokujouKaisenDonburi/optical-backend/internal/scheduler/service/query/output"
@@ -15,19 +16,21 @@ type UserStatusModel struct {
 	Status  int8      `db:"status"`
 }
 
-func (r *SchedulerPsqlRepository) FindStatusById(ctx context.Context, schedulerId, userId uuid.UUID) (*output.SchedulerUserOutput, error) {
+func (r *SchedulerPsqlRepository) FindStatusById(ctx context.Context, calendarId, schedulerId, userId uuid.UUID) (*output.SchedulerUserOutput, error) {
 	sql := `
 	SELECT sa.user_id, sa.comment, ss.date, ss.status
 	FROM scheduler_attendance sa
-	LEFT JOIN scheduler s ON sa.scheduler_id = s.id
-	LEFT JOIN scheduler_status ss ON sa.id = ss.attendance_id
-	LEFT JOIN calendar_members cm ON s.calendar_id = cm.calendar_id
-	WHERE sa.scheduler_id = $1 AND cm.user_id = $2 AND cm.joined_at IS NOT NULL
+	LEFT JOIN scheduler_status ss ON ss.attendance_id = sa.id
+	LEFT JOIN calendar_members cm ON cm.calendar_id = $1
+	WHERE sa.scheduler_id = $2 AND cm.user_id = $3 AND cm.joined_at IS NOT NULL
 	`
 	var rows []UserStatusModel
-	err := r.db.SelectContext(ctx, &rows, sql, schedulerId, userId)
+	err := r.db.SelectContext(ctx, &rows, sql, calendarId, schedulerId, userId)
 	if err != nil {
 		return nil, err
+	}
+	if len(rows) == 0 {
+		return nil, errors.New("scheduler status is not found")
 	}
 	statuses := make([]output.UserStatus, len(rows))
 	for i, v := range rows {

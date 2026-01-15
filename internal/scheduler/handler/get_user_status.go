@@ -22,7 +22,13 @@ type StatusResponse struct {
 	Status int8      `json:"status"`
 }
 
-func (h *SchedulerHttpHandler) SchedulerHandler(w http.ResponseWriter, r *http.Request) {
+func (h *SchedulerHttpHandler) GetUserStatus(w http.ResponseWriter, r *http.Request) {
+	// calendarId
+	calendarId, err := uuid.Parse(chi.URLParam(r, "calendarId"))
+	if err != nil {
+		_ = render.Render(w, r, apperr.ErrInvalidRequest(err))
+		return
+	}
 	// schedulerId
 	schedulerId, err := uuid.Parse(chi.URLParam(r, "schedulerId"))
 	if err != nil {
@@ -37,6 +43,7 @@ func (h *SchedulerHttpHandler) SchedulerHandler(w http.ResponseWriter, r *http.R
 	}
 	// service
 	service, err := h.schedulerQuery.UserStatusQuery(r.Context(), query.SchedulerUserStatusInput{
+		CalendarId:  calendarId,
 		SchedulerId: schedulerId,
 		UserId:      userId,
 	})
