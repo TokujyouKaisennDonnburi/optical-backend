@@ -209,7 +209,7 @@ func main() {
 		// Scheduler
 		r.Post("/calendars/{calendarId}/schedulers", schedulerHandler.SchedulerCreate)
 		r.Get("/schedulers/{schedulerId}/result", schedulerHandler.SchedulerResultHandler)
-		r.Post("/calendars/{calendarId}/schedulers/{schedulerId}", schedulerHandler.AddAttendanceHandler)
+		r.Post("/calendars/{calendarId}/schedulers/{schedulerId}/attendance", schedulerHandler.AddAttendanceHandler)
 		r.Get("/calendars/{calendarId}/schedulers/{schedulerId}", schedulerHandler.GetAttendance)
 		r.Get("/calendars/{calendarId}/schedulers/{schedulerId}/user-status", schedulerHandler.GetUserStatus)
 	})
