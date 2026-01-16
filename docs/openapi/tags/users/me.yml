@@ -1,0 +1,65 @@
+get:
+  summary: Get current user information
+  tags:
+    - users
+  security:
+    - bearerAuth: []
+  responses:
+    "200":
+      description: User information retrieved successfully
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/UserResponse"
+patch:
+  summary: Update current user information
+  tags:
+    - users
+  security:
+    - bearerAuth: []
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: '#/components/schemas/UserUpdateRequest'
+  responses:
+    '204':
+      description: User information updated successfully
+    '400':
+      description: Invalid request
+    '500':
+      description: Internal server error
+
+components:
+  schemas:
+    UserResponse:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        email:
+          type: string
+          format: email
+        avatarUrl:
+          type: string
+          format: url
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+    UserUpdateRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          example: optical-master
+        email:
+          type: string
+          format: email
+          example: optical-user@example.com

@@ -1,0 +1,29 @@
+post:
+  summary: Link user with GitHub
+  tags: [github]
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: "#/components/schemas/GithubUserLinkRequest"
+  responses:
+    "204":
+      description: User linked successfully
+    "400":
+      description: Invalid request
+    "500":
+      description: Internal server error
+
+components:
+  schemas:
+    GithubUserLinkRequest:
+      type: object
+      required:
+        - code
+        - state
+      properties:
+        code:
+          type: string
+        state:
+          type: string

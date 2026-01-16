@@ -1,0 +1,64 @@
+get:
+  summary: Get events by month
+  tags:
+    - events
+  security:
+    - bearerAuth: []
+  parameters:
+    - name: month
+      in: query
+      required: false
+      schema:
+        type: string
+        example: "2025-12"
+  responses:
+    "200":
+      description: Events retrieved successfully
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/EventMonthResponse"
+    "500":
+      description: Internal server error
+    "400":
+      description: Invalid request
+    "401":
+      description: Unauthorized
+
+components:
+  schemas:
+    EventMonthResponse:
+      type: object
+      properties:
+        date:
+          type: string
+          format: date
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/EventMonthResponseItem"
+    EventMonthResponseItem:
+      type: object
+      properties:
+        calendarId:
+          type: string
+        calendarName:
+          type: string
+        calendarColor:
+          type: string
+        id:
+          type: string
+        title:
+          type: string
+        location:
+          type: string
+        memo:
+          type: string
+        startAt:
+          type: string
+          format: date-time
+        endAt:
+          type: string
+          format: date-time
+        isAllDay:
+          type: boolean
