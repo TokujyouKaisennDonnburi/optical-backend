@@ -2,6 +2,7 @@ package todo
 
 import (
 	"errors"
+	"strings"
 	"unicode/utf8"
 
 	"github.com/google/uuid"
@@ -45,6 +46,7 @@ func NewList(userId, calendarId uuid.UUID, name string) (*List, error) {
 }
 
 func (l *List) SetName(name string) error {
+	name = strings.TrimSpace(name)
 	length := utf8.RuneCountInString(name)
 	if length < MIN_LIST_NAME_LENGTH || length > MAX_LIST_NAME_LENGTH {
 		return errors.New("todo list `name` is invalid")
