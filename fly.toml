@@ -15,6 +15,7 @@ primary_region = 'nrt'
   auto_stop_machines = 'stop'
   auto_start_machines = true
   min_machines_running = 0
+  processes = ['app']
 
 [[files]]
   guest_path = '/app/optical-github.private-key.pem'

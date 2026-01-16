@@ -1,16 +1,16 @@
-name: Nightly Release
+name: Release
 
 on:
   workflow_dispatch:
   push:
-    # branches:
-    #   - main
+    branches:
+      - main
 
 permissions:
   contents: write
 
 jobs:
-  build-and-release:
+  nightly:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
