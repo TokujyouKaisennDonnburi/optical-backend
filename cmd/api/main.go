@@ -5,7 +5,6 @@ import (
 	"encoding/base64"
 	"crypto/tls"
 	"fmt"
-	"io"
 	"github.com/rubenv/sql-migrate"
 	"net/http"
 	"os"
