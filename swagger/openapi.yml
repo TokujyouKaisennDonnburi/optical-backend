@@ -408,7 +408,7 @@ paths:
           description: Invalid request
         "500":
           description: Internal server error
-  /calendars/{calendarId}/scheduler:
+  /calendars/{calendarId}/schedulers:
     post:
       summary: Create a new scheduler
       tags:
@@ -443,45 +443,115 @@ paths:
           description: Forbidden - Scheduler option not enabled
         "500":
           description: Internal server error
-  /calendars/{calendarId}/scheduler/{schedulerId}:
-    post:
-      summary: Add Attendance to Scheduler
-      tags:
-        - schedulers
-      security:
-        - bearerAuth: []
-      parameters:
-        - name: calendarId
-          in: path
-          required: true
-          description: Calendar ID (UUID format)
-          schema:
-            type: string
-            format: uuid
-        - name: schedulerId
-          in: path
-          required: true
-          description: Scheduler ID (UUID format)
-          schema:
-            type: string
-            format: uuid
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/AddAttendanceRequest"
-      responses:
-        "204":
-          description: Attendance added successfully
-        "400":
-          description: Invalid request
-        "401":
-          description: Unauthorized
-        "403":
-          description: Forbidden - Scheduler option not enabled
-        "500":
-          description: Internal server error
+  /schedulers/{schedulerId}/result:
+     get:
+       summary: Get scheduler result
+       tags:
+         - schedulers
+       security:
+         - bearerAuth: []
+       parameters:
+         - name: schedulerId
+           in: path
+           required: true
+           description: Scheduler ID (UUID format)
+           schema:
+             type: string
+             format: uuid
+       responses:
+         "200":
+           description: Scheduler result retrieved successfully
+           content:
+             application/json:
+               schema:
+                 $ref: "#/components/schemas/SchedulerResultResponse"
+         "400":
+           description: Invalid request
+         "401":
+           description: Unauthorized
+         "403":
+           description: Forbidden
+         "404":
+           description: Scheduler not found
+         "500":
+           description: Internal server error
+  /calendars/{calendarId}/schedulers/{schedulerId}/attendance:
+     post:
+       summary: Add Attendance to Scheduler
+       tags:
+         - schedulers
+       security:
+         - bearerAuth: []
+       parameters:
+         - name: calendarId
+           in: path
+           required: true
+           description: Calendar ID (UUID format)
+           schema:
+             type: string
+             format: uuid
+         - name: schedulerId
+           in: path
+           required: true
+           description: Scheduler ID (UUID format)
+           schema:
+             type: string
+             format: uuid
+       requestBody:
+         required: true
+         content:
+           application/json:
+             schema:
+               $ref: "#/components/schemas/AddAttendanceRequest"
+       responses:
+         "204":
+           description: Attendance added successfully
+         "400":
+           description: Invalid request
+         "401":
+           description: Unauthorized
+         "403":
+           description: Forbidden - Scheduler option not enabled
+         "500":
+           description: Internal server error
+     get:
+       summary: Get Attendance for Scheduler
+       tags:
+         - schedulers
+       security:
+         - bearerAuth: []
+       parameters:
+         - name: calendarId
+           in: path
+           required: true
+           description: Calendar ID (UUID format)
+           schema:
+             type: string
+             format: uuid
+         - name: schedulerId
+           in: path
+           required: true
+           description: Scheduler ID (UUID format)
+           schema:
+             type: string
+             format: uuid
+       responses:
+         "200":
+           description: Attendance retrieved successfully
+           content:
+             application/json:
+               schema:
+                 $ref: "#/components/schemas/AttendanceQueryResponse"
+         "400":
+           description: Invalid request
+         "401":
+           description: Unauthorized
+         "403":
+           description: Forbidden
+         "404":
+           description: Scheduler not found
+         "500":
+           description: Internal server error
   /calendars/images:
     post:
       summary: Upload an image
@@ -1128,6 +1198,76 @@ components:
         schedulerId:
           type: string
           format: uuid
+    SchedulerResultResponse:
+      type: object
+      required:
+        - owner_id
+        - title
+        - memo
+        - limit_time
+        - is_allday
+        - members
+        - date
+      properties:
+        owner_id:
+          type: string
+          format: uuid
+          description: Owner user ID
+        title:
+          type: string
+          description: Scheduler title
+        memo:
+          type: string
+          description: Scheduler memo/description
+        limit_time:
+          type: string
+          format: date-time
+          description: Deadline for responses
+        is_allday:
+          type: boolean
+          description: Whether this is an all-day scheduler
+        members:
+          type: array
+          description: List of members
+          items:
+            $ref: "#/components/schemas/SchedulerMemberResponse"
+        date:
+          type: array
+          description: List of possible dates
+          items:
+            $ref: "#/components/schemas/SchedulerDateResponse"
+    SchedulerMemberResponse:
+      type: object
+      required:
+        - user_id
+        - user_name
+      properties:
+        user_id:
+          type: string
+          format: uuid
+          description: User ID
+        user_name:
+          type: string
+          description: User name
+    SchedulerDateResponse:
+      type: object
+      required:
+        - date
+        - start_time
+        - end_time
+      properties:
+        date:
+          type: string
+          format: date-time
+          description: The date of the possible time slot
+        start_time:
+          type: string
+          format: date-time
+          description: Start time of the possible time slot
+        end_time:
+          type: string
+          format: date-time
+          description: End time of the possible time slot
     AttendanceQueryResponse:
       type: object
       required:
