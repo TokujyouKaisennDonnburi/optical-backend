@@ -552,45 +552,7 @@ paths:
            description: Scheduler not found
          "500":
            description: Internal server error
-  /calendars/{calendarId}/scheduler/{schedulerId}:
-    post:
-      summary: Add Attendance to Scheduler
-      tags:
-        - schedulers
-      security:
-        - bearerAuth: []
-      parameters:
-        - name: calendarId
-          in: path
-          required: true
-          description: Calendar ID (UUID format)
-          schema:
-            type: string
-            format: uuid
-        - name: schedulerId
-          in: path
-          required: true
-          description: Scheduler ID (UUID format)
-          schema:
-            type: string
-            format: uuid
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/AddAttendanceRequest"
-      responses:
-        "204":
-          description: Attendance added successfully
-        "400":
-          description: Invalid request
-        "401":
-          description: Unauthorized
-        "403":
-          description: Forbidden - Scheduler option not enabled
-        "500":
-          description: Internal server error
+
   /calendars/{calendarId}/schedulers/{schedulerId}/user-status:
     get:
       summary: Get User Status
