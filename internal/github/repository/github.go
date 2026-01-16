@@ -35,9 +35,18 @@ type GithubRepository interface {
 	GetMilestones(
 		ctx context.Context,
 		userId, calendarId uuid.UUID,
-		getFn func(installationId string)(*github.Organization, error),
-	)(
+		getFn func(installationId string) (*github.Organization, error),
+	) (
 		[]github.Milestones,
+		error,
+	)
+
+	// GitHubアカウントが連携されているか
+	IsLinkedUser(
+		ctx context.Context,
+		userId uuid.UUID,
+	) (
+		*output.IsLinkedUserQueryOutput,
 		error,
 	)
 }
