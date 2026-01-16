@@ -1,0 +1,29 @@
+post:
+  summary: Install GitHub to calendar
+  tags: [github]
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: "#/components/schemas/GithubCalendarInstallRequest"
+  responses:
+    "204":
+      description: Installed successfully
+    "400":
+      description: Invalid request
+    "500":
+      description: Internal server error
+
+components:
+  schemas:
+    GithubCalendarInstallRequest:
+      type: object
+      required:
+        - state
+        - installationId
+      properties:
+        state:
+          type: string
+        installationId:
+          type: string
