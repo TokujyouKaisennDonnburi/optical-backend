@@ -1,7 +1,6 @@
 package calendar
 
 import (
-	"encoding/hex"
 	"errors"
 	"time"
 	"unicode/utf8"
@@ -21,7 +20,6 @@ type Event struct {
 	CalendarId    uuid.UUID
 	Title         string
 	Memo          string
-	Color         string
 	Location      string
 	ScheduledTime ScheduledTime
 }
@@ -32,7 +30,7 @@ type ScheduledTime struct {
 	EndTime   time.Time
 }
 
-func NewEvent(calendarId uuid.UUID, title, memo, color, location string, scheduledTime ScheduledTime) (*Event, error) {
+func NewEvent(calendarId uuid.UUID, title, memo, location string, scheduledTime ScheduledTime) (*Event, error) {
 	id, err := uuid.NewV7()
 	if err != nil {
 		return nil, errors.New("Event `id` is nil")
@@ -45,10 +43,6 @@ func NewEvent(calendarId uuid.UUID, title, memo, color, location string, schedul
 		CalendarId: calendarId,
 	}
 	err = event.SetTitle(title)
-	if err != nil {
-		return nil, err
-	}
-	err = event.SetColor(color)
 	if err != nil {
 		return nil, err
 	}
@@ -73,23 +67,6 @@ func (e *Event) SetTitle(title string) error {
 		return errors.New("Event `title` length is invalid")
 	}
 	e.Title = title
-	return nil
-}
-
-func (e *Event) SetColor(color string) error {
-	if color == "" {
-		e.Color = ""
-		return nil
-	}
-	colorLen := utf8.RuneCountInString(color)
-	if colorLen != 6 {
-		return errors.New("Color length is invalid")
-	}
-	_, err := hex.DecodeString(color)
-	if err != nil {
-		return errors.New("Color format is invalid")
-	}
-	e.Color = color
 	return nil
 }
 

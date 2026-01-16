@@ -16,7 +16,6 @@ type EventModel struct {
 	CalendarId uuid.UUID `db:"calendar_id"`
 	Title      string    `db:"title"`
 	Memo       string    `db:"memo"`
-	Color      string    `db:"color"`
 	Location   string    `db:"location"`
 	IsAllDay   bool      `db:"all_day"`
 	StartAt    time.Time `db:"start_at"`
@@ -25,8 +24,8 @@ type EventModel struct {
 
 func FindEventByUserIdAndId(ctx context.Context, tx *sqlx.Tx, userId, eventId uuid.UUID) (*calendar.Event, error) {
 	query := `
-		SELECT 
-			events.id, events.calendar_id, title, memo, color, event_locations.location, all_day, start_at, end_at
+		SELECT
+			events.id, events.calendar_id, title, memo, event_locations.location, all_day, start_at, end_at
 		FROM events
 		JOIN calendar_members
 			ON calendar_members.calendar_id = events.calendar_id
@@ -52,7 +51,6 @@ func FindEventByUserIdAndId(ctx context.Context, tx *sqlx.Tx, userId, eventId uu
 		CalendarId: eventModel.CalendarId,
 		Title:      eventModel.Title,
 		Memo:       eventModel.Memo,
-		Color:      eventModel.Color,
 		Location:   eventModel.Location,
 		ScheduledTime: calendar.ScheduledTime{
 			AllDay:    eventModel.IsAllDay,

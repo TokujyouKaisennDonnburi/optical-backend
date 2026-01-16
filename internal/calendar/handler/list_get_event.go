@@ -14,16 +14,16 @@ import (
 )
 
 type ListGetEventResponse struct {
-	Id         string `json:"id"`
-	CalendarId string `json:"calendar_id"`
-	Title      string `json:"title"`
-	Memo       string `json:"memo"`
-	Color      string `json:"color"`
-	Location   string `json:"location"`
-	IsAllDay   bool   `json:"is_all_day"`
-	StartAt    string `json:"start_at"`
-	EndAt      string `json:"end_at"`
-	CreatedAt  string `json:"created_at"`
+	Id            string `json:"id"`
+	CalendarId    string `json:"calendarId"`
+	CalendarColor string `json:"calendarColor"`
+	Title         string `json:"title"`
+	Memo          string `json:"memo"`
+	Location      string `json:"location"`
+	IsAllDay      bool   `json:"isAllDay"`
+	StartAt       string `json:"startAt"`
+	EndAt         string `json:"endAt"`
+	CreatedAt     string `json:"createdAt"`
 }
 
 // GET /calendars/{calendarId}/events
@@ -56,16 +56,16 @@ func (h *CalendarHttpHandler) ListGetEvents(w http.ResponseWriter, r *http.Reque
 	response := make([]ListGetEventResponse, 0, len(events))
 	for _, event := range events {
 		response = append(response, ListGetEventResponse{
-			Id:         event.Id.String(),
-			CalendarId: event.CalendarId.String(),
-			Title:      event.Title,
-			Memo:       event.Memo,
-			Color:      event.Color,
-			Location:   event.Location,
-			IsAllDay:   event.IsAllDay,
-			StartAt:    event.StartAt,
-			EndAt:      event.EndAt,
-			CreatedAt:  event.CreatedAt,
+			Id:            event.Id.String(),
+			CalendarId:    event.CalendarId.String(),
+			CalendarColor: event.CalendarColor,
+			Title:         event.Title,
+			Memo:          event.Memo,
+			Location:      event.Location,
+			IsAllDay:      event.IsAllDay,
+			StartAt:       event.StartAt,
+			EndAt:         event.EndAt,
+			CreatedAt:     event.CreatedAt,
 		})
 	}
 	render.JSON(w, r, response)

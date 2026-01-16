@@ -14,7 +14,6 @@ type EventCreateInput struct {
 	CalendarId uuid.UUID
 	Title      string
 	Memo       string
-	Color      string
 	Location   string
 	StartTime  time.Time
 	EndTime    time.Time
@@ -33,7 +32,7 @@ func (c *EventCommand) Create(ctx context.Context, input EventCreateInput) (*Eve
 		return nil, err
 	}
 	// 予定を作成
-	event, err := calendar.NewEvent(input.CalendarId, input.Title, input.Memo, input.Color, input.Location, *scheduledTime)
+	event, err := calendar.NewEvent(input.CalendarId, input.Title, input.Memo, input.Location, *scheduledTime)
 	if err != nil {
 		return nil, err
 	}

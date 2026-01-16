@@ -36,15 +36,14 @@ func (r *EventPsqlRepository) Create(
 			return err
 		}
 		query := `
-			INSERT INTO events(id, calendar_id, title, memo, color, all_day, start_at, end_at, created_at, updated_at)
-			VALUES(:id, :calendarId, :title, :memo, :color, :allDay, :startAt, :endAt, :createdAt, :updatedAt)
+			INSERT INTO events(id, calendar_id, title, memo, all_day, start_at, end_at, created_at, updated_at)
+			VALUES(:id, :calendarId, :title, :memo, :allDay, :startAt, :endAt, :createdAt, :updatedAt)
 		`
 		_, err = tx.NamedExecContext(ctx, query, map[string]any{
 			"id":         event.Id,
 			"calendarId": event.CalendarId,
 			"title":      event.Title,
 			"memo":       event.Memo,
-			"color":      event.Color,
 			"allDay":     event.ScheduledTime.AllDay,
 			"startAt":    event.ScheduledTime.StartTime,
 			"endAt":      event.ScheduledTime.EndTime,
@@ -84,19 +83,17 @@ func (r *EventPsqlRepository) Update(
 			UPDATE events SET
 				title = :title,
 				memo = :memo,
-				color = :color,
 				all_day = :allDay,
 				start_at = :startAt,
 				end_at = :endAt,
 				updated_at = :updatedAt
-			WHERE 
+			WHERE
 				id = :id AND deleted_at IS NULL
 		`
 		_, err = tx.NamedExecContext(ctx, query, map[string]any{
 			"id":        event.Id,
 			"title":     event.Title,
 			"memo":      event.Memo,
-			"color":     event.Color,
 			"allDay":    event.ScheduledTime.AllDay,
 			"startAt":   event.ScheduledTime.StartTime,
 			"endAt":     event.ScheduledTime.EndTime,

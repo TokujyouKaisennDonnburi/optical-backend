@@ -12,16 +12,16 @@ import (
 // 専用モデル
 // gateway層専用のモデル
 type EventListQueryModel struct {
-	Id         uuid.UUID `db:"id"`
-	CalendarId uuid.UUID `db:"calendar_id"`
-	Title      string    `db:"title"`
-	Memo       string    `db:"memo"`
-	Color      string    `db:"color"`
-	Location   string    `db:"location"`
-	AllDay     bool      `db:"all_day"`
-	StartAt    string    `db:"start_at"`
-	EndAt      string    `db:"end_at"`
-	CreatedAt  string    `db:"created_at"`
+	Id            uuid.UUID `db:"id"`
+	CalendarId    uuid.UUID `db:"calendar_id"`
+	CalendarColor string    `db:"calendar_color"`
+	Title         string    `db:"title"`
+	Memo          string    `db:"memo"`
+	Location      string    `db:"location"`
+	AllDay        bool      `db:"all_day"`
+	StartAt       string    `db:"start_at"`
+	EndAt         string    `db:"end_at"`
+	CreatedAt     string    `db:"created_at"`
 }
 
 // 特定のカレンダーに対応するイベント一覧取得
@@ -30,7 +30,7 @@ func (r *EventPsqlRepository) ListEventsByCalendarId(
 	calendarId uuid.UUID,
 ) ([]output.EventQueryOutput, error) {
 	query := `
-		SELECT e.id, e.calendar_id, e.title, e.memo, c.color, COALESCE(el.location, '') as location, e.all_day, e.start_at, e.end_at, e.created_at
+		SELECT e.id, e.calendar_id, c.color as calendar_color, e.title, e.memo, COALESCE(el.location, '') as location, e.all_day, e.start_at, e.end_at, e.created_at
 		FROM events e
 		JOIN event_locations el ON e.id = el.event_id
 		JOIN calendars c ON e.calendar_id = c.id
@@ -50,16 +50,16 @@ func (r *EventPsqlRepository) ListEventsByCalendarId(
 	events := make([]output.EventQueryOutput, len(rows))
 	for i, row := range rows {
 		events[i] = output.EventQueryOutput{
-			Id:         row.Id,
-			CalendarId: row.CalendarId,
-			Title:      row.Title,
-			Memo:       row.Memo,
-			Color:      row.Color,
-			Location:   row.Location,
-			IsAllDay:   row.AllDay,
-			StartAt:    row.StartAt,
-			EndAt:      row.EndAt,
-			CreatedAt:  row.CreatedAt,
+			Id:            row.Id,
+			CalendarId:    row.CalendarId,
+			CalendarColor: row.CalendarColor,
+			Title:         row.Title,
+			Memo:          row.Memo,
+			Location:      row.Location,
+			IsAllDay:      row.AllDay,
+			StartAt:       row.StartAt,
+			EndAt:         row.EndAt,
+			CreatedAt:     row.CreatedAt,
 		}
 	}
 

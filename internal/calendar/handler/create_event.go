@@ -14,13 +14,12 @@ import (
 )
 
 type EventCreateRequest struct {
-	Title     string    `jsno:"title"`
-	Memo      string    `jsno:"memo"`
-	Color     string    `jsno:"color"`
-	Location  string    `jsno:"location"`
-	StartTime time.Time `jsno:"startTime"`
-	EndTime   time.Time `jsno:"endTime"`
-	IsAllDay  bool      `jsno:"isAllDay"`
+	Title     string    `json:"title"`
+	Memo      string    `json:"memo"`
+	Location  string    `json:"location"`
+	StartTime time.Time `json:"startTime"`
+	EndTime   time.Time `json:"endTime"`
+	IsAllDay  bool      `json:"isAllDay"`
 }
 
 type EventCreateResponse struct {
@@ -50,7 +49,6 @@ func (h *CalendarHttpHandler) CreateEvent(w http.ResponseWriter, r *http.Request
 		CalendarId: calendarId,
 		Title:      request.Title,
 		Memo:       request.Memo,
-		Color:      request.Color,
 		Location:   request.Location,
 		StartTime:  request.StartTime,
 		EndTime:    request.EndTime,
