@@ -14,10 +14,14 @@ type SchedulerEventInput struct {
 	SchedulerId uuid.UUID
 	UserId      uuid.UUID
 	Date        time.Time
+	StartTime   time.Time
+	EndTime     time.Time
+	isAllDay    bool
+	isDone      bool
 }
 
-func (c *SchedulerCommand) SchedulerEvent(ctx context.Context, input SchedulerEventInput)error{
-		// option check
+func (c *SchedulerCommand) SchedulerEvent(ctx context.Context, input SchedulerEventInput) error {
+	// option check
 	options, err := c.optionRepository.FindsByCalendarId(ctx, input.CalendarId)
 	if err != nil {
 		return err
@@ -32,4 +36,9 @@ func (c *SchedulerCommand) SchedulerEvent(ctx context.Context, input SchedulerEv
 	if !hasOption {
 		return apperr.ForbiddenError("option not enabled")
 	}
+	err := c.eventRepository.Create(ctx, input.CalendarId)
+	if err != nil {
+		return err
+	}
+	return nil
 }
