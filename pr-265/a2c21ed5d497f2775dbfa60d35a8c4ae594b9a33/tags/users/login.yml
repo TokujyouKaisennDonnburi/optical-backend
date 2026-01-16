@@ -1,0 +1,58 @@
+post:
+  summary: Login a user
+  tags:
+    - users
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: "#/components/schemas/UserLoginRequest"
+  responses:
+    "200":
+      description: User logged in successfully
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/UserLoginResponse"
+    "400":
+      description: Invalid request
+    "401":
+      description: Unauthorized
+    "500":
+      description: Internal server error
+
+components:
+  schemas:
+    UserLoginRequest:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          format: email
+          example: optical-user@example.com
+        password:
+          type: string
+          example: password
+    UserLoginResponse:
+      type: object
+      properties:
+        accessToken:
+          type: string
+        refreshToken:
+          type: string
+        user:
+          $ref: "#/components/schemas/UserLoginResponseUser"
+    UserLoginResponseUser:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        email:
+          type: string
+          format: email
