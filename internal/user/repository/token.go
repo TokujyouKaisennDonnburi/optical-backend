@@ -7,5 +7,5 @@ import (
 
 type TokenRepository interface {
 	AddToWhitelist(refreshToken *user.RefreshToken) error
-	IsWhitelisted(tokenId uuid.UUID) error
+	IsWhitelisted(userId uuid.UUID, tokenId uuid.UUID) error
 }
