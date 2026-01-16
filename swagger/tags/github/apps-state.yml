@@ -1,0 +1,41 @@
+post:
+  summary: Create GitHub App installation state
+  description: Creates an App installation state URL for GitHub.
+  tags:
+    - github
+  security:
+    - bearerAuth: []
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: "#/components/schemas/GithubAppStateRequest"
+  responses:
+    "200":
+      description: App state created
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/GithubStateResponse"
+    "400":
+      description: Invalid request
+    "500":
+      description: Internal server error
+
+components:
+  schemas:
+    GithubAppStateRequest:
+      type: object
+      required:
+        - calendarId
+      properties:
+        calendarId:
+          type: string
+          format: uuid
+    GithubStateResponse:
+      type: object
+      properties:
+        url:
+          type: string
+          format: url

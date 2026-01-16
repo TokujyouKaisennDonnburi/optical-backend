@@ -1,0 +1,82 @@
+post:
+  summary: Add a member to a calendar
+  tags:
+    - members
+  security:
+    - bearerAuth: []
+  parameters:
+    - name: calendarId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: "#/components/schemas/MemberCreateRequest"
+  responses:
+    "204":
+      description: Member added successfully
+    "400":
+      description: Invalid request
+    "500":
+      description: Internal server error
+patch:
+  summary: Join a calendar as an invited member
+  description: Allows an invited user to join a calendar. The user must have been previously invited.
+  tags:
+    - members
+  security:
+    - bearerAuth: []
+  parameters:
+    - name: calendarId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+  responses:
+    "204":
+      description: Successfully joined the calendar
+    "500":
+      description: Not invited or already joined
+delete:
+  summary: Reject a calendar invitation
+  description: Allows an invited user to reject a calendar invitation. Only pending invitations (not yet joined) can be rejected.
+  tags:
+    - members
+  security:
+    - bearerAuth: []
+  parameters:
+    - name: calendarId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+  responses:
+    "204":
+      description: Successfully rejected the invitation
+    "400":
+      description: Invalid calendarId format
+    "500":
+      description: Internal server error
+
+components:
+  schemas:
+    MemberCreateRequest:
+      type: object
+      required:
+        - email
+      properties:
+        email:
+          type: array
+          items:
+            type: string
+            format: email
+          example:
+            - optical-user1@example.com
+            - optical-user2@example.com
