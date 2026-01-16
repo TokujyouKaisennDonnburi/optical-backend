@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"fmt"
-	"io"
 	"net/http"
 	"os"
 	"strconv"
@@ -32,6 +31,9 @@ import (
 	schedulerHandler "github.com/TokujouKaisenDonburi/optical-backend/internal/scheduler/handler"
 	schedulerCommand "github.com/TokujouKaisenDonburi/optical-backend/internal/scheduler/service/command"
 	schedulerQuery "github.com/TokujouKaisenDonburi/optical-backend/internal/scheduler/service/query"
+	todoGateway "github.com/TokujouKaisenDonburi/optical-backend/internal/todo/gateway"
+	todoHandler "github.com/TokujouKaisenDonburi/optical-backend/internal/todo/handler"
+	todoCommand "github.com/TokujouKaisenDonburi/optical-backend/internal/todo/service/command"
 	userGateway "github.com/TokujouKaisenDonburi/optical-backend/internal/user/gateway"
 	userHandler "github.com/TokujouKaisenDonburi/optical-backend/internal/user/handler"
 	userCommand "github.com/TokujouKaisenDonburi/optical-backend/internal/user/service/command"
@@ -137,6 +139,9 @@ func main() {
 		AllowCredentials: false,
 		MaxAge:           300,
 	}))
+	todoRepository := todoGateway.NewTodoPsqlRepository(db)
+	todoCommand := todoCommand.NewTodoCommand(todoRepository)
+	todoHandler := todoHandler.NewTodoHttpHandler(todoCommand)
 
 	// Unprotected Routes
 	r.Group(func(r chi.Router) {
@@ -149,12 +154,6 @@ func main() {
 		r.Post("/github/apps/install", githubHandler.InstallToCalendar)
 		r.Post("/github/oauth/link", githubHandler.LinkUser)
 		r.Post("/github/oauth/create", githubHandler.CreateNewUserOauthState)
-		r.Post("/chat/completions", func(w http.ResponseWriter, r *http.Request) {
-			body, err := io.ReadAll(r.Body)
-			if err == nil {
-				logrus.WithField("body", string(body)).Info("chat completion")
-			}
-		})
 	})
 
 	// Protected Routes
@@ -211,6 +210,10 @@ func main() {
 		r.Post("/calendars/{calendarId}/schedulers/{schedulerId}/attendance", schedulerHandler.AddAttendanceHandler)
 		r.Get("/calendars/{calendarId}/schedulers/{schedulerId}/attendance", schedulerHandler.GetAttendance)
 		r.Get("/schedulers/{schedulerId}/result", schedulerHandler.SchedulerResultHandler)
+		r.Post("/calendars/{calendarId}/scheduler", schedulerHandler.SchedulerCreate)
+
+		// Todos
+		r.Post("/calendars/{calendarId}/todos", todoHandler.CreateList)
 	})
 
 	// Start Serving

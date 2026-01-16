@@ -138,3 +138,21 @@ func modelsToCalendar(calendarModels []CalendarModel, memberModels []MemberModel
 		Options: options,
 	}, nil
 }
+
+func IsUserInCalendarMembers(ctx context.Context, tx *sqlx.Tx, userId, calendarId uuid.UUID) (bool, error) {
+	exists := false
+	query := `
+		SELECT 1
+		FROM calendar_members
+		WHERE calendar_members.calendar_id = $2
+			AND calendar_members.user_id = $1
+	`
+	err := tx.GetContext(ctx, &exists, query, userId, calendarId)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return false, apperr.ForbiddenError(err.Error())
+		}
+		return false, err
+	}
+	return exists, nil
+}
