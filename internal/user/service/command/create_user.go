@@ -41,7 +41,7 @@ func (c *UserCommand) CreateUser(ctx context.Context, input UserCreateInput) (*U
 		return nil, err
 	}
 	// リフレッシュトークンを保存
-	err = c.tokenRepository.AddToWhitelist(refreshToken)
+	err = c.tokenRepository.AddToWhitelist(ctx, refreshToken)
 	if err != nil {
 		return nil, err
 	}

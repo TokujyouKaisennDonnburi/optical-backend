@@ -41,8 +41,7 @@ func (r *TokenRedisRepository) getWhitelistKey(userId uuid.UUID) string {
 }
 
 // リフレッシュトークンをホワイトリストに追加する
-func (r *TokenRedisRepository) AddToWhitelist(refreshToken *user.RefreshToken) error {
-	ctx := context.Background()
+func (r *TokenRedisRepository) AddToWhitelist(ctx context.Context, refreshToken *user.RefreshToken) error {
 	key := r.getWhitelistKey(refreshToken.UserId)
 
 	// 既存のリストを取得
@@ -73,8 +72,7 @@ func (r *TokenRedisRepository) AddToWhitelist(refreshToken *user.RefreshToken) e
 }
 
 // 指定されたトークンがホワイトリストに存在するか確認する
-func (r *TokenRedisRepository) IsWhitelisted(userId uuid.UUID, tokenId uuid.UUID) error {
-	ctx := context.Background()
+func (r *TokenRedisRepository) IsWhitelisted(ctx context.Context, userId uuid.UUID, tokenId uuid.UUID) error {
 	key := r.getWhitelistKey(userId)
 
 	entries, err := r.getWhitelistEntries(ctx, key)
