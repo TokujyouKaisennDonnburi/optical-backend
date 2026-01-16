@@ -59,11 +59,7 @@ func (r *TodoPsqlRepository) AddItem(
 	todoItem *todo.Item,
 ) error {
 	return db.RunInTx(r.db, func(tx *sqlx.Tx) error {
-		todoList, err := psql.FindTodoListById(ctx, tx, listId)
-		if err != nil {
-			return err
-		}
-		exists, err := psql.IsUserInCalendarMembers(ctx, tx, todoItem.UserId, todoList.CalendarId)
+		exists, err := psql.IsUserInTodoListMembers(ctx, tx, todoItem.UserId, listId)
 		if err != nil {
 			return err
 		}
@@ -76,7 +72,7 @@ func (r *TodoPsqlRepository) AddItem(
 		`
 		_, err = tx.NamedExecContext(ctx, query, map[string]any{
 			"id":         todoItem.Id,
-			"todoListId": todoList.Id,
+			"todoListId": todoItem.ListId,
 			"userId":     todoItem.UserId,
 			"name":       todoItem.Name,
 			"isDone":     todoItem.IsDone,

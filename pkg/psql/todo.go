@@ -58,3 +58,28 @@ func FindTodoListById(ctx context.Context, tx *sqlx.Tx, id uuid.UUID) (*todo.Lis
 		Items:      todoItems,
 	}, nil
 }
+
+func IsUserInTodoListMembers(ctx context.Context, tx *sqlx.Tx, userId, todoListId uuid.UUID) (bool, error) {
+	exists := false
+	query := `
+		SELECT 1
+		FROM (
+			SELECT calendar_id
+			FROM todo_lists
+			WHERE 
+				todo_lists.id = $2
+		) lists
+		JOIN calendar_members
+			ON lists.calendar_id = calendar_members.calendar_id
+		WHERE 
+			calendar_members.user_id = $1
+	`
+	err := tx.GetContext(ctx, &exists, query, userId, todoListId)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return false, apperr.ForbiddenError(err.Error())
+		}
+		return false, err
+	}
+	return exists, nil
+}
