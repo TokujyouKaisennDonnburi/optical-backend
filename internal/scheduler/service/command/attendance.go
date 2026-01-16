@@ -39,11 +39,6 @@ func (c *SchedulerCommand) AddAttendanceCommand(ctx context.Context, input Atten
 	if !hasOption {
 		return apperr.ForbiddenError("option not enabled")
 	}
-	// scheduler exists check
-	_, err = c.schedulerRepository.FindById(ctx, input.SchedulerId)
-	if err != nil {
-		return apperr.NotFoundError("scheduler not found")
-	}
 	// domain
 	attendance, err := scheduler.NewAttendance(input.SchedulerId, input.UserId, input.Comment)
 	if err != nil {
