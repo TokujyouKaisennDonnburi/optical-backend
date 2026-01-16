@@ -18,5 +18,5 @@ func (q *SchedulerQuery) UserStatusQuery(ctx context.Context, input SchedulerUse
 	if err != nil {
 		return nil, err
 	}
-	return &result, nil
+	return result, nil
 }

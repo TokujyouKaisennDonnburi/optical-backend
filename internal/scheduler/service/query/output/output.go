@@ -23,7 +23,6 @@ type PossibleDateOutput struct {
 	EndTime   time.Time
 }
 
-<<<<<<< HEAD
 type SchedulerResultOutput struct {
 	OwnerId   uuid.UUID
 	Title     string
