@@ -9,55 +9,40 @@ import (
 	"github.com/google/uuid"
 )
 
-type SchedulerModel struct {
-	Id         uuid.UUID `db:"id"`
-	CalendarId uuid.UUID `db:"calendar_id"`
-	UserId     uuid.UUID `db:"user_id"`
-	Title      string    `db:"title"`
-	Memo       string    `db:"memo"`
-	LimitTime  time.Time `db:"limit_time"`
-	IsAllDay   bool      `db:"is_allday"`
-	Date       time.Time `db:"date"`
-	StartTime  time.Time `db:"start_time"`
-	EndTime    time.Time `db:"end_time"`
+type UserStatusModel struct {
+	UserId  uuid.UUID `db:"user_id"`
+	Comment string    `db:"comment"`
+	Date    time.Time `db:"date"`
+	Status  int8      `db:"status"`
 }
 
-func (r *SchedulerPsqlRepository) FindSchedulerById(
-	ctx context.Context,
-	id uuid.UUID,
-) (*output.SchedulerOutput, error) {
-	query := `
-	SELECT s.id, s.calendar_id, s.user_id, s.title, s.memo, s.limit_time, s.is_allday,
-	pd.date, pd.start_time, pd.end_time
-	FROM scheduler s
-	LEFT JOIN scheduler_possible_date pd ON pd.scheduler_id = s.id
-	WHERE s.id = $1
+func (r *SchedulerPsqlRepository) FindAttendanceById(ctx context.Context, calendarId, schedulerId, userId uuid.UUID) (*output.SchedulerAttendanceOutput, error) {
+	sql := `
+	SELECT sa.user_id, sa.comment, ss.date, ss.status
+	FROM scheduler_attendance sa
+	LEFT JOIN scheduler_status ss ON ss.attendance_id = sa.id
+	INNER JOIN calendar_members cm ON cm.calendar_id = $1
+	WHERE sa.scheduler_id = $2 AND cm.user_id = $3 AND cm.joined_at IS NOT NULL
 	`
-	var row []SchedulerModel
-	err := r.db.SelectContext(ctx, &row, query, id)
+	var rows []UserStatusModel
+	err := r.db.SelectContext(ctx, &rows, sql, calendarId, schedulerId, userId)
 	if err != nil {
 		return nil, err
 	}
-	if len(row) == 0 {
-		return nil, errors.New("scheduler not found")
+	if len(rows) == 0 {
+		return nil, errors.New("scheduler status is not found")
 	}
-	dates := make([]output.PossibleDateOutput, len(row))
-	for i, v := range row {
-		dates[i] = output.PossibleDateOutput{
-			Date:      v.Date,
-			StartTime: v.StartTime,
-			EndTime:   v.EndTime,
+	statuses := make([]output.StatusOutput, len(rows))
+	for i, v := range rows {
+		statuses[i] = output.StatusOutput{
+			Date:   v.Date,
+			Status: v.Status,
 		}
 	}
-	result := output.SchedulerOutput{
-		Id:           row[0].Id,
-		CalendarId:   row[0].CalendarId,
-		UserId:       row[0].UserId,
-		Title:        row[0].Title,
-		Memo:         row[0].Memo,
-		LimitTime:    row[0].LimitTime,
-		IsAllDay:     row[0].IsAllDay,
-		PossibleDate: dates,
+	result := output.SchedulerAttendanceOutput{
+		UserId:  rows[0].UserId,
+		Comment: rows[0].Comment,
+		Status:  statuses,
 	}
 	return &result, nil
 }
