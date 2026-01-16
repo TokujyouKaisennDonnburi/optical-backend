@@ -51,6 +51,9 @@ func (r *TokenRedisRepository) AddToWhitelist(refreshToken *user.RefreshToken) e
 		return err
 	}
 
+	// 期限切れトークンを除外
+	entries = filterValidEntries(entries)
+
 	// 新しいエントリを追加
 	newEntry := tokenWhitelistEntry{
 		TokenId:   refreshToken.Id.String(),
@@ -77,7 +80,21 @@ func (r *TokenRedisRepository) IsWhitelisted(userId uuid.UUID, tokenId uuid.UUID
 		return err
 	}
 
-	for _, entry := range entries {
+	// 期限切れトークンを除外
+	validEntries := filterValidEntries(entries)
+
+	// 期限切れトークンがあれば保存し直す
+	if len(validEntries) != len(entries) {
+		data, err := json.Marshal(validEntries)
+		if err != nil {
+			return err
+		}
+		if err := r.client.Set(ctx, key, data, 0).Err(); err != nil {
+			return err
+		}
+	}
+
+	for _, entry := range validEntries {
 		if entry.TokenId == tokenId.String() {
 			return nil
 		}
@@ -102,5 +119,17 @@ func (r *TokenRedisRepository) getWhitelistEntries(ctx context.Context, key stri
 	}
 
 	return entries, nil
+}
+
+// 期限切れでない有効なエントリのみを返す
+func filterValidEntries(entries []tokenWhitelistEntry) []tokenWhitelistEntry {
+	now := time.Now().UTC()
+	valid := make([]tokenWhitelistEntry, 0, len(entries))
+	for _, entry := range entries {
+		if entry.ExpiresIn.After(now) {
+			valid = append(valid, entry)
+		}
+	}
+	return valid
 }
 
