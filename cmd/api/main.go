@@ -266,7 +266,7 @@ func getPostgresDB() *sqlx.DB {
 	// #63 環境変数から読むように変える
 	host, ok := os.LookupEnv("POSTGRES_HOST")
 	if !ok {
-		panic("'POSTGREST_HOST' is not set")
+		panic("'POSTGRES_HOST' is not set")
 	}
 	port, ok := os.LookupEnv("POSTGRES_PORT")
 	if !ok {
