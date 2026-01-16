@@ -45,8 +45,8 @@ func (r *TodoPsqlRepository) CreateList(
 			"userId":     list.UserId,
 			"calendarId": list.CalendarId,
 			"name":       list.Name,
-			"createdAt":  time.Now(),
-			"updatedAt":  time.Now(),
+			"createdAt":  time.Now().UTC(),
+			"updatedAt":  time.Now().UTC(),
 		})
 		return err
 	})
