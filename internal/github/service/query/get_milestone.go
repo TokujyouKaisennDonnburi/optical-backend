@@ -30,7 +30,7 @@ func (g *GithubQuery) GetMilestone(ctx context.Context, input MilestonesInput) (
 	}
 	hasOption := false
 	for _, opt := range options {
-		if opt.Id == option.OPTION_MILESTONE_STATUS {
+		if opt.Id == option.OPTION_MILESTONE_PROGRESS {
 			hasOption = true
 			break
 		}
