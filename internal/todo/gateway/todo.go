@@ -80,8 +80,8 @@ func (r *TodoPsqlRepository) AddItem(
 			"userId":     todoItem.UserId,
 			"name":       todoItem.Name,
 			"isDone":     todoItem.IsDone,
-			"createdAt":  time.Now(),
-			"updatedAt":  time.Now(),
+			"createdAt":  time.Now().UTC(),
+			"updatedAt":  time.Now().UTC(),
 		})
 		return err
 	})
