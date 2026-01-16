@@ -28,7 +28,7 @@ func (u UserCommand) Refresh(ctx context.Context, input TokenRefreshInput) (*Tok
 		return nil, errors.New("RefreshToken is expired")
 	}
 	// 有効なリフレッシュトークンか確認
-	err = u.tokenRepository.IsWhitelisted(refreshToken.Id)
+	err = u.tokenRepository.IsWhitelisted(refreshToken.UserId, refreshToken.Id)
 	if err != nil {
 		return nil, err
 	}
