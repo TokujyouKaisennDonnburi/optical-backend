@@ -42,7 +42,7 @@ func (h *SchedulerHttpHandler) GetUserStatus(w http.ResponseWriter, r *http.Requ
 		return
 	}
 	// service
-	service, err := h.schedulerQuery.UserStatusQuery(r.Context(), query.SchedulerUserStatusInput{
+	output, err := h.schedulerQuery.UserStatusQuery(r.Context(), query.SchedulerUserStatusInput{
 		CalendarId:  calendarId,
 		SchedulerId: schedulerId,
 		UserId:      userId,
@@ -52,8 +52,8 @@ func (h *SchedulerHttpHandler) GetUserStatus(w http.ResponseWriter, r *http.Requ
 		return
 	}
 	// array bind
-	statuses := make([]StatusResponse, len(service.Status))
-	for i, v := range service.Status {
+	statuses := make([]StatusResponse, len(output.Status))
+	for i, v := range output.Status {
 		statuses[i] = StatusResponse{
 			Date:   v.Date,
 			Status: v.Status,
@@ -61,8 +61,8 @@ func (h *SchedulerHttpHandler) GetUserStatus(w http.ResponseWriter, r *http.Requ
 	}
 	// bind
 	response := UserStatusResponse{
-		UserId:  service.UserId,
-		Comment: service.Comment,
+		UserId:  output.UserId,
+		Comment: output.Comment,
 		Status:  statuses,
 	}
 	// response
