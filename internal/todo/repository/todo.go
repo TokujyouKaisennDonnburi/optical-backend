@@ -8,6 +8,10 @@ import (
 )
 
 type TodoRepository interface {
+	FindByCalendarId(
+		ctx context.Context,
+		userId, calendarId uuid.UUID,
+	) ([]todo.List, error)
 	CreateList(
 		ctx context.Context,
 		list *todo.List,
