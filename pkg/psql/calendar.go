@@ -149,6 +149,9 @@ func IsUserInCalendarMembers(ctx context.Context, tx *sqlx.Tx, userId, calendarI
 	`
 	err := tx.GetContext(ctx, &exists, query, userId, calendarId)
 	if err != nil {
+		if err == sql.ErrNoRows {
+			return false, apperr.ForbiddenError(err.Error())
+		}
 		return false, err
 	}
 	return exists, nil
