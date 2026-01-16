@@ -198,6 +198,7 @@ func main() {
 		r.Get("/calendars/{calendarId}/events", calendarHandler.ListGetEvents)
 		r.Get("/events/todays", calendarHandler.GetToday)
 		r.Get("/events/months", calendarHandler.GetByMonth)
+		r.Get("/events/search", calendarHandler.SearchEvents)
 
 		// Options
 		r.Get("/options", optionHandler.GetList)

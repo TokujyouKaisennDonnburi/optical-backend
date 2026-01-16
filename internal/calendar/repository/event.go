@@ -38,4 +38,15 @@ type EventRepository interface {
 	GetEventsByDate(ctx context.Context, userId uuid.UUID, date time.Time) ([]output.EventTodayQueryOutputItem, error)
 	GetEventsByMonth(ctx context.Context, userId uuid.UUID, date time.Time) ([]output.EventTodayQueryOutputItem, error)
 	FindAnalyzableEventsByUserId(ctx context.Context, userId uuid.UUID) ([]agent.AnalyzableEvent, error)
+
+	// イベント検索
+	SearchEvents(
+		ctx context.Context,
+		userId uuid.UUID,
+		query string,
+		startFrom time.Time,
+		startTo time.Time,
+		limit int,
+		offset int,
+	) (*output.EventSearchQueryOutput, error)
 }

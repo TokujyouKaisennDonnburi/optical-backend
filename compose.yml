@@ -1,6 +1,7 @@
 services:
   optical_postgres:
-    image: postgres:latest
+    # image: postgres:latest
+    image: paradedb/paradedb:latest
     container_name: optical_postgres
     ports:
       - 127.0.0.1:5433:5432
