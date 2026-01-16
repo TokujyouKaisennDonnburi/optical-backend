@@ -97,6 +97,9 @@ func (r *TokenRedisRepository) IsWhitelisted(ctx context.Context, userId uuid.UU
 
 	for _, entry := range validEntries {
 		if entry.TokenId == tokenId.String() {
+			// 成功時もTTLを延長
+			ttl := time.Second * time.Duration(user.REFRESH_TOKEN_EXPIRE)
+			_ = r.client.Expire(ctx, key, ttl)
 			return nil
 		}
 	}
