@@ -16,8 +16,8 @@ type SchedulerEventInput struct {
 	Date        time.Time
 	StartTime   time.Time
 	EndTime     time.Time
-	isAllDay    bool
-	isDone      bool
+	IsAllDay    bool
+	IsDone      bool
 }
 
 func (c *SchedulerCommand) SchedulerEvent(ctx context.Context, input SchedulerEventInput) error {

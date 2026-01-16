@@ -54,6 +54,8 @@ func (h *SchedulerHttpHandler) CreateEvent(w http.ResponseWriter, r *http.Reques
 		Date:        request.Date,
 		StartTime:   request.StartTime,
 		EndTime:     request.EndTime,
+		IsAllDay:    request.IsAllDay,
+		IsDone:      request.IsDone,
 	})
 	if err != nil {
 		apperr.HandleAppError(w, r, err)
