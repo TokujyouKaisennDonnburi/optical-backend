@@ -914,6 +914,32 @@ paths:
         '500':
           description: Internal server error
   /calendars/{calendarId}/todos:
+    get:
+      summary: Get todo lists
+      tags:
+        - todos
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: calendarId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Todo lists retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TodoListResponse"
+        "400":
+          description: Invalid request
+        "401":
+          description: Unauthorized
+        "500":
+          description: Internal server error
     post:
       summary: Create a new todo list
       tags:
@@ -1918,3 +1944,42 @@ components:
           type: string
           format: uuid
           example: "019b1ffe-efd5-7d9b-a13f-f636cfc89c4d"
+    TodoListResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: "019b1ffe-efd5-7d9b-a13f-f636cfc89c4d"
+        userId:
+          type: string
+          format: uuid
+          example: "019b1ffe-efd5-7d9b-a13f-f636cfc89c4d"
+        calendarId:
+          type: string
+          format: uuid
+          example: "019b1ffe-efd5-7d9b-a13f-f636cfc89c4d"
+        name:
+          type: string
+          example: "Shopping List"
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/TodoListResponseItem"
+    TodoListResponseItem:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: "019b1ffe-efd5-7d9b-a13f-f636cfc89c4d"
+        userId:
+          type: string
+          format: uuid
+          example: "019b1ffe-efd5-7d9b-a13f-f636cfc89c4d"
+        name:
+          type: string
+          example: "Buy milk"
+        isDone:
+          type: boolean
+          example: false
