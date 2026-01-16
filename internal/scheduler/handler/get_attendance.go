@@ -12,29 +12,17 @@ import (
 	"github.com/google/uuid"
 )
 
-type AttendanceQueryResponse struct {
-	Id           uuid.UUID              `json:"schedulerId"`
-	CalendarId   uuid.UUID              `json:"calendarId"`
-	UserId       uuid.UUID              `json:"userId"`
-	Title        string                 `json:"title"`
-	Memo         string                 `json:"memo"`
-	LimitTime    time.Time              `json:"limitTime"`
-	IsAllDay     bool                   `json:"isAllDay"`
-	PossibleDate []PossibleDateResponse `json:"possibleDate"`
+type AttendanceResponse struct {
+	UserId  uuid.UUID        `json:"user_id"`
+	Comment string           `json:"comment"`
+	Status  []StatusResponse `json:"status"`
 }
-type PossibleDateResponse struct {
-	Date      time.Time `json:"date"`
-	StartTime time.Time `json:"startTime"`
-	EndTime   time.Time `json:"endTime"`
+type StatusResponse struct {
+	Date   time.Time `json:"date"`
+	Status int8      `json:"status"`
 }
 
 func (h *SchedulerHttpHandler) GetAttendance(w http.ResponseWriter, r *http.Request) {
-	// userId
-	userId, err := auth.GetUserIdFromContext(r)
-	if err != nil {
-		_ = render.Render(w, r, apperr.ErrInternalServerError(err))
-		return
-	}
 	// calendarId
 	calendarId, err := uuid.Parse(chi.URLParam(r, "calendarId"))
 	if err != nil {
@@ -47,15 +35,36 @@ func (h *SchedulerHttpHandler) GetAttendance(w http.ResponseWriter, r *http.Requ
 		_ = render.Render(w, r, apperr.ErrInvalidRequest(err))
 		return
 	}
-	result, err := h.schedulerQuery.AttendanceQuery(r.Context(), query.AttendanceQueryInput{
+	// userId
+	userId, err := auth.GetUserIdFromContext(r)
+	if err != nil {
+		_ = render.Render(w, r, apperr.ErrUnauthorized(err))
+		return
+	}
+	// service
+	output, err := h.schedulerQuery.AttendanceQuery(r.Context(), query.AttendanceQueryInput{
+		CalendarId:  calendarId,
 		SchedulerId: schedulerId,
 		UserId:      userId,
-		CalendarId:  calendarId,
 	})
 	if err != nil {
 		apperr.HandleAppError(w, r, err)
 		return
 	}
+	// array bind
+	statuses := make([]StatusResponse, len(output.Status))
+	for i, v := range output.Status {
+		statuses[i] = StatusResponse{
+			Date:   v.Date,
+			Status: v.Status,
+		}
+	}
+	// bind
+	response := AttendanceResponse{
+		UserId:  output.UserId,
+		Comment: output.Comment,
+		Status:  statuses,
+	}
 	// response
-	render.JSON(w, r, result)
+	render.JSON(w, r, response)
 }

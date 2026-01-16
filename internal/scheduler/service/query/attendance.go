@@ -8,29 +8,15 @@ import (
 )
 
 type AttendanceQueryInput struct {
+	CalendarId  uuid.UUID
 	SchedulerId uuid.UUID
 	UserId      uuid.UUID
-	CalendarId  uuid.UUID
 }
 
-func (q *SchedulerQuery) AttendanceQuery(
-	ctx context.Context,
-	input AttendanceQueryInput,
-) (*output.SchedulerAttendanceQuery, error) {
-	// repository
-	result, err := q.schedulerRepository.FindById(ctx, input.SchedulerId)
+func (q *SchedulerQuery) AttendanceQuery(ctx context.Context, input AttendanceQueryInput) (*output.SchedulerAttendanceOutput, error) {
+	result, err := q.schedulerRepository.FindAttendanceById(ctx, input.CalendarId, input.SchedulerId, input.UserId)
 	if err != nil {
 		return nil, err
 	}
-	// assign
-	return &output.SchedulerAttendanceQuery{
-		Id:           result.Id,
-		CalendarId:   result.CalendarId,
-		UserId:       result.UserId,
-		Title:        result.Title,
-		Memo:         result.Memo,
-		LimitTime:    result.LimitTime,
-		IsAllDay:     result.IsAllDay,
-		PossibleDate: result.PossibleDate,
-	}, nil
+	return result, nil
 }

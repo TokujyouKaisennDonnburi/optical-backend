@@ -24,7 +24,7 @@ type DateModel struct {
 	EndTime   time.Time `db:"end_time"`
 }
 
-func (r *SchedulerPsqlRepository) FindByMemberId(
+func (r *SchedulerPsqlRepository) FindResultById(
 	ctx context.Context,
 	schedulerId, userId uuid.UUID,
 ) (*output.SchedulerResultOutput, error) {

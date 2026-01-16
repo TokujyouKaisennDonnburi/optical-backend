@@ -16,7 +16,7 @@ type UserStatusModel struct {
 	Status  int8      `db:"status"`
 }
 
-func (r *SchedulerPsqlRepository) FindStatusById(ctx context.Context, calendarId, schedulerId, userId uuid.UUID) (*output.SchedulerUserOutput, error) {
+func (r *SchedulerPsqlRepository) FindAttendanceById(ctx context.Context, calendarId, schedulerId, userId uuid.UUID) (*output.SchedulerAttendanceOutput, error) {
 	sql := `
 	SELECT sa.user_id, sa.comment, ss.date, ss.status
 	FROM scheduler_attendance sa
@@ -32,14 +32,14 @@ func (r *SchedulerPsqlRepository) FindStatusById(ctx context.Context, calendarId
 	if len(rows) == 0 {
 		return nil, errors.New("scheduler status is not found")
 	}
-	statuses := make([]output.UserStatus, len(rows))
+	statuses := make([]output.StatusOutput, len(rows))
 	for i, v := range rows {
-		statuses[i] = output.UserStatus{
+		statuses[i] = output.StatusOutput{
 			Date:   v.Date,
 			Status: v.Status,
 		}
 	}
-	result := output.SchedulerUserOutput{
+	result := output.SchedulerAttendanceOutput{
 		UserId:  rows[0].UserId,
 		Comment: rows[0].Comment,
 		Status:  statuses,

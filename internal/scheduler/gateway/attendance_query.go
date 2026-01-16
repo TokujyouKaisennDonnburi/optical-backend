@@ -22,10 +22,10 @@ type SchedulerModel struct {
 	EndTime    time.Time `db:"end_time"`
 }
 
-func (r *SchedulerPsqlRepository) FindById(
+func (r *SchedulerPsqlRepository) FindSchedulerById(
 	ctx context.Context,
 	id uuid.UUID,
-) (*output.SchedulerAttendanceQuery, error) {
+) (*output.SchedulerOutput, error) {
 	query := `
 	SELECT s.id, s.calendar_id, s.user_id, s.title, s.memo, s.limit_time, s.is_allday,
 	pd.date, pd.start_time, pd.end_time
@@ -49,7 +49,7 @@ func (r *SchedulerPsqlRepository) FindById(
 			EndTime:   v.EndTime,
 		}
 	}
-	result := output.SchedulerAttendanceQuery{
+	result := output.SchedulerOutput{
 		Id:           row[0].Id,
 		CalendarId:   row[0].CalendarId,
 		UserId:       row[0].UserId,

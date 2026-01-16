@@ -6,7 +6,7 @@ import (
 	"github.com/google/uuid"
 )
 
-type SchedulerAttendanceQuery struct {
+type SchedulerOutput struct {
 	Id           uuid.UUID
 	CalendarId   uuid.UUID
 	UserId       uuid.UUID
@@ -43,12 +43,12 @@ type DateOutput struct {
 	StartTime time.Time
 	EndTime   time.Time
 }
-type SchedulerUserOutput struct {
+type SchedulerAttendanceOutput struct {
 	UserId  uuid.UUID
 	Comment string
-	Status  []UserStatus
+	Status  []StatusOutput
 }
-type UserStatus struct {
+type StatusOutput struct {
 	Date   time.Time
 	Status int8
 }
