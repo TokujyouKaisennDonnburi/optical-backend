@@ -67,7 +67,9 @@ func (r *TokenRedisRepository) AddToWhitelist(refreshToken *user.RefreshToken) e
 		return err
 	}
 
-	return r.client.Set(ctx, key, data, 0).Err()
+	// 180日のTTLを設定
+	ttl := time.Second * time.Duration(user.REFRESH_TOKEN_EXPIRE)
+	return r.client.Set(ctx, key, data, ttl).Err()
 }
 
 // 指定されたトークンがホワイトリストに存在するか確認する
@@ -89,7 +91,8 @@ func (r *TokenRedisRepository) IsWhitelisted(userId uuid.UUID, tokenId uuid.UUID
 		if err != nil {
 			return err
 		}
-		if err := r.client.Set(ctx, key, data, 0).Err(); err != nil {
+		ttl := time.Second * time.Duration(user.REFRESH_TOKEN_EXPIRE)
+		if err := r.client.Set(ctx, key, data, ttl).Err(); err != nil {
 			return err
 		}
 	}
