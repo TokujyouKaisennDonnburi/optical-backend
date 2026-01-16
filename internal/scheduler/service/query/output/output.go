@@ -43,3 +43,12 @@ type DateOutput struct {
 	StartTime time.Time
 	EndTime   time.Time
 }
+type SchedulerUserOutput struct {
+	UserId  uuid.UUID
+	Comment string
+	Status  []UserStatus
+}
+type UserStatus struct {
+	Date   time.Time
+	Status int8
+}
