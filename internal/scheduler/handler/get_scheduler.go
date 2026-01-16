@@ -15,7 +15,7 @@ func (h *SchedulerHttpHandler) GetScheduler(w http.ResponseWriter, r *http.Reque
 	// userId
 	userId, err := auth.GetUserIdFromContext(r)
 	if err != nil {
-		_ = render.Render(w, r, apperr.ErrInternalServerError(err))
+		_ = render.Render(w, r, apperr.ErrUnauthorized(err))
 		return
 	}
 	// calendarId

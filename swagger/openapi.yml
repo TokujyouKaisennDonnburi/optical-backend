@@ -516,7 +516,7 @@ paths:
              description: Forbidden - Scheduler option not enabled
           "500":
             description: Internal server error
-  /calendars/{calendarId}/schedulers/{schedulerId}/scheduler:
+  /calendars/{calendarId}/schedulers/{schedulerId}:
       get:
         summary: Get Attendance for Scheduler
         tags:
