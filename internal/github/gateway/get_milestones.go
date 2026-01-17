@@ -23,7 +23,7 @@ func (r *GithubApiRepository) GetMilestones(
 ) {
 	var milestones []github.Milestones
 	err := db.RunInTx(r.db, func(tx *sqlx.Tx) error {
-		_, installationId, err := psql.FindInstallationIdAndGithubId(ctx, tx, userId, calendarId)
+		_, installationId, err := psql.FindInstallationIdAndGithubId(ctx, tx, userId, calendarId, r.installationIdEncryptionKey)
 		if err != nil {
 			return err
 		}
