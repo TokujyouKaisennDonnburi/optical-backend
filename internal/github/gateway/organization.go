@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"os"
 	"time"
 
 	"github.com/TokujouKaisenDonburi/optical-backend/internal/github"
@@ -20,12 +19,12 @@ func (r *StateRedisRepository) GetOrganization(
 ) (*github.Organization, error) {
 	// キャッシュから取得する関数を定義
 	getFromCache := func() (*github.Organization, error) {
-		redisKey := security.Hash(installationId, getEncryptionKey())
+		redisKey := security.Hash(installationId, r.redisEncryptionKey)
 		result, err := r.redisClient.Get(ctx, getGithubAccessKey(redisKey)).Result()
 		if err != nil {
 			return nil, err
 		}
-		plainText, err := security.Decrypt(result, getEncryptionKey())
+		plainText, err := security.Decrypt(result, r.redisEncryptionKey)
 		if err != nil {
 			return nil, err
 		}
@@ -70,21 +69,12 @@ func (r *StateRedisRepository) SaveOrganization(
 	if err != nil {
 		return err
 	}
-	encryptedToken, err := security.Encrypt(string(jsonText), getEncryptionKey())
+	encryptedToken, err := security.Encrypt(string(jsonText), r.redisEncryptionKey)
 	if err != nil {
 		return err
 	}
-	redisKey := security.Hash(organization.InstallationId, getEncryptionKey())
+	redisKey := security.Hash(organization.InstallationId, r.redisEncryptionKey)
 	return r.redisClient.SetEx(ctx, getGithubAccessKey(redisKey), encryptedToken, expiration).Err()
-}
-
-// TODO: DIにする
-func getEncryptionKey() []byte {
-	encryptionKey, ok := os.LookupEnv("REDIS_ENCRYPTION_KEY")
-	if !ok {
-		panic("'REDIS_ENCRYPTION_KEY' is not set")
-	}
-	return []byte(encryptionKey)
 }
 
 func getGithubAccessKey(installationId string) string {
