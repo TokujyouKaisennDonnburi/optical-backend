@@ -35,6 +35,7 @@ import (
 	todoGateway "github.com/TokujouKaisenDonburi/optical-backend/internal/todo/gateway"
 	todoHandler "github.com/TokujouKaisenDonburi/optical-backend/internal/todo/handler"
 	todoCommand "github.com/TokujouKaisenDonburi/optical-backend/internal/todo/service/command"
+	todoQuery "github.com/TokujouKaisenDonburi/optical-backend/internal/todo/service/query"
 	userGateway "github.com/TokujouKaisenDonburi/optical-backend/internal/user/gateway"
 	userHandler "github.com/TokujouKaisenDonburi/optical-backend/internal/user/handler"
 	userCommand "github.com/TokujouKaisenDonburi/optical-backend/internal/user/service/command"
@@ -143,8 +144,9 @@ func main() {
 		MaxAge:           300,
 	}))
 	todoRepository := todoGateway.NewTodoPsqlRepository(db)
+	todoQuery := todoQuery.NewTodoQuery(todoRepository)
 	todoCommand := todoCommand.NewTodoCommand(todoRepository)
-	todoHandler := todoHandler.NewTodoHttpHandler(todoCommand)
+	todoHandler := todoHandler.NewTodoHttpHandler(todoQuery, todoCommand)
 
 	// Unprotected Routes
 	r.Group(func(r chi.Router) {
@@ -217,8 +219,8 @@ func main() {
 		r.Get("/schedulers/{schedulerId}/result", schedulerHandler.GetResult)
 
 		// Todos
+		r.Get("/calendars/{calendarId}/todos", todoHandler.GetList)
 		r.Post("/calendars/{calendarId}/todos", todoHandler.CreateList)
-		r.Post("/todos/lists", todoHandler.CreateList)
 		r.Post("/calendars/{calendarId}/todos/{todoListId}/items", todoHandler.AddItem)
 	})
 
