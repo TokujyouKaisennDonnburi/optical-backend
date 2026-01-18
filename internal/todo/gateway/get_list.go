@@ -45,7 +45,7 @@ func (r *TodoPsqlRepository) FindByCalendarId(
 		LEFT JOIN user_profiles item_user_profiles
 			ON items.user_id = item_user_profiles.user_id
 		LEFT JOIN avatars item_avatars
-			ON item_user_profiles.avatar_id = avatars.id
+			ON item_user_profiles.avatar_id = item_avatars.id
 		WHERE 
 			calendar_members.user_id = $1
 			AND lists.calendar_id = $2
