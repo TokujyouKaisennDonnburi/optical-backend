@@ -25,7 +25,7 @@ func (r *GithubApiRepository) GetPullRequests(
 	var outputs []output.GithubPullRequestListQueryOutput
 	err := db.RunInTx(r.db, func(tx *sqlx.Tx) error {
 		// データベースからインストールIDを取得
-		githubId, installationId, err := psql.FindInstallationIdAndGithubId(ctx, tx, userId, calendarId)
+		githubId, installationId, err := psql.FindInstallationIdAndGithubId(ctx, tx, userId, calendarId, r.installationIdEncryptionKey)
 		if err != nil {
 			return err
 		}

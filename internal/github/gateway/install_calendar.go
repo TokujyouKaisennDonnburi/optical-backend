@@ -6,6 +6,7 @@ import (
 
 	"github.com/TokujouKaisenDonburi/optical-backend/pkg/api"
 	"github.com/TokujouKaisenDonburi/optical-backend/pkg/db"
+	"github.com/TokujouKaisenDonburi/optical-backend/pkg/security"
 	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
 )
@@ -20,10 +21,15 @@ func (r *GithubApiRepository) InstallToCalendar(
 		if err != nil {
 			return err
 		}
+		// installation_idを暗号化
+		encryptedInstallationId, err := security.Encrypt(installationId, r.installationIdEncryptionKey)
+		if err != nil {
+			return err
+		}
 		query := `
 			INSERT INTO calendar_githubs(calendar_id, github_id, github_name, installation_id, created_at, updated_at)
 				VALUES(:calendarId, :githubId, :githubName, :installationId, :createdAt, :updatedAt)
-			ON CONFLICT(calendar_id) 
+			ON CONFLICT(calendar_id)
 			DO UPDATE SET
 				github_id = :githubId,
 				github_name = :githubName,
@@ -34,7 +40,7 @@ func (r *GithubApiRepository) InstallToCalendar(
 			"calendarId":     calendarId,
 			"githubId":       response.Account.Id,
 			"githubName":     response.Account.Login,
-			"installationId": installationId,
+			"installationId": encryptedInstallationId,
 			"createdAt":      time.Now().UTC(),
 			"updatedAt":      time.Now().UTC(),
 		})

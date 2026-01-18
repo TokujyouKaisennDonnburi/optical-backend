@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"encoding/base64"
 	"fmt"
 	"net/http"
 	"os"
@@ -96,9 +97,11 @@ func main() {
 	userRepository := userGateway.NewUserPsqlRepository(db)
 	avatarRepository := userGateway.NewAvatarPsqlAndMinioRepository(db, minioClient, bucketName)
 	tokenRepository := userGateway.NewTokenRedisRepository(redisClient)
-	stateRepository := githubGateway.NewStateRedisRepository(db, redisClient)
+	redisEncryptionKey := getRedisEncryptionKey()
+	installationIdEncryptionKey := getInstallationIdEncryptionKey()
+	stateRepository := githubGateway.NewStateRedisRepository(db, redisClient, redisEncryptionKey)
 	optionRepository := optionGateway.NewOptionPsqlRepository(db)
-	githubRepository := githubGateway.NewGithubApiRepository(db)
+	githubRepository := githubGateway.NewGithubApiRepository(db, installationIdEncryptionKey)
 	gmailRepository := calendarGateway.NewGmailRepository(dialer)
 	eventRepository := calendarGateway.NewEventPsqlRepository(db)
 	optionAgentRepository := agentGateway.NewOptionAgentOpenRouterRepository(openRouter)
@@ -399,4 +402,29 @@ func GetOpenRouter() *openrouter.OpenRouter {
 		openRouter.SetProviderOrder(providerList)
 	}
 	return openRouter
+}
+
+// 暗号キー
+func getRedisEncryptionKey() []byte {
+	key, ok := os.LookupEnv("REDIS_ENCRYPTION_KEY")
+	if !ok {
+		panic("'REDIS_ENCRYPTION_KEY' is not set")
+	}
+	decoded, err := base64.StdEncoding.DecodeString(key)
+	if err != nil {
+		panic("failed to decode REDIS_ENCRYPTION_KEY: " + err.Error())
+	}
+	return decoded
+}
+
+func getInstallationIdEncryptionKey() []byte {
+	key, ok := os.LookupEnv("INSTALLATION_ID_ENCRYPTION_KEY")
+	if !ok {
+		panic("'INSTALLATION_ID_ENCRYPTION_KEY' is not set")
+	}
+	decoded, err := base64.StdEncoding.DecodeString(key)
+	if err != nil {
+		panic("failed to decode INSTALLATION_ID_ENCRYPTION_KEY: " + err.Error())
+	}
+	return decoded
 }
