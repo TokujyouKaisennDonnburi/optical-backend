@@ -79,8 +79,6 @@ func IsUserInTodoListMembers(ctx context.Context, tx *sqlx.Tx, userId, todoListI
 		if err == sql.ErrNoRows {
 			return false, apperr.ForbiddenError(err.Error())
 		}
-	}
-	if err != nil {
 		return false, err
 	}
 	return exists, nil
