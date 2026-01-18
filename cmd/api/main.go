@@ -182,6 +182,7 @@ func main() {
 		r.Get("/github/calendars/{calendarId}/review-load-status", githubHandler.GetReviewLoadStatus)
 		r.Get("/github/calendars/{calendarId}/milestones", githubHandler.GetMilestones)
 		r.Get("/github/oauth/status", githubHandler.IsLinkedUser)
+		r.Get("/github/calendars/{calendarId}/installation-status", githubHandler.IsInstalledGithubApp)
 
 		// Calendars
 		r.Post("/calendars", calendarHandler.CreateCalendar)
