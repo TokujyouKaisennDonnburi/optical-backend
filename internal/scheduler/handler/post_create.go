@@ -30,7 +30,7 @@ type SchedulerCreateResponse struct {
 	Id uuid.UUID `json:"schedulerId"`
 }
 
-func (h *SchedulerHttpHandler) SchedulerCreate(w http.ResponseWriter, r *http.Request) {
+func (h *SchedulerHttpHandler) CreateScheduler(w http.ResponseWriter, r *http.Request) {
 	var request SchedulerCreateRequest
 	// body
 	err := json.NewDecoder(r.Body).Decode(&request)

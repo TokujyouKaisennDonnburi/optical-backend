@@ -206,12 +206,11 @@ func main() {
 		r.Get("/notices", noticeHttpHandler.GetNotices)
 
 		// Scheduler
-		r.Post("/calendars/{calendarId}/schedulers", schedulerHandler.SchedulerCreate)
+		r.Post("/calendars/{calendarId}/schedulers", schedulerHandler.CreateScheduler)
 		r.Post("/calendars/{calendarId}/schedulers/{schedulerId}/attendance", schedulerHandler.AddAttendanceHandler)
+		r.Get("/calendars/{calendarId}/schedulers/{schedulerId}", schedulerHandler.GetScheduler)
 		r.Get("/calendars/{calendarId}/schedulers/{schedulerId}/attendance", schedulerHandler.GetAttendance)
-		r.Get("/calendars/{calendarId}/schedulers/{schedulerId}/user-status", schedulerHandler.GetUserStatus)
-		r.Get("/schedulers/{schedulerId}/result", schedulerHandler.SchedulerResultHandler)
-		r.Post("/calendars/{calendarId}/scheduler", schedulerHandler.SchedulerCreate)
+		r.Get("/schedulers/{schedulerId}/result", schedulerHandler.GetResult)
 
 		// Todos
 		r.Post("/calendars/{calendarId}/todos", todoHandler.CreateList)

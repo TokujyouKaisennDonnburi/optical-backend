@@ -31,7 +31,7 @@ type DateResponse struct {
 	EndTime   time.Time `json:"end_time"`
 }
 
-func (h *SchedulerHttpHandler) SchedulerResultHandler(w http.ResponseWriter, r *http.Request) {
+func (h *SchedulerHttpHandler) GetResult(w http.ResponseWriter, r *http.Request) {
 	// schedulerId
 	schedulerId, err := uuid.Parse(chi.URLParam(r, "schedulerId"))
 	if err != nil {
