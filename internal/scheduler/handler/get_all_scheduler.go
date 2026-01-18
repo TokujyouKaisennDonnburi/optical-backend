@@ -46,16 +46,19 @@ func (h *SchedulerHttpHandler) GetAllScheduler(w http.ResponseWriter, r *http.Re
 		return
 	}
 	// bind
-	response := AllSchedulerResponse{
-		Id:         output.Id,
-		CalendarId: output.CalendarId,
-		UserId:     output.UserId,
-		Title:      output.Title,
-		Memo:       output.Memo,
-		LimitTime:  output.LimitTime,
-		IsAllDay:   output.IsAllDay,
-		IsDone:     output.IsDone,
+	responses := make([]AllSchedulerResponse, len(output))
+	for i, scheduler := range output {
+		responses[i] = AllSchedulerResponse{
+			Id:         scheduler.Id,
+			CalendarId: scheduler.CalendarId,
+			UserId:     scheduler.UserId,
+			Title:      scheduler.Title,
+			Memo:       scheduler.Memo,
+			LimitTime:  scheduler.LimitTime,
+			IsAllDay:   scheduler.IsAllDay,
+			IsDone:     scheduler.IsDone,
+		}
 	}
 	// response
-	render.JSON(w, r, response)
+	render.JSON(w, r, responses)
 }

@@ -21,15 +21,28 @@ type AllSchedulerModel struct {
 
 func (g *SchedulerPsqlRepository) FindAllSchedulerById(ctx context.Context, calendarId, userId uuid.UUID) ([]scheduler.Scheduler, error) {
 	sql := `
-	SELECT s.id, s.calendar_id, s.user_id, s.title, s.memo, s.limit_time, s.is_allday, s.is_done,
+	SELECT s.id, s.calendar_id, s.user_id, s.title, s.memo, s.limit_time, s.is_allday, s.is_done
 	FROM scheduler s
-	LEFT JOIN scheduler_members sm ON sm.user_id = $2
-	WHERE s.calendarId = $1 AND sm.joined_at IS NULL
+	INNER JOIN calendar_members cm ON cm.calendar_id = $1
+	WHERE s.calendar_id = $1 AND cm.user_id = $2 AND cm.joined_at IS NOT NULL
 	`
 	var rows []AllSchedulerModel
 	err := g.db.SelectContext(ctx, &rows, sql, calendarId, userId)
 	if err != nil {
 		return nil, err
 	}
-	return rows, nil
+	schedulers := make([]scheduler.Scheduler, len(rows))
+	for i, row := range rows {
+		schedulers[i] = scheduler.Scheduler{
+			Id:         row.Id,
+			CalendarId: row.CalendarId,
+			UserId:     row.UserId,
+			Title:      row.Title,
+			Memo:       row.Memo,
+			LimitTime:  row.LimitTime,
+			IsAllDay:   row.IsAllDay,
+			IsDone:     row.IsDone,
+		}
+	}
+	return schedulers, nil
 }

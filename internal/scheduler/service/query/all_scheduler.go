@@ -14,7 +14,7 @@ type AllSchedulerInput struct {
 	UserId     uuid.UUID
 }
 
-func (q *SchedulerQuery) AllScheduler(ctx context.Context, input SchedulerQueryInput) (*scheduler.Scheduler, error) {
+func (q *SchedulerQuery) AllScheduler(ctx context.Context, input SchedulerQueryInput) ([]scheduler.Scheduler, error) {
 	// option check
 	options, err := q.optionRepository.FindsByCalendarId(ctx, input.CalendarId)
 	if err != nil {
@@ -31,18 +31,23 @@ func (q *SchedulerQuery) AllScheduler(ctx context.Context, input SchedulerQueryI
 		return nil, apperr.ForbiddenError("option not enabled")
 	}
 	// repository
-	result, err := q.schedulerRepository.FindAllSchedulerById(ctx, input.CalendarId, input.UserId)
+	results, err := q.schedulerRepository.FindAllSchedulerById(ctx, input.CalendarId, input.UserId)
 	if err != nil {
 		return nil, err
 	}
-	// assign
-	return &scheduler.Scheduler{
-		Id:         result.Id,
-		CalendarId: result.CalendarId,
-		UserId:     result.UserId,
-		Title:      result.Title,
-		Memo:       result.Memo,
-		LimitTime:  result.LimitTime,
-		IsAllDay:   result.IsAllDay,
-	}, nil
+	// bind
+	schedulers := make([]scheduler.Scheduler, len(results))
+	for i, row := range results {
+		schedulers[i] = scheduler.Scheduler{
+			Id:         row.Id,
+			CalendarId: row.CalendarId,
+			UserId:     row.UserId,
+			Title:      row.Title,
+			Memo:       row.Memo,
+			LimitTime:  row.LimitTime,
+			IsAllDay:   row.IsAllDay,
+			IsDone:     row.IsDone,
+		}
+	}
+	return schedulers, nil
 }
