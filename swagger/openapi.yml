@@ -1964,6 +1964,10 @@ components:
         name:
           type: string
           example: "Shopping List"
+        avatarUrl:
+          type: string
+          nullable: true
+          example: "http://localhost/avatars/images/icon.png"
         items:
           type: array
           items:
@@ -1982,6 +1986,10 @@ components:
         name:
           type: string
           example: "Buy milk"
+        avatarUrl:
+          type: string
+          nullable: true
+          example: "http://localhost/avatars/images/icon.png"
         isDone:
           type: boolean
           example: false

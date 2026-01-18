@@ -14,16 +14,18 @@ import (
 type TodoListResponse struct {
 	Id         uuid.UUID              `json:"id"`
 	UserId     uuid.UUID              `json:"userId"`
+	AvatarUrl  string                 `json:"avatarUrl,omitempty"`
 	CalendarId uuid.UUID              `json:"calendarId"`
 	Name       string                 `json:"name"`
 	Items      []TodoListResponseItem `json:"items"`
 }
 
 type TodoListResponseItem struct {
-	Id     uuid.UUID `json:"id"`
-	UserId uuid.UUID `json:"userId"`
-	Name   string    `json:"name"`
-	IsDone bool      `json:"isDone"`
+	Id        uuid.UUID `json:"id"`
+	UserId    uuid.UUID `json:"userId"`
+	Name      string    `json:"name"`
+	AvatarUrl string    `json:"avatarUrl,omitempty"`
+	IsDone    bool      `json:"isDone"`
 }
 
 func (h *TodoHttpHandler) GetList(w http.ResponseWriter, r *http.Request) {
@@ -50,10 +52,11 @@ func (h *TodoHttpHandler) GetList(w http.ResponseWriter, r *http.Request) {
 		responseItems := make([]TodoListResponseItem, len(output.Items))
 		for j, item := range output.Items {
 			responseItems[j] = TodoListResponseItem{
-				Id:     item.Id,
-				UserId: item.UserId,
-				Name:   item.Name,
-				IsDone: item.IsDone,
+				Id:        item.Id,
+				UserId:    item.UserId,
+				Name:      item.Name,
+				AvatarUrl: item.UserAvatarUrl,
+				IsDone:    item.IsDone,
 			}
 		}
 		responseList[i] = TodoListResponse{
@@ -61,6 +64,7 @@ func (h *TodoHttpHandler) GetList(w http.ResponseWriter, r *http.Request) {
 			UserId:     output.UserId,
 			CalendarId: output.CalendarId,
 			Name:       output.Name,
+			AvatarUrl:  output.UserAvatarUrl,
 			Items:      responseItems,
 		}
 	}
