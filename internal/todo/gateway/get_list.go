@@ -43,6 +43,7 @@ func (r *TodoPsqlRepository) FindByCalendarId(
 				CalendarId: todoListModel.CalendarId,
 				Name:       todoListModel.Name,
 			}
+			todoListMap[todoListModel.Id] = model
 		}
 		if !todoListModel.ItemId.Valid {
 			continue
