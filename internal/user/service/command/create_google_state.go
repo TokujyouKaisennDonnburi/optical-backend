@@ -24,16 +24,16 @@ func (c *UserCommand) CreateGoogleState(
 	if err != nil {
 		return nil, err
 	}
-	clientId := c.oauthStateRepository.GetClientId()
-	redirectUri := c.oauthStateRepository.GetRedirectUri()
 	err = c.oauthStateRepository.SaveOauthState(ctx, input.UserId, stateCode)
 	if err != nil {
 		return nil, err
 	}
+	clientId := c.oauthStateRepository.GetClientId()
+	redirectUri := c.oauthStateRepository.GetRedirectUri()
 	url := "https://accounts.google.com/o/oauth2/v2/auth?"
 	url += "scope=email%20profile%20openid"
 	url += "&include_granted_scopes=true"
-	url += "&response_type=code&"
+	url += "&response_type=code"
 	url += "&state=" + stateCode
 	url += "&redirect_uri=" + redirectUri
 	url += "&client_id=" + clientId
