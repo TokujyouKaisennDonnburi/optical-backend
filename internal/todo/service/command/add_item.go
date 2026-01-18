@@ -14,7 +14,11 @@ type TodoCreateItemInput struct {
 }
 
 type TodoCreateItemOutput struct {
-	Id uuid.UUID
+	Id     uuid.UUID
+	UserId uuid.UUID
+	ListId uuid.UUID
+	Name   string
+	IsDone bool
 }
 
 func (c *TodoCommand) AddItem(
@@ -30,6 +34,10 @@ func (c *TodoCommand) AddItem(
 		return nil, err
 	}
 	return &TodoCreateItemOutput{
-		Id: todoItem.Id,
+		Id:     todoItem.Id,
+		UserId: todoItem.UserId,
+		ListId: todoItem.ListId,
+		Name:   todoItem.Name,
+		IsDone: todoItem.IsDone,
 	}, nil
 }

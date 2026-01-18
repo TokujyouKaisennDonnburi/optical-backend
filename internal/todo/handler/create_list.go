@@ -17,7 +17,18 @@ type CreateTodoListRequest struct {
 }
 
 type CreateTodoListResponse struct {
-	Id uuid.UUID `json:"id"`
+	Id         uuid.UUID                    `json:"id"`
+	UserId     uuid.UUID                    `json:"userId"`
+	CalendarId uuid.UUID                    `json:"calendarId"`
+	Name       string                       `json:"name"`
+	Items      []CreateTodoListResponseItem `json:"items"`
+}
+
+type CreateTodoListResponseItem struct {
+	Id     uuid.UUID `json:"id"`
+	UserId uuid.UUID `json:"userId"`
+	Name   string    `json:"name"`
+	IsDone bool      `json:"isDone"`
 }
 
 func (h *TodoHttpHandler) CreateList(w http.ResponseWriter, r *http.Request) {
@@ -45,7 +56,12 @@ func (h *TodoHttpHandler) CreateList(w http.ResponseWriter, r *http.Request) {
 		apperr.HandleAppError(w, r, err)
 		return
 	}
+	items := make([]CreateTodoListResponseItem, len(output.Items))
 	render.JSON(w, r, CreateTodoListResponse{
-		Id: output.Id,
+		Id:         output.Id,
+		UserId:     output.UserId,
+		CalendarId: output.CalendarId,
+		Name:       output.Name,
+		Items:      items,
 	})
 }
