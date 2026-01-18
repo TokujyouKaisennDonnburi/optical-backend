@@ -24,8 +24,7 @@ jobs:
 
       - name: Build
         run: |
-          CGO_ENABLED=0 GOOS=linux GOARCH=amd64
-          go build -v -ldflags="-s -w -X main.version=nightly-${{ github.sha }}" -o optical-backend-app-nightly ./cmd/api
+          CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -v -ldflags="-s -w -X main.version=nightly-${{ github.sha }}" -o optical-backend-app-nightly ./cmd/api
           tar -cvzf optical-backend-nightly-linux_amd64.tar.gz optical-backend-app-nightly
 
       - name: Update Nightly Release
