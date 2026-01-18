@@ -92,7 +92,7 @@ type TodoItemModel struct {
 	IsDone bool      `db:"is_done"`
 }
 
-func FindItemListById(ctx context.Context, tx *sqlx.Tx, id uuid.UUID) (*todo.Item, error) {
+func FindTodoItemById(ctx context.Context, tx *sqlx.Tx, id uuid.UUID) (*todo.Item, error) {
 	query := `
 		SELECT
 			id, todo_list_id AS list_id, user_id, name, is_done
