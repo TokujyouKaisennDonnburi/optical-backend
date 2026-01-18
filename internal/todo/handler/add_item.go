@@ -17,7 +17,10 @@ type CreateTodoItemRequest struct {
 }
 
 type CreateTodoItemResponse struct {
-	Id uuid.UUID `json:"id"`
+	Id     uuid.UUID `json:"id"`
+	UserId uuid.UUID `json:"userId"`
+	Name   string    `json:"name"`
+	IsDone bool      `json:"isDone"`
 }
 
 func (h *TodoHttpHandler) AddItem(w http.ResponseWriter, r *http.Request) {
@@ -46,6 +49,9 @@ func (h *TodoHttpHandler) AddItem(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	render.JSON(w, r, CreateTodoItemResponse{
-		Id: output.Id,
+		Id:     output.Id,
+		UserId: output.UserId,
+		Name:   output.Name,
+		IsDone: output.IsDone,
 	})
 }

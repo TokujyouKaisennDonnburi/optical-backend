@@ -26,6 +26,8 @@ tags:
     description: Notifications management
   - name: todos
     description: Todo management
+  - name: google
+    description: Google OAuth integration
 paths:
   /register:
     post:
@@ -965,6 +967,44 @@ paths:
         '401':
           description: Unauthorized
         '500':
+          description: Internal server error
+  /google/oauth/state:
+    post:
+      summary: Create Google OAuth state URL
+      description: Generates a Google OAuth state URL for user authentication.
+      tags:
+        - google
+      responses:
+        "200":
+          description: OAuth state created successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GoogleOauthStateResponse"
+        "500":
+          description: Internal server error
+  /google/oauth/user:
+    post:
+      summary: Create user with Google OAuth
+      description: Creates a new user using Google OAuth authentication code.
+      tags:
+        - google
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateGoogleUserRequest"
+      responses:
+        "200":
+          description: User created successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CreateGoogleUserResponse"
+        "400":
+          description: Invalid request
+        "500":
           description: Internal server error
   /calendars/{calendarId}/todos:
     get:
@@ -1986,8 +2026,38 @@ components:
         joinedAt:
           type: string
           format: date-time
-          description: joined-calendar-date
-          example: "2025-12-15T12:12:39.893888Z"
+    GoogleOauthStateResponse:
+      type: object
+      properties:
+        url:
+          type: string
+          format: url
+          description: Google OAuth URL for authentication
+    CreateGoogleUserRequest:
+      type: object
+      required:
+        - code
+        - state
+      properties:
+        code:
+          type: string
+          description: Google OAuth authorization code
+        state:
+          type: string
+          description: Google OAuth state parameter
+    CreateGoogleUserResponse:
+      type: object
+      properties:
+        user:
+          type: string
+          format: uuid
+          description: Created user ID
+        accessToken:
+          type: string
+          description: JWT access token
+        refreshToken:
+          type: string
+          description: JWT refresh token
     Option:
       type: object
       required:

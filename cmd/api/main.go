@@ -98,6 +98,18 @@ func main() {
 	userRepository := userGateway.NewUserPsqlRepository(db)
 	avatarRepository := userGateway.NewAvatarPsqlAndMinioRepository(db, minioClient, bucketName)
 	tokenRepository := userGateway.NewTokenRedisRepository(redisClient)
+	googleRepository := userGateway.NewGooglePsqlAndApiRepository(
+		db,
+		getGoogleOauthClientId(),
+		getGoogleOauthClientSecret(),
+		getGoogleOauthRedirectUri(),
+	)
+	googleOauthStateRepository := userGateway.NewGoogleOauthStateRedisRepository(
+		getGoogleOauthClientId(),
+		getGoogleOauthClientSecret(),
+		getGoogleOauthRedirectUri(),
+		redisClient,
+	)
 	redisEncryptionKey := getRedisEncryptionKey()
 	installationIdEncryptionKey := getInstallationIdEncryptionKey()
 	stateRepository := githubGateway.NewStateRedisRepository(db, redisClient, redisEncryptionKey)
@@ -115,7 +127,7 @@ func main() {
 	githubCommand := githubCommand.NewGithubCommand(tokenRepository, stateRepository, githubRepository)
 	githubHandler := githubHandler.NewGithubHandler(githubQuery, githubCommand)
 	userQuery := userQuery.NewUserQuery(userRepository)
-	userCommand := userCommand.NewUserCommand(userRepository, tokenRepository, avatarRepository)
+	userCommand := userCommand.NewUserCommand(userRepository, tokenRepository, avatarRepository, googleRepository, googleOauthStateRepository)
 	userHandler := userHandler.NewUserHttpHandler(userQuery, userCommand)
 	optionQuery := optionQuery.NewOptionQuery(optionRepository)
 	optionHandler := optionHandler.NewOptionHttpHandler(optionQuery)
@@ -159,6 +171,10 @@ func main() {
 		r.Post("/github/apps/install", githubHandler.InstallToCalendar)
 		r.Post("/github/oauth/link", githubHandler.LinkUser)
 		r.Post("/github/oauth/create", githubHandler.CreateNewUserOauthState)
+
+		// Google
+		r.Post("/google/oauth/user", userHandler.CreateGoogleUser)
+		r.Post("/google/oauth/state", userHandler.CreateGoogleOauthState)
 	})
 
 	// Protected Routes
@@ -431,4 +447,28 @@ func getInstallationIdEncryptionKey() []byte {
 		panic("failed to decode INSTALLATION_ID_ENCRYPTION_KEY: " + err.Error())
 	}
 	return decoded
+}
+
+func getGoogleOauthClientId() string {
+	clientId, ok := os.LookupEnv("GOOGLE_OAUTH_CLIENT_ID")
+	if !ok {
+		panic("'GOOGLE_OAUTH_CLIENT_ID' is not set")
+	}
+	return clientId
+}
+
+func getGoogleOauthClientSecret() string {
+	clientSecret, ok := os.LookupEnv("GOOGLE_OAUTH_CLIENT_SECRET")
+	if !ok {
+		panic("'GOOGLE_OAUTH_CLIENT_SECRET' is not set")
+	}
+	return clientSecret
+}
+
+func getGoogleOauthRedirectUri() string {
+	redirectUri, ok := os.LookupEnv("GOOGLE_OAUTH_REDIRECT_URI")
+	if !ok {
+		panic("'GOOGLE_OAUTH_REDIRECT_URI' is not set")
+	}
+	return redirectUri
 }
