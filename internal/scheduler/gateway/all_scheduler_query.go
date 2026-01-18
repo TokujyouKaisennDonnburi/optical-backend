@@ -14,7 +14,7 @@ type AllSchedulerModel struct {
 	UserId     uuid.UUID `db:"user_id"`
 	Title      string    `db:"title"`
 	Memo       string    `db:"memo"`
-	LimitTime  time.Time `db:"limitTime"`
+	LimitTime  time.Time `db:"limit_time"`
 	IsAllDay   bool      `db:"is_allday"`
 	IsDone     bool      `db:"is_done"`
 }
