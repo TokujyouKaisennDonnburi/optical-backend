@@ -933,7 +933,9 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/TodoListResponse"
+                type: array
+                items:
+                  $ref: "#/components/schemas/TodoListResponse"
         "400":
           description: Invalid request
         "401":
