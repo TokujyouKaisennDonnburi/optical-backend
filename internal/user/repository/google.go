@@ -15,4 +15,8 @@ type GoogleRepository interface {
 		avatar *user.Avatar,
 		googleUser *user.GoogleUser,
 	) error
+	FindUserByGoogleId(
+		ctx context.Context,
+		googleId string,
+	) (*user.User, error)
 }

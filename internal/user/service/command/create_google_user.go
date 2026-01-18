@@ -7,6 +7,7 @@ import (
 	"github.com/TokujouKaisenDonburi/optical-backend/pkg/apperr"
 	"github.com/TokujouKaisenDonburi/optical-backend/pkg/security"
 	"github.com/google/uuid"
+	"github.com/sirupsen/logrus"
 )
 
 type CreateGoogleUserInput struct {
@@ -46,23 +47,31 @@ func (c *UserCommand) CreateGoogleUser(
 	if err != nil {
 		return nil, err
 	}
-	password, err := security.GenerateRandomString(32)
+	appUser, err := c.googleRepository.FindUserByGoogleId(ctx, googleUser.Id)
+	// ユーザーがない場合新規作成
 	if err != nil {
-		return nil, err
-	}
-	// ユーザー新規作成
-	appUser, err := user.NewUser(googleUser.Name, googleUser.Email, password)
-	if err != nil {
-		return nil, err
-	}
-	avatar, err := user.NewAvatar(googleUser.AvatarUrl)
-	if err != nil {
-		return nil, err
-	}
-	// リポジトリ保存
-	err = c.googleRepository.CreateUser(ctx, appUser, avatar, googleUser)
-	if err != nil {
-		return nil, err
+		if !apperr.IsNotFound(err) {
+			return nil, err
+		}
+		logrus.WithError(err).Info("creating new google user")
+		password, err := security.GenerateRandomString(32)
+		if err != nil {
+			return nil, err
+		}
+		// ユーザー新規作成
+		appUser, err = user.NewUser(googleUser.Name, googleUser.Email, password)
+		if err != nil {
+			return nil, err
+		}
+		avatar, err := user.NewAvatar(googleUser.AvatarUrl)
+		if err != nil {
+			return nil, err
+		}
+		// リポジトリ保存
+		err = c.googleRepository.CreateUser(ctx, appUser, avatar, googleUser)
+		if err != nil {
+			return nil, err
+		}
 	}
 	// アクセストークン発行
 	accessToken, err := user.NewAccessToken(appUser.Id, appUser.Name)

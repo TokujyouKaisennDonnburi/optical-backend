@@ -10,6 +10,7 @@ import (
 
 	"github.com/TokujouKaisenDonburi/optical-backend/internal/user"
 	"github.com/TokujouKaisenDonburi/optical-backend/pkg/db"
+	"github.com/TokujouKaisenDonburi/optical-backend/pkg/psql"
 	"github.com/jmoiron/sqlx"
 	"github.com/sirupsen/logrus"
 )
@@ -165,4 +166,17 @@ func (r *GooglePsqlAndApiRepository) CreateUser(
 		})
 		return err
 	})
+}
+
+func (r *GooglePsqlAndApiRepository) FindUserByGoogleId(
+	ctx context.Context,
+	googleId string,
+) (*user.User, error) {
+	var appUser *user.User
+	err := db.RunInTx(r.db, func(tx *sqlx.Tx) error {
+		var err error
+		appUser, err = psql.FindUserByGoogleId(ctx, tx, googleId)
+		return err
+	})
+	return appUser, err
 }
