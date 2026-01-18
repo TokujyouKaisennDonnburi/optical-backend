@@ -316,8 +316,9 @@ func GetMinIOClient() *minio.Client {
 		if err != nil {
 			panic(err)
 		}
+		skipVerify := os.Getenv("MINIO_TLS_INSECURE_SKIP_VERIFY") == "1"
 		customTransport.TLSClientConfig = &tls.Config{
-			InsecureSkipVerify: true,
+			InsecureSkipVerify: skipVerify,
 		}
 		client, err := minio.New(endpoint, &minio.Options{
 			Region: getMinioRegion(),
@@ -389,9 +390,10 @@ func GetRedisClient() *redis.Client {
 	}
 	if os.Getenv("REDIS_TLS") == "1" {
 		logrus.Info("REDIS_TLS enabled")
+		skipVerify := os.Getenv("REDIS_TLS_INSECURE_SKIP_VERIFY") == "1"
 		opts.TLSConfig = &tls.Config{
 			MinVersion:         tls.VersionTLS12,
-			InsecureSkipVerify: true,
+			InsecureSkipVerify: skipVerify,
 		}
 	}
 	client := redis.NewClient(opts)
