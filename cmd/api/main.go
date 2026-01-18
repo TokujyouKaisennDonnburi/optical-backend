@@ -132,7 +132,7 @@ func main() {
 	noticeHttpHandler := noticeHandler.NewNoticeHttpHandler(noticeQueryService)
 	schedulerRepository := schedulerGateway.NewSchedulerPsqlRepository(db)
 	schedulerCommand := schedulerCommand.NewSchedulerCommand(schedulerRepository, optionRepository)
-	schedulerQuery := schedulerQuery.NewSchedulerQuery(schedulerRepository)
+	schedulerQuery := schedulerQuery.NewSchedulerQuery(schedulerRepository, optionRepository)
 	schedulerHandler := schedulerHandler.NewSchedulerHttpHandler(schedulerCommand, schedulerQuery)
 
 	r.Use(logs.HttpLogger)
@@ -215,6 +215,7 @@ func main() {
 		r.Post("/calendars/{calendarId}/schedulers", schedulerHandler.CreateScheduler)
 		r.Post("/calendars/{calendarId}/schedulers/{schedulerId}/attendance", schedulerHandler.AddAttendanceHandler)
 		r.Get("/calendars/{calendarId}/schedulers/{schedulerId}", schedulerHandler.GetScheduler)
+		r.Get("/calendars/{calendarId}/schedulers", schedulerHandler.GetAllScheduler)
 		r.Get("/calendars/{calendarId}/schedulers/{schedulerId}/attendance", schedulerHandler.GetAttendance)
 		r.Get("/schedulers/{schedulerId}/result", schedulerHandler.GetResult)
 

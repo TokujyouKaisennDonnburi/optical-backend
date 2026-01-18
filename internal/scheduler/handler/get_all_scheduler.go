@@ -23,7 +23,7 @@ type AllSchedulerResponse struct {
 	IsDone     bool      `json:"is_done"`
 }
 
-func (h *SchedulerHttpHandler) GetScheduler(w http.ResponseWriter, r *http.Request) {
+func (h *SchedulerHttpHandler) GetAllScheduler(w http.ResponseWriter, r *http.Request) {
 	calendarId, err := uuid.Parse(chi.URLParam(r, "calendarId"))
 	if err != nil {
 		_ = render.Render(w, r, apperr.ErrInvalidRequest(err))
