@@ -13,6 +13,6 @@ type SchedulerRepository interface {
 	CreateScheduler(ctx context.Context, id, calendarId, userId uuid.UUID, title, memo string, possibleDates []scheduler.PossibleDate, limitTime time.Time, isAllDay bool) error
 	FindSchedulerById(ctx context.Context, id uuid.UUID) (*output.SchedulerOutput, error)
 	AddAttendance(ctx context.Context, id, schedulerId, userId uuid.UUID, comment string, schedulerStatus []scheduler.SchedulerStatus) error
-	FindResultById(ctx context.Context, schedulerId, userId uuid.UUID) (*output.SchedulerResultOutput, error)
+	FindResultByIdAndUserId(ctx context.Context, schedulerId, userId uuid.UUID) (*output.SchedulerResultOutput, error)
 	FindAttendanceById(ctx context.Context, calendarId, schedulerId, userId uuid.UUID) (*output.SchedulerAttendanceOutput, error)
 }
