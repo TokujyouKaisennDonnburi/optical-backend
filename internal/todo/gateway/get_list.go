@@ -17,7 +17,7 @@ func (r *TodoPsqlRepository) FindByCalendarId(
 ) ([]todo.List, error) {
 	query := `
 		SELECT
-			lists.id, lists.user_id, lists.calendar_id, lists.name
+			lists.id, lists.user_id, lists.calendar_id, lists.name,
 			items.id AS item_id, items.user_id AS item_user_id, items.name AS item_name, items.is_done as item_is_done
 		FROM todo_lists lists
 		JOIN calendar_members
