@@ -2,7 +2,6 @@ package gateway
 
 import (
 	"context"
-	"errors"
 	"time"
 
 	"github.com/TokujouKaisenDonburi/optical-backend/internal/scheduler"
@@ -20,20 +19,16 @@ type AllSchedulerModel struct {
 	IsDone     bool      `db:"is_done"`
 }
 
-func (d *SchedulerPsqlRepository) FindAllSchedulerById(ctx context.Context, calendarId, userId uuid.UUID) (*scheduler.Scheduler, error) {
+func (d *SchedulerPsqlRepository) FindAllSchedulerById(ctx context.Context, calendarId uuid.UUID) ([]scheduler.Scheduler, error) {
 	sql := `
-	SELECT s.id, s.calendar_id, s.user_id, s.title, s.memo, s.limit_time, s.is_allday, s.is_done,
+	SELECT s.id, s.calendar_id, s.user_id, s.title, s.memo, s.limit_time, s.is_allday, s.is_done
 	FROM scheduler s
-	LEFT JOIN calendar_members cm ON cm.user_id = $2
 	WHERE s.calendar_id = $1
 	`
 	var rows []AllSchedulerModel
-	err := d.db.SelectContext(ctx, &rows, sql, calendarId, userId)
+	err := d.db.SelectContext(ctx, &rows, sql, calendarId)
 	if err != nil {
 		return nil, err
-	}
-	if len(rows) == 0 {
-		return nil, errors.New("scheduler not found")
 	}
 	result := make([]scheduler.Scheduler, len(rows))
 	for i, v := range rows {
@@ -48,5 +43,5 @@ func (d *SchedulerPsqlRepository) FindAllSchedulerById(ctx context.Context, cale
 			IsDone:     v.IsDone,
 		}
 	}
-	return *result, nil
+	return result, nil
 }
