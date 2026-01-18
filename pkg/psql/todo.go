@@ -102,6 +102,9 @@ func FindTodoItemById(ctx context.Context, tx *sqlx.Tx, id uuid.UUID) (*todo.Ite
 	var model TodoItemModel
 	err := tx.GetContext(ctx, &model, query, id)
 	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, apperr.NotFoundError(err.Error())
+		}
 		return nil, err
 	}
 	return &todo.Item{
