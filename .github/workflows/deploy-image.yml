@@ -1,0 +1,25 @@
+name: Deploy Image
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy-ghcr:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      # リポジトリにチェックアウト
+      - name: checkout
+        uses: actions/checkout@v4
+      # イメージをビルド
+      - name: build and deploy
+        run: |
+          REPO=${{ github.repository }}
+          docker build -t ghcr.io/${REPO,,}:latest .
+          echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+          docker push ghcr.io/${REPO,,}:latest
+

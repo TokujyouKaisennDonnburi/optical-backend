@@ -10,6 +10,7 @@ import (
 
 	"github.com/TokujouKaisenDonburi/optical-backend/pkg/auth"
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/sirupsen/logrus"
 )
 
 const (
@@ -32,14 +33,17 @@ func setRequestHeader(r *http.Request) error {
 func getGithubAppBearerToken() (string, error) {
 	file, err := os.ReadFile(GITHUB_PRIVATE_KEY_PEM_PATH)
 	if err != nil {
+		logrus.WithError(err).Error("failed to read github private key pem")
 		return "", err
 	}
 	block, _ := pem.Decode(file)
 	if block == nil || block.Type != "RSA PRIVATE KEY" {
+		logrus.Error("RSA private key block error")
 		return "", errors.New("RSA private key block error")
 	}
 	privateKey, err := x509.ParsePKCS1PrivateKey(block.Bytes)
 	if err != nil {
+		logrus.WithError(err).Error("failed to parse github private key pem")
 		return "", err
 	}
 	now := time.Now().UTC()
