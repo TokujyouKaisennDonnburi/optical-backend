@@ -93,7 +93,7 @@ func (r *GooglePsqlAndApiRepository) GetUserByToken(
 	defer resp.Body.Close()
 	if resp.StatusCode != http.StatusOK {
 		logrus.WithField("statusCode", resp.StatusCode).Error("userinfo response invalid status")
-		return nil, err
+		return nil, errors.New("userinfo request status error")
 	}
 	var response GoogleUserInfoResponse
 	if err := json.NewDecoder(resp.Body).Decode(&response); err != nil {
