@@ -37,7 +37,7 @@ func (h *SchedulerHttpHandler) GetAllScheduler(w http.ResponseWriter, r *http.Re
 		return
 	}
 	// service
-	output, err := h.schedulerQuery.AllScheduler(r.Context(), query.SchedulerQueryInput{
+	output, err := h.schedulerQuery.AllScheduler(r.Context(), query.AllSchedulerInput{
 		CalendarId: calendarId,
 		UserId:     userId,
 	})
