@@ -1,0 +1,19 @@
+CalendarUpdateRequest:
+  type: object
+  required:
+    - name
+    - color
+    - optionIds
+  properties:
+    name:
+      type: string
+      example: calendar
+    color:
+      type: string
+      example: "#002244"
+    optionIds:
+      type: array
+      items:
+        type: integer
+        format: int32
+      example: []

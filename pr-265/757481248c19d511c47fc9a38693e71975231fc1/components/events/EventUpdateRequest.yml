@@ -1,0 +1,27 @@
+EventUpdateRequest:
+  type: object
+  required:
+    - title
+    - memo
+    - location
+    - startTime
+    - endTime
+    - isAllDay
+  properties:
+    title:
+      type: string
+      example: title-example
+    memo:
+      type: string
+      example: memo-example
+    location:
+      type: string
+      example: location-example
+    startTime:
+      type: string
+      format: date-time
+    endTime:
+      type: string
+      format: date-time
+    isAllDay:
+      type: boolean

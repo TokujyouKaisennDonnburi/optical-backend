@@ -1,0 +1,10 @@
+EventMonthResponse:
+  type: object
+  properties:
+    date:
+      type: string
+      format: date
+    items:
+      type: array
+      items:
+        $ref: "./EventMonthResponseItem.yml"

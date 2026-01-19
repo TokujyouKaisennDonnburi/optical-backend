@@ -1,0 +1,12 @@
+CalendarResponse:
+  type: object
+  properties:
+    id:
+      type: string
+    name:
+      type: string
+    color:
+      type: string
+    imageUrl:
+      type: string
+      nullable: true

@@ -1,0 +1,9 @@
+CreateGoogleUserResponse:
+  type: object
+  properties:
+    user:
+      $ref: "../users/UserCreateResponseUser.yml"
+    accessToken:
+      type: string
+    refreshToken:
+      type: string

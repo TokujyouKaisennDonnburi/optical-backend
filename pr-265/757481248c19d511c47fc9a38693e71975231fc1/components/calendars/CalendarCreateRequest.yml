@@ -1,0 +1,30 @@
+CalendarCreateRequest:
+  type: object
+  required:
+    - name
+    - color
+    - members
+    - optionIds
+  properties:
+    name:
+      type: string
+      example: calendar
+    color:
+      type: string
+      example: "#002244"
+    imageId:
+      type: string
+      format: uuid
+      example: ""
+    members:
+      type: array
+      items:
+        type: string
+        format: email
+      example: ["optical-user2@example.com", "optical-user3@example.com"]
+    optionIds:
+      type: array
+      items:
+        type: integer
+        format: int32
+      example: []
