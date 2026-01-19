@@ -114,3 +114,18 @@ func (r *EventPsqlRepository) Update(
 		return err
 	})
 }
+
+func (r *EventPsqlRepository) Delete(ctx context.Context, eventId, userId uuid.UUID) error {
+	return db.RunInTx(r.db, func(tx *sqlx.Tx) error {
+		query := `
+		INSERT e.deleted_at
+		FROM events e
+		INNER JOIN calendar_members cm ON cm.user_id = $2
+		WHERE e.id = $1
+		`
+		err := r.db.NamedExecContext(ctx, query, map[string]any{})
+		if err != nil {
+			return err
+		}
+	})
+}
