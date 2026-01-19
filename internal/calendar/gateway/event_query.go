@@ -79,6 +79,7 @@ func (r *EventPsqlRepository) ExistsCalendarByUserIdAndCalendarId(
 			JOIN calendars c ON cm.calendar_id = c.id
 			WHERE cm.user_id = $1
 				AND cm.calendar_id = $2
+				AND cm.joined_at IS NOT NULL
 				AND c.deleted_at IS NULL
 		)
 	`
@@ -125,6 +126,7 @@ func (r *EventPsqlRepository) GetEventsByDate(
 		    events.deleted_at IS NULL 
 			AND calendars.deleted_at IS NULL 
 			AND	calendar_members.user_id = $1
+			AND calendar_members.joined_at IS NOT NULL
 			AND	
 			(
 				events.start_at::date = $2 OR events.end_at::date = $2 
@@ -176,6 +178,7 @@ func (r *EventPsqlRepository) GetEventsByMonth(
 		    events.deleted_at IS NULL 
 			AND calendars.deleted_at IS NULL 
 			AND	calendar_members.user_id = $1
+			AND calendar_members.joined_at IS NOT NULL
 			AND	
 			(
 				TO_CHAR(events.start_at, 'YYYY-MM') = $2 OR TO_CHAR(events.end_at, 'YYYY-MM') = $2 
@@ -228,6 +231,7 @@ func (r *EventPsqlRepository) FindAnalyzableEventsByUserId(
 		    events.deleted_at IS NULL 
 			AND calendars.deleted_at IS NULL 
 			AND	calendar_members.user_id = $1
+			AND calendar_members.joined_at IS NOT NULL
 	`
 	var models []EventTodayQueryModel
 	err := r.db.SelectContext(ctx, &models, query, userId)
