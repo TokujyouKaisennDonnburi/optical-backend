@@ -128,7 +128,7 @@ func main() {
 	stateRepository := githubGateway.NewStateRedisRepository(db, redisClient, redisEncryptionKey)
 	optionRepository := optionGateway.NewOptionPsqlRepository(db)
 	githubRepository := githubGateway.NewGithubApiRepository(db, installationIdEncryptionKey)
-	gmailRepository := calendarGateway.NewGmailRepository(dialer)
+	gmailRepository := calendarGateway.NewGmailRepository(dialer, getEmailAddress())
 	eventRepository := calendarGateway.NewEventPsqlRepository(db)
 	optionAgentRepository := agentGateway.NewOptionAgentOpenRouterRepository(openRouter)
 	agentQueryRepository := agentGateway.NewAgentQueryPsqlRepository(db)
@@ -423,6 +423,14 @@ func GetRedisClient() *redis.Client {
 	}
 	logrus.WithField("address", endpoint).Info("redis connected")
 	return client
+}
+
+func getEmailAddress() string {
+	email, ok := os.LookupEnv("SENDER_EMAIL_ADDRESS")
+	if !ok {
+		panic("'SENDER_EMAIL_ADDRESS' is not set")
+	}
+	return email
 }
 
 func GetDialer() *mail.Dialer {

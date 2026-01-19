@@ -14,7 +14,6 @@ import (
 )
 
 const (
-	GITHUB_PRIVATE_KEY_PEM_PATH = "optical-github.private-key.pem"
 	GITHUB_API_VERSION = "2022-11-28"
 	GITHUB_BASE_URL = "https://api.github.com"
 )
@@ -31,7 +30,11 @@ func setRequestHeader(r *http.Request) error {
 }
 
 func getGithubAppBearerToken() (string, error) {
-	file, err := os.ReadFile(GITHUB_PRIVATE_KEY_PEM_PATH)
+	filePath, ok := os.LookupEnv("GITHUB_PRIVATE_KEY_PEM_PATH")
+	if !ok {
+		return "", errors.New("'GITHUB_PRIVATE_KEY_PEM_PATH' is not set")
+	}
+	file, err := os.ReadFile(filePath)
 	if err != nil {
 		logrus.WithError(err).Error("failed to read github private key pem")
 		return "", err
@@ -50,7 +53,7 @@ func getGithubAppBearerToken() (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodRS256, jwt.MapClaims{
 		"iat": now.Unix(),
 		"exp": now.Add(5 * time.Minute).Unix(),
-		"iss": auth.GetGithubAppId(),
+		"iss": auth.GetClientId(),
 	})
 	return token.SignedString(privateKey)
 }

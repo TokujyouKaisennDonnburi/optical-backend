@@ -2,9 +2,8 @@ name: Deploy Image
 on:
   workflow_dispatch:
   push:
-    branches:
-      - main
-
+    # branches:
+    #   - main
 jobs:
   deploy-ghcr:
     runs-on: ubuntu-latest

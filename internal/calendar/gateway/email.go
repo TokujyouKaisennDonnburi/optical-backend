@@ -9,21 +9,26 @@ import (
 
 type GmailRepository struct {
 	dialer *mail.Dialer
+	email  string
 }
 
-func NewGmailRepository(dialer *mail.Dialer) *GmailRepository {
+func NewGmailRepository(dialer *mail.Dialer, email string) *GmailRepository {
 	if dialer == nil {
 		panic("email dialer is nil")
 	}
+	if email == "" {
+		panic("email address is empty")
+	}
 	return &GmailRepository{
 		dialer: dialer,
+		email:  email,
 	}
 }
 
 func (r *GmailRepository) NotifyAll(ctx context.Context, subject, content string, emails []user.Email) error {
 	m := mail.NewMessage()
-	m.SetHeader("From", r.dialer.Username)
-	m.SetHeader("To", r.dialer.Username)
+	m.SetHeader("From", r.email)
+	m.SetHeader("To", r.email)
 	mails := make([]string, len(emails))
 	for i, email := range emails {
 		mails[i] = string(email)
