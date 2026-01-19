@@ -23,6 +23,11 @@ type EventRepository interface {
 		updateFn func(*calendar.Event) (*calendar.Event, error),
 	) error
 
+	Delete(
+		ctx context.Context,
+		userId, eventId uuid.UUID,
+	) error
+
 	// 一覧取得
 	ListEventsByCalendarId(
 		ctx context.Context,
