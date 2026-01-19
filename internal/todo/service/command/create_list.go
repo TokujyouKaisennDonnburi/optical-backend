@@ -14,7 +14,18 @@ type TodoCreateInput struct {
 }
 
 type TodoCreateOutput struct {
-	Id uuid.UUID
+	Id         uuid.UUID
+	UserId     uuid.UUID
+	CalendarId uuid.UUID
+	Name       string
+	Items      []TodoCreateOutputItem
+}
+
+type TodoCreateOutputItem struct {
+	Id     uuid.UUID
+	UserId uuid.UUID
+	Name   string
+	IsDone bool
 }
 
 // TODOリストを新規作成する
@@ -28,6 +39,10 @@ func (c *TodoCommand) CreateList(ctx context.Context, input TodoCreateInput) (*T
 		return nil, err
 	}
 	return &TodoCreateOutput{
-		Id: todoList.Id,
+		Id:         todoList.Id,
+		UserId:     todoList.UserId,
+		CalendarId: todoList.CalendarId,
+		Name:       todoList.Name,
+		Items:      []TodoCreateOutputItem{},
 	}, nil
 }
