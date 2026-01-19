@@ -21,8 +21,8 @@ func (q *SchedulerQuery) AllScheduler(ctx context.Context, input SchedulerQueryI
 		return nil, err
 	}
 	hasOption := false
-	for _, x := range options {
-		if x.Id == option.OPTION_SCHEDULER {
+	for _, opt := range options {
+		if opt.Id == option.OPTION_SCHEDULER {
 			hasOption = true
 			break
 		}
