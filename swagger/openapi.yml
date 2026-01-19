@@ -1460,11 +1460,11 @@ components:
         memo:
           type: string
           example: "memo"
-        limitTime:
+        limit_time:
           type: string
           format: date-time
           example: "2026-03-15T12:00:00Z"
-        isAllDay:
+        is_all_day:
           type: boolean
           example: false
         dates:
@@ -1482,11 +1482,11 @@ components:
           type: string
           format: date-time
           example: "2026-03-20T00:00:00Z"
-        startTime:
+        start_time:
           type: string
           format: date-time
           example: "2026-03-20T09:00:00Z"
-        endTime:
+        end_time:
           type: string
           format: date-time
           example: "2026-03-20T10:00:00Z"
@@ -1503,7 +1503,7 @@ components:
         - title
         - memo
         - limit_time
-        - is_allday
+        - is_all_day
         - members
         - date
       properties:
@@ -1569,24 +1569,24 @@ components:
     AttendanceQueryResponse:
       type: object
       required:
-        - schedulerId
-        - calendarId
-        - userId
+        - scheduler_id
+        - calendar_id
+        - user_id
         - title
         - memo
-        - limitTime
-        - isAllDay
+        - limit_time
+        - is_all_day
         - possibleDate
       properties:
-        schedulerId:
+        scheduler_id:
           type: string
           format: uuid
           description: Scheduler ID
-        calendarId:
+        calendar_id:
           type: string
           format: uuid
           description: Calendar ID
-        userId:
+        user_id:
           type: string
           format: uuid
           description: User ID who created the scheduler
@@ -1596,14 +1596,14 @@ components:
         memo:
           type: string
           description: Scheduler memo/description
-        limitTime:
+        limit_time:
           type: string
           format: date-time
           description: Deadline for responses
-        isAllDay:
+        is_all_day:
           type: boolean
           description: Whether this is an all-day scheduler
-        possibleDate:
+        possible_date:
           type: array
           description: List of possible dates for the scheduler
           items:
@@ -1612,16 +1612,16 @@ components:
       type: object
       required:
         - date
-        - startTime
-        - endTime
+        - start_time
+        - end_time
       properties:
         date:
           type: string
           format: date-time
-        startTime:
+        start_time:
           type: string
           format: date-time
-        endTime:
+        end_time:
           type: string
           format: date-time
     AddAttendanceRequest:
@@ -1681,18 +1681,18 @@ components:
       type: object
       required:
         - date
-        - startTime
-        - endTime
+        - start_time
+        - end_time
       properties:
         date:
           type: string
           format: date-time
           description: The date of the possible time slot
-        startTime:
+        start_time:
           type: string
           format: date-time
           description: Start time of the possible time slot
-        endTime:
+        end_time:
           type: string
           format: date-time
           description: End time of the possible time slot
@@ -1703,10 +1703,10 @@ components:
         id:
           type: string
           format: uuid
-        calendarId:
+        calendar_id:
           type: string
           format: uuid
-        calendarColor:
+        calendar_color:
           type: string
         title:
           type: string
@@ -1714,15 +1714,15 @@ components:
           type: string
         location:
           type: string
-        isAllDay:
+        is_all_day:
           type: boolean
-        startAt:
+        start_at:
           type: string
           format: date-time
         endAt:
           type: string
           format: date-time
-        createdAt:
+        created_at:
           type: string
           format: date-time
     TokenRefreshRequest:
