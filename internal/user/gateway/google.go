@@ -99,7 +99,6 @@ func (r *GooglePsqlAndApiRepository) GetUserByToken(
 		logrus.WithError(err).Error("userinfo response decode error")
 		return nil, err
 	}
-	logrus.WithField("userinfo_response_body", response).Info("userinfo response decoded")
 	googleUser, err := user.NewGoogleUser(response.Sub, response.Name, response.Email, response.Picture)
 	if err != nil {
 		return nil, err
