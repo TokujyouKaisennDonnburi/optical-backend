@@ -1,0 +1,59 @@
+get:
+  summary: Get today's events
+  tags:
+    - events
+  security:
+    - bearerAuth: []
+  responses:
+    "200":
+      description: Today's events retrieved successfully
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/EventTodayResponse"
+    "500":
+      description: Internal server error
+    "400":
+      description: Invalid request
+    "401":
+      description: Unauthorized
+
+components:
+  schemas:
+    EventTodayResponse:
+      type: object
+      properties:
+        date:
+          type: string
+          format: date
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/EventTodayResponseItem"
+    EventTodayResponseItem:
+      type: object
+      properties:
+        calendarId:
+          type: string
+          format: uuid
+        calendarName:
+          type: string
+        calendarColor:
+          type: string
+        id:
+          type: string
+          format: uuid
+        title:
+          type: string
+        location:
+          type: string
+        memo:
+          type: string
+        startAt:
+          type: string
+          format: date-time
+        endAt:
+          type: string
+          format: date-time
+        isAllDay:
+          type: boolean

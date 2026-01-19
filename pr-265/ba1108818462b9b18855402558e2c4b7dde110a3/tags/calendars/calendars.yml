@@ -1,0 +1,95 @@
+get:
+  summary: Get list of calendars
+  tags:
+    - calendars
+  security:
+    - bearerAuth: []
+  responses:
+    "200":
+      description: Calendar list retrieved successfully
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/CalendarListResponse"
+    "500":
+      description: Internal server error
+post:
+  summary: Create a new calendar
+  tags:
+    - calendars
+  security:
+    - bearerAuth: []
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: "#/components/schemas/CalendarCreateRequest"
+  responses:
+    "200":
+      description: Calendar created successfully
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/CalendarCreateResponse"
+    "400":
+      description: Invalid request
+    "500":
+      description: Internal server error
+
+components:
+  schemas:
+    CalendarListResponse:
+      type: object
+      properties:
+        calendars:
+          type: array
+          items:
+            $ref: "#/components/schemas/CalendarResponse"
+    CalendarResponse:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        color:
+          type: string
+        imageUrl:
+          type: string
+          nullable: true
+    CalendarCreateRequest:
+      type: object
+      required:
+        - name
+        - color
+        - members
+        - optionIds
+      properties:
+        name:
+          type: string
+          example: calendar
+        color:
+          type: string
+          example: "#002244"
+        imageId:
+          type: string
+          format: uuid
+          example: ""
+        members:
+          type: array
+          items:
+            type: string
+            format: email
+          example: ["optical-user2@example.com", "optical-user3@example.com"]
+        optionIds:
+          type: array
+          items:
+            type: integer
+            format: int32
+          example: []
+    CalendarCreateResponse:
+      type: object
+      properties:
+        id:
+          type: string

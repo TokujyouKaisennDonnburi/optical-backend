@@ -1,0 +1,22 @@
+post:
+  summary: Create user with Google OAuth
+  description: Creates a new user using Google OAuth authentication code.
+  tags:
+    - google
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: "#/components/schemas/CreateGoogleUserRequest"
+  responses:
+    "200":
+      description: User created successfully
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/CreateGoogleUserResponse"
+    "400":
+      description: Invalid request
+    "500":
+      description: Internal server error
