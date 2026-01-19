@@ -1,0 +1,12 @@
+type: object
+properties:
+  githubId:
+    type: integer
+    format: int64
+  githubName:
+    type: string
+  githubUrl:
+    type: string
+    format: url
+  assigned:
+    type: integer

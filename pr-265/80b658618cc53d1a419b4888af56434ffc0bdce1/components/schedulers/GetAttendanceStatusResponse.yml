@@ -1,0 +1,11 @@
+type: object
+required:
+  - date
+  - status
+properties:
+  date:
+    type: string
+    format: date-time
+  status:
+    type: integer
+    format: int8

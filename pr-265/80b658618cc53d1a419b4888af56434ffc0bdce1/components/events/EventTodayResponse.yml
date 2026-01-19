@@ -1,0 +1,9 @@
+type: object
+properties:
+  date:
+    type: string
+    format: date
+  items:
+    type: array
+    items:
+      $ref: "./components/events/EventTodayResponseItem.yml"

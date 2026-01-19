@@ -1,0 +1,13 @@
+type: object
+properties:
+  repositoryId:
+    type: integer
+    format: int64
+  repositoryName:
+    type: string
+  total:
+    type: integer
+  reviewers:
+    type: array
+    items:
+      $ref: "./components/github/GithubReviewLoadStatusListResponseItem.yml"

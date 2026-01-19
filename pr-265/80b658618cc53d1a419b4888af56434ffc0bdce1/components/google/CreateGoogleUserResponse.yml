@@ -1,0 +1,8 @@
+type: object
+properties:
+  user:
+    $ref: "./components/users/UserCreateResponseUser.yml"
+  accessToken:
+    type: string
+  refreshToken:
+    type: string

@@ -1,0 +1,15 @@
+type: object
+required:
+  - user_id
+  - comment
+  - status
+properties:
+  user_id:
+    type: string
+    format: uuid
+  comment:
+    type: string
+  status:
+    type: array
+    items:
+      $ref: "./components/schedulers/GetAttendanceStatusResponse.yml"

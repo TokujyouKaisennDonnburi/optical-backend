@@ -1,0 +1,14 @@
+post:
+  summary: Create Google OAuth state URL
+  description: Generates a Google OAuth state URL for user authentication.
+  tags:
+    - google
+  responses:
+    "200":
+      description: OAuth state created successfully
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/GoogleOauthStateResponse"
+    "500":
+      description: Internal server error
