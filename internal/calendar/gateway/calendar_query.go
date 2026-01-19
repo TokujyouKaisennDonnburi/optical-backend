@@ -32,6 +32,7 @@ func (r *CalendarPsqlRepository) FindByUserId(ctx context.Context, userId uuid.U
 			ON c.image_id = ci.id
 		WHERE 
 			m.user_id = $1
+			AND m.joined_at IS NOT NULL
 			AND c.deleted_at IS NULL
 		ORDER BY c.id DESC
 	`
@@ -95,6 +96,7 @@ func (r *CalendarPsqlRepository) FindByUserCalendarId(ctx context.Context, userI
 	INNER JOIN users ON users.id = calendar_members.user_id
 	WHERE calendars.id = $2
 	AND calendar_members.user_id = $1
+	AND calendar_members.joined_at IS NOT NULL
 	AND calendars.deleted_at IS NULL `
 	calRow := []CalendarImageMember{}
 	err := r.db.SelectContext(ctx, &calRow, query, userId, calendarId)
