@@ -16,18 +16,18 @@ import (
 type SchedulerCreateRequest struct {
 	Title     string    `json:"title"`
 	Memo      string    `json:"memo"`
-	LimitTime time.Time `json:"limitTime"`
-	IsAllDay  bool      `json:"isAllDay"`
+	LimitTime time.Time `json:"limit_time"`
+	IsAllDay  bool      `json:"is_allday"`
 	Dates     []SchedulerCreateDateRequest `json:"dates"`
 }
 
 type SchedulerCreateDateRequest struct {
 	Date      time.Time `json:"date"`
-	StartTime time.Time `json:"startTime"`
-	EndTime   time.Time `json:"endTime"`
+	StartTime time.Time `json:"start_time"`
+	EndTime   time.Time `json:"end_time"`
 }
 type SchedulerCreateResponse struct {
-	Id uuid.UUID `json:"schedulerId"`
+	Id uuid.UUID `json:"scheduler_id"`
 }
 
 func (h *SchedulerHttpHandler) CreateScheduler(w http.ResponseWriter, r *http.Request) {

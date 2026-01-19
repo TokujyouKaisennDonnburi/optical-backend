@@ -18,7 +18,7 @@ type AllSchedulerResponse struct {
 	UserId     uuid.UUID `json:"user_id"`
 	Title      string    `json:"title"`
 	Memo       string    `json:"memo"`
-	LimitTime  time.Time `json:"limitTime"`
+	LimitTime  time.Time `json:"limit_time"`
 	IsAllDay   bool      `json:"is_allday"`
 	IsDone     bool      `json:"is_done"`
 }
