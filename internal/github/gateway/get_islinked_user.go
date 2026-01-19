@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"time"
 
 	"github.com/TokujouKaisenDonburi/optical-backend/internal/github/service/query/output"
 	"github.com/google/uuid"
@@ -11,11 +12,11 @@ import (
 
 // gateway用構造体
 type IsLinkedUserModel struct {
-	GithubId    string `db:"github_id"`
-	GithubName  string `db:"github_name"`
-	GithubEmail string `db:"github_email"`
-	SsoLogin    bool   `db:"sso_login"`
-	UpdatedAt   string `db:"updated_at"`
+	GithubId    string    `db:"github_id"`
+	GithubName  string    `db:"github_name"`
+	GithubEmail string    `db:"github_email"`
+	SsoLogin    bool      `db:"sso_login"`
+	UpdatedAt   time.Time `db:"updated_at"`
 }
 
 // GitHubアカウントが連携されているか取得

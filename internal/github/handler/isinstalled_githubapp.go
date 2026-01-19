@@ -43,7 +43,7 @@ func (h *GithubHandler) IsInstalledGithubApp(w http.ResponseWriter, r *http.Requ
 
 	var installedAt string
 	if !result.InstalledAt.IsZero() {
-		installedAt = result.InstalledAt.Format(time.RFC3339)
+		installedAt = result.InstalledAt.UTC().Format(time.RFC3339)
 	}
 
 	render.JSON(w, r, IsInstalledGithubAppResponse{

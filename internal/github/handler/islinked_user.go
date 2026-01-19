@@ -2,6 +2,7 @@ package handler
 
 import (
 	"net/http"
+	"time"
 
 	"github.com/TokujouKaisenDonburi/optical-backend/pkg/apperr"
 	"github.com/TokujouKaisenDonburi/optical-backend/pkg/auth"
@@ -32,12 +33,18 @@ func (h *GithubHandler) IsLinkedUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// linledat(time.time)が無い場合、空文字にして返却したい
+	var linkedAt string
+	if !result.LinkedAt.IsZero() {
+		linkedAt = result.LinkedAt.UTC().Format(time.RFC3339)
+	}
+
 	render.JSON(w, r, IsLinkedUserResponse{
 		IsLinked:    result.IsLinked,
 		GithubId:    result.GithubId,
 		GithubName:  result.GithubName,
 		GithubEmail: result.GithubEmail,
 		IsSsoLogin:  result.IsSsoLogin,
-		LinkedAt:    result.LinkedAt,
+		LinkedAt:    linkedAt,
 	})
 }
