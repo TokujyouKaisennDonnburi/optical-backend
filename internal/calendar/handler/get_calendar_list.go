@@ -6,16 +6,15 @@ import (
 	"github.com/TokujouKaisenDonburi/optical-backend/internal/calendar/service/query"
 	"github.com/TokujouKaisenDonburi/optical-backend/pkg/apperr"
 	"github.com/TokujouKaisenDonburi/optical-backend/pkg/auth"
-	"github.com/TokujouKaisenDonburi/optical-backend/pkg/storage"
 	"github.com/go-chi/render"
 )
 
 
 type CalendarListResponse struct {
-	Id       string  `json:"id"`
-	Name     string  `json:"name"`
-	Color    string  `json:"color"`
-	ImageUrl *string `json:"imageUrl"`
+	Id       string `json:"id"`
+	Name     string `json:"name"`
+	Color    string `json:"color"`
+	ImageUrl string `json:"imageUrl"`
 }
 
 // カレンダー一覧を取得する
@@ -37,16 +36,11 @@ func (h *CalendarHttpHandler) GetCalendars(w http.ResponseWriter, r *http.Reques
 	// レスポンスに変換
 	calendars := make([]CalendarListResponse, len(output))
 	for i, cal := range output {
-		var imageUrl *string = nil
-		if cal.Image.Valid {
-			fullUrl := storage.GetImageStorageBaseUrl() + "/" + cal.Image.Url
-			imageUrl = &fullUrl
-		}
 		calendars[i] = CalendarListResponse{
 			Id:       cal.Id.String(),
 			Name:     cal.Name,
 			Color:    cal.Color,
-			ImageUrl: imageUrl,
+			ImageUrl: cal.ImageUrl,
 		}
 	}
 	render.JSON(w, r, calendars)
