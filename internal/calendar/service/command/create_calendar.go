@@ -63,26 +63,28 @@ func (c *CalendarCommand) CreateCalendar(ctx context.Context, input CalendarCrea
 	if err != nil {
 		return nil, err
 	}
-	go func() {
-		content := getEmailContent(getFontendUrl(), newCalendar.Id)
-		emails := make([]user.Email, len(input.MemberEmails))
-		for i, mail := range input.MemberEmails {
-			newEmail, err := user.NewEmail(mail)
-			if err != nil {
-				continue
+	if len(input.MemberEmails) > 0 {
+		go func() {
+			content := getEmailContent(getFontendUrl(), newCalendar.Id)
+			emails := make([]user.Email, len(input.MemberEmails))
+			for i, mail := range input.MemberEmails {
+				newEmail, err := user.NewEmail(mail)
+				if err != nil {
+					continue
+				}
+				emails[i] = newEmail
 			}
-			emails[i] = newEmail
-		}
-		err := c.emailRepository.NotifyAll(
-			ctx,
-			"OptiCal: メンバーに招待されました",
-			content,
-			emails,
-		)
-		if err != nil {
-			logrus.WithError(err).Error("failed to send emails")
-		}
-	}()
+			err := c.emailRepository.NotifyAll(
+				ctx,
+				"OptiCal: メンバーに招待されました",
+				content,
+				emails,
+			)
+			if err != nil {
+				logrus.WithError(err).Error("failed to send emails")
+			}
+		}()
+	}
 	return &CalendarCreateOutput{
 		Id:   newCalendar.Id,
 		Name: newCalendar.Name,
