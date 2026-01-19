@@ -55,11 +55,11 @@ func (r *GooglePsqlAndApiRepository) GetTokenByCode(
 		logrus.WithError(err).Error("failed to get oauth token")
 		return "", err
 	}
+	defer resp.Body.Close()
 	if resp.StatusCode != http.StatusOK {
 		logrus.WithField("statusCode", resp.StatusCode).Error("failed to get oauth token")
 		return "", errors.New("token request status error")
 	}
-	defer resp.Body.Close()
 	var response GoogleOauthTokenResponse
 	if err := json.NewDecoder(resp.Body).Decode(&response); err != nil {
 		logrus.WithError(err).Error("token response decode error")
@@ -89,11 +89,11 @@ func (r *GooglePsqlAndApiRepository) GetUserByToken(
 		logrus.WithError(err).Error("userinfo request error")
 		return nil, err
 	}
+	defer resp.Body.Close()
 	if resp.StatusCode != http.StatusOK {
 		logrus.WithField("statusCode", resp.StatusCode).Error("userinfo response invalid status")
 		return nil, err
 	}
-	defer resp.Body.Close()
 	var response GoogleUserInfoResponse
 	if err := json.NewDecoder(resp.Body).Decode(&response); err != nil {
 		logrus.WithError(err).Error("userinfo response decode error")
