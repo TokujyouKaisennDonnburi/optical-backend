@@ -18,14 +18,6 @@ func GetClientSecret() string {
 	return secret
 }
 
-func GetGithubAppId() string {
-	appId, ok := os.LookupEnv("GITHUB_APP_ID")
-	if !ok {
-		panic("'GITHUB_APP_ID' is not set")
-	}
-	return appId
-}
-
 func GetGithubOauthRedirectURI() string {
 	redirectUri, ok := os.LookupEnv("GITHUB_OAUTH_REDIRECT_URI")
 	if !ok {
