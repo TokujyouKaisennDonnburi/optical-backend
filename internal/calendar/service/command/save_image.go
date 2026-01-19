@@ -9,7 +9,6 @@ import (
 	"github.com/google/uuid"
 
 	"github.com/TokujouKaisenDonburi/optical-backend/internal/calendar"
-	"github.com/TokujouKaisenDonburi/optical-backend/pkg/storage"
 )
 
 const (
@@ -53,8 +52,8 @@ func (c *CalendarCommand) SaveImage(ctx context.Context, input SaveImageCommandI
 	if err != nil {
 		return nil, err
 	}
-	// URLを設定
-	image.SetUrl(storage.GetImageStorageBaseUrl() + "/" + url)
+	// URLを設定（ベースURLなしのパスを保存）
+	image.SetUrl(url)
 	// 画像情報を保存
 	err = c.imageRepository.Save(ctx, image)
 	if err != nil {
