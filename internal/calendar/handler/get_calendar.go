@@ -7,6 +7,7 @@ import (
 	"github.com/TokujouKaisenDonburi/optical-backend/internal/calendar/service/query"
 	"github.com/TokujouKaisenDonburi/optical-backend/pkg/apperr"
 	"github.com/TokujouKaisenDonburi/optical-backend/pkg/auth"
+	"github.com/TokujouKaisenDonburi/optical-backend/pkg/storage"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
 
@@ -70,11 +71,15 @@ func (h *CalendarHttpHandler) GetCalendar(w http.ResponseWriter, r *http.Request
 			Deprecated: row.Deprecated,
 		}
 	}
+	imageUrl := ""
+	if output.Image.Valid {
+		imageUrl = storage.GetImageStorageBaseUrl() + "/" + output.Image.Url
+	}
 	response := CalendarResponse{
 		Id:      output.Id.String(),
 		Name:    output.Name,
 		Color:   string(output.Color),
-		Image:   output.Image.Url,
+		Image:   imageUrl,
 		Members: members,
 		Options: options,
 	}

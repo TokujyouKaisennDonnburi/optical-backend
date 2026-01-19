@@ -6,6 +6,7 @@ import (
 	"github.com/TokujouKaisenDonburi/optical-backend/internal/user/service/command"
 	"github.com/TokujouKaisenDonburi/optical-backend/pkg/apperr"
 	"github.com/TokujouKaisenDonburi/optical-backend/pkg/auth"
+	"github.com/TokujouKaisenDonburi/optical-backend/pkg/storage"
 	"github.com/go-chi/render"
 )
 
@@ -37,6 +38,6 @@ func (h *UserHttpHandler) UploadAvatar(w http.ResponseWriter, r *http.Request) {
 	}
 	render.JSON(w, r, UploadAvatarResponse{
 		Id:  output.Id.String(),
-		Url: output.Url,
+		Url: storage.GetImageStorageBaseUrl() + "/" + output.Url,
 	})
 }

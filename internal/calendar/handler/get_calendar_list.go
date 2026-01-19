@@ -6,6 +6,7 @@ import (
 	"github.com/TokujouKaisenDonburi/optical-backend/internal/calendar/service/query"
 	"github.com/TokujouKaisenDonburi/optical-backend/pkg/apperr"
 	"github.com/TokujouKaisenDonburi/optical-backend/pkg/auth"
+	"github.com/TokujouKaisenDonburi/optical-backend/pkg/storage"
 	"github.com/go-chi/render"
 )
 
@@ -38,7 +39,8 @@ func (h *CalendarHttpHandler) GetCalendars(w http.ResponseWriter, r *http.Reques
 	for i, cal := range output {
 		var imageUrl *string = nil
 		if cal.Image.Valid {
-			imageUrl = &cal.Image.Url
+			fullUrl := storage.GetImageStorageBaseUrl() + "/" + cal.Image.Url
+			imageUrl = &fullUrl
 		}
 		calendars[i] = CalendarListResponse{
 			Id:       cal.Id.String(),

@@ -5,6 +5,7 @@ import (
 
 	"github.com/TokujouKaisenDonburi/optical-backend/internal/calendar/service/command"
 	"github.com/TokujouKaisenDonburi/optical-backend/pkg/apperr"
+	"github.com/TokujouKaisenDonburi/optical-backend/pkg/storage"
 	"github.com/go-chi/render"
 	"github.com/google/uuid"
 )
@@ -31,6 +32,6 @@ func (h *CalendarHttpHandler) UploadImage(w http.ResponseWriter, r *http.Request
 	}
 	render.JSON(w, r, SaveImageResponse{
 		Id:  output.Id,
-		Url: output.Url,
+		Url: storage.GetImageStorageBaseUrl() + "/" + output.Url,
 	})
 }
