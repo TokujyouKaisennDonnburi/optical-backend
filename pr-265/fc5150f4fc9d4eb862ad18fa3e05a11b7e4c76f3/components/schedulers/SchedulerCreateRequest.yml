@@ -1,0 +1,25 @@
+type: object
+required:
+  - title
+  - memo
+  - limitTime
+  - isAllDay
+  - dates
+properties:
+  title:
+    type: string
+    example: "scheduler title"
+  memo:
+    type: string
+    example: "memo"
+  limitTime:
+    type: string
+    format: date-time
+    example: "2026-03-15T12:00:00Z"
+  isAllDay:
+    type: boolean
+    example: false
+  dates:
+    type: array
+    items:
+      $ref: "./SchedulerCreateDateRequest.yml"

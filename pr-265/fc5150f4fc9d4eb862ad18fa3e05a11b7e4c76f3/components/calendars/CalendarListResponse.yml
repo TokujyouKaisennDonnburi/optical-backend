@@ -1,0 +1,6 @@
+type: object
+properties:
+  calendars:
+    type: array
+    items:
+      $ref: "./CalendarResponse.yml"

@@ -1,0 +1,9 @@
+type: object
+required:
+  - state
+  - installationId
+properties:
+  state:
+    type: string
+  installationId:
+    type: string

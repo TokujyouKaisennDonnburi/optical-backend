@@ -1,0 +1,8 @@
+type: object
+required:
+  - isLinked
+properties:
+  isLinked:
+    type: boolean
+    description: Whether the user has linked their GitHub account
+    example: true

@@ -1,0 +1,12 @@
+type: object
+required:
+  - comment
+  - status
+properties:
+  comment:
+    type: string
+    example: "参加します"
+  status:
+    type: array
+    items:
+      $ref: "./StatusRequest.yml"
