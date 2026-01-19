@@ -49,4 +49,13 @@ type GithubRepository interface {
 		*output.IsLinkedUserQueryOutput,
 		error,
 	)
+
+	// GitHubAppがアカウントと連携されているか
+	IsInstalledGithubApp(
+		ctx context.Context,
+		userId, calendarId uuid.UUID,
+	) (
+		*output.IsInstalledGithubAppQueryOutput,
+		error,
+	)
 }

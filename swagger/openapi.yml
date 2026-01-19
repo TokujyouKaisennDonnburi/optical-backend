@@ -966,6 +966,34 @@ paths:
                 $ref: '#/components/schemas/GithubLinkStatusResponse'
         '401':
           description: Unauthorized
+  /github/calendars/{calendarId}/installation-status:
+    get:
+      summary: Get GitHub App installation status for a calendar
+      description: カレンダーにGitHub Appがインストールされているかを確認します。ユーザーはカレンダーのメンバーである必要があります。
+      tags: [github]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: calendarId
+          in: path
+          required: true
+          description: カレンダーID (UUID形式)
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Installation status retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GithubInstallationStatusResponse'
+        '400':
+          description: Invalid request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden - User is not a member of this calendar
         '500':
           description: Internal server error
   /google/oauth/state:
@@ -2007,6 +2035,32 @@ components:
           format: date-time
           description: When the GitHub account was linked (only present if linked)
           example: "2025-01-15T10:30:00Z"
+    GithubInstallationStatusResponse:
+      type: object
+      required:
+        - isInstalled
+      properties:
+        isInstalled:
+          type: boolean
+          description: GitHub Appがインストールされているか
+          example: true
+        githubId:
+          type: string
+          description: GitHub ID (インストール済みの場合のみ)
+          example: "12345678"
+        githubName:
+          type: string
+          description: GitHub組織名またはユーザー名 (インストール済みの場合のみ)
+          example: "my-organization"
+        installationId:
+          type: string
+          description: GitHub AppのインストールID (インストール済みの場合のみ)
+          example: "98765432"
+        installedAt:
+          type: string
+          format: date-time
+          description: インストール日時 (インストール済みの場合のみ)
+          example: "2025-01-10T09:00:00Z"
     Member:
       type: object
       required:
