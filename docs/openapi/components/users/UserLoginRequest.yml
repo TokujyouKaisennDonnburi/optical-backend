@@ -1,0 +1,13 @@
+UserLoginRequest:
+  type: object
+  required:
+    - email
+    - password
+  properties:
+    email:
+      type: string
+      format: email
+      example: optical-user@example.com
+    password:
+      type: string
+      example: password

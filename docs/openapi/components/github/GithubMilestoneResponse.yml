@@ -1,0 +1,11 @@
+GithubMilestoneResponse:
+  type: object
+  properties:
+    title:
+      type: string
+    progress:
+      type: integer
+    open:
+      type: integer
+    close:
+      type: integer
