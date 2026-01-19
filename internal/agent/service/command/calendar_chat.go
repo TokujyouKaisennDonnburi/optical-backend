@@ -12,6 +12,9 @@ import (
 	"github.com/google/uuid"
 	"github.com/sirupsen/logrus"
 )
+var (
+	JST = time.FixedZone("JST", 9*60*60)
+)
 
 const (
 	CALENDAR_CHAT_SYSTEM_PROMPT = `
@@ -25,6 +28,8 @@ const (
 ## 予定の管理体制
 - ユーザーは複数のカレンダー(calendar)を持っています。
 - それぞれのカレンダーに予定(event)があります。
+- 予定を作成する際に同じ時間に予定が入っているか確認する必要はありません。
+- 予定を作成する際はJSTフォーマットで作成する必要があります。
 
 ## 回答ルール
 - ユーザーの要求や質問に応じてカレンダーや予定の分析や作成をします。
@@ -86,7 +91,8 @@ func (c *AgentCommand) CalendarChat(ctx context.Context, input AgentCommandCalen
 		calendarOptionListTool,
 		calendarOptionUpdateTool,
 	}
-	systemPrompt := fmt.Sprintf(CALENDAR_CHAT_SYSTEM_PROMPT, input.CalendarId.String(), time.Now().UTC())
+	now := time.Now().In(JST)
+	systemPrompt := fmt.Sprintf(CALENDAR_CHAT_SYSTEM_PROMPT, input.CalendarId.String(), now)
 	messages := []openrouter.Message{
 		openrouter.SystemMessage(systemPrompt),
 		openrouter.UserMessage(userPrompt),

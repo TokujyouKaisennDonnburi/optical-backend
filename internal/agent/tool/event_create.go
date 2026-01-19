@@ -154,8 +154,8 @@ func (t EventCreateTool) Call(ctx context.Context, input string) (string, error)
 					Title:         newEvent.Title,
 					Memo:          newEvent.Memo,
 					Location:      newEvent.Location,
-					StartAt:       event.StartAt,
-					EndAt:         event.EndAt,
+					StartAt:       event.StartAt.UTC(),
+					EndAt:         event.EndAt.UTC(),
 					IsAllday:      event.IsAllday,
 				}
 			}
