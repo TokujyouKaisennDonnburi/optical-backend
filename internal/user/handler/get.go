@@ -7,7 +7,6 @@ import (
 	"github.com/TokujouKaisenDonburi/optical-backend/internal/user/service/query"
 	"github.com/TokujouKaisenDonburi/optical-backend/pkg/apperr"
 	"github.com/TokujouKaisenDonburi/optical-backend/pkg/auth"
-	"github.com/TokujouKaisenDonburi/optical-backend/pkg/storage"
 	"github.com/go-chi/render"
 )
 
@@ -43,9 +42,8 @@ func (h *UserHttpHandler) GetMe(w http.ResponseWriter, r *http.Request) {
 		CreatedAt: output.CreatedAt,
 		UpdatedAt: output.UpdatedAt,
 	}
-	if output.Avatar.Valid {
-		fullUrl := storage.GetImageStorageBaseUrl() + "/" + output.Avatar.Url
-		response.AvatarUrl = &fullUrl
+	if output.AvatarUrl != "" {
+		response.AvatarUrl = &output.AvatarUrl
 	}
 	render.JSON(w, r, response)
 }

@@ -12,6 +12,7 @@ type UserQueryOutput struct {
 	Name      string
 	Email     string
 	Avatar    user.Avatar
+	AvatarUrl string
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }

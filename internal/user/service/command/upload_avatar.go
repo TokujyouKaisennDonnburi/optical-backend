@@ -7,6 +7,7 @@ import (
 
 	"github.com/TokujouKaisenDonburi/optical-backend/internal/user"
 	"github.com/TokujouKaisenDonburi/optical-backend/pkg/apperr"
+	"github.com/TokujouKaisenDonburi/optical-backend/pkg/storage"
 	"github.com/google/uuid"
 )
 
@@ -63,6 +64,6 @@ func (c *UserCommand) UploadAvatar(ctx context.Context, input UploadAvatarInput)
 	}
 	return &UploadAvatarOutput{
 		Id:  avatar.Id,
-		Url: avatar.Url,
+		Url: storage.GetImageStorageBaseUrl() + "/" + avatar.Url,
 	}, nil
 }
