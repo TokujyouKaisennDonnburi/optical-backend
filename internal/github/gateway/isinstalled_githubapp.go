@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"time"
 
 	"github.com/TokujouKaisenDonburi/optical-backend/internal/github/service/query/output"
 	"github.com/TokujouKaisenDonburi/optical-backend/pkg/apperr"
@@ -12,10 +13,10 @@ import (
 
 // gateway用構造体
 type IsInstalledGithubAppModel struct {
-	GithubId       string `db:"github_id"`
-	GithubName     string `db:"github_name"`
-	InstallationId string `db:"installation_id"`
-	UpdateAt       string `db:"updated_at"` // InstalledAtとする
+	GithubId       string       `db:"github_id"`
+	GithubName     string       `db:"github_name"`
+	InstallationId string       `db:"installation_id"`
+	UpdatedAt      time.Time `db:"updated_at"` // InstalledAtとする
 }
 
 // GithubAppが連携されているか確認
@@ -31,7 +32,7 @@ func (r *GithubApiRepository) IsInstalledGithubApp(
 			COALESCE(cg.github_id, '') as github_id,
 			COALESCE(cg.github_name, '') as github_name,
 			COALESCE(cg.installation_id, '') as installation_id,
-			COALESCE(cg.updated_at::text, '') as updated_at
+			COALESCE(cg.updated_at, '0001-01-01'::timestamp) as updated_at
 		FROM calendar_members cm
 		LEFT JOIN calendar_githubs cg ON cg.calendar_id = cm.calendar_id
 		WHERE cm.calendar_id = $1 AND cm.user_id = $2
@@ -59,6 +60,6 @@ func (r *GithubApiRepository) IsInstalledGithubApp(
 		GithubId:       model.GithubId,
 		GithubName:     model.GithubName,
 		InstallationId: model.InstallationId,
-		InstalledAt:    model.UpdateAt,
+		InstalledAt:    model.UpdatedAt,
 	}, nil
 }

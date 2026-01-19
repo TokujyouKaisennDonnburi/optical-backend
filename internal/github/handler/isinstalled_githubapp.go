@@ -2,6 +2,7 @@ package handler
 
 import (
 	"net/http"
+	"time"
 
 	"github.com/TokujouKaisenDonburi/optical-backend/pkg/apperr"
 	"github.com/TokujouKaisenDonburi/optical-backend/pkg/auth"
@@ -40,11 +41,16 @@ func (h *GithubHandler) IsInstalledGithubApp(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
+	var installedAt string
+	if !result.InstalledAt.IsZero() {
+		installedAt = result.InstalledAt.Format(time.RFC3339)
+	}
+
 	render.JSON(w, r, IsInstalledGithubAppResponse{
 		IsInstalled:    result.IsInstalled,
 		GithubId:       result.GithubId,
 		GithubName:     result.GithubName,
 		InstallationId: result.InstallationId,
-		InstalledAt:    result.InstalledAt,
+		InstalledAt:    installedAt,
 	})
 }
