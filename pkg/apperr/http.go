@@ -2,6 +2,7 @@ package apperr
 
 import (
 	"net/http"
+	"os"
 
 	"github.com/go-chi/render"
 )
@@ -10,6 +11,10 @@ type AppError struct {
 	StatusCode int    `json:"code"`
 	Message    string `json:"message"`
 }
+
+var (
+	IS_PRODUCTION = os.Getenv("PRODUCTION") == "1"
+)
 
 func (er *AppError) Render(w http.ResponseWriter, r *http.Request) error {
 	render.Status(r, er.StatusCode)
@@ -31,6 +36,12 @@ func ErrUnauthorized(err error) render.Renderer {
 }
 
 func ErrInternalServerError(err error) render.Renderer {
+	if IS_PRODUCTION {
+		return &AppError{
+			StatusCode: http.StatusInternalServerError,
+			Message:    "Internal server error.",
+		}
+	}
 	return &AppError{
 		StatusCode: http.StatusInternalServerError,
 		Message:    err.Error(),
