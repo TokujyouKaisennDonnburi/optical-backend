@@ -16,7 +16,7 @@ const (
 	REDIS_TOKEN_WHITELIST_PREFIX = "token:whitelist:"
 )
 
-//  ホワイトリストに保存するトークン情報を表す
+// ホワイトリストに保存するトークン情報を表す
 type tokenWhitelistEntry struct {
 	TokenId   string    `json:"tokenId"`
 	ExpiresIn time.Time `json:"expiresIn"`
@@ -42,86 +42,86 @@ func (r *TokenRedisRepository) getWhitelistKey(userId uuid.UUID) string {
 
 // リフレッシュトークンをホワイトリストに追加する
 func (r *TokenRedisRepository) AddToWhitelist(ctx context.Context, refreshToken *user.RefreshToken) error {
-	key := r.getWhitelistKey(refreshToken.UserId)
-
-	// 既存のリストを取得
-	entries, err := r.getWhitelistEntries(ctx, key)
-	if err != nil {
+	err := r.client.Watch(ctx, func(tx *redis.Tx) error {
+		key := r.getWhitelistKey(refreshToken.UserId)
+		// 既存のリストを取得
+		entries, err := r.getWhitelistEntries(ctx, tx, key)
+		if err != nil {
+			return err
+		}
+		// 期限切れトークンを除外
+		entries = filterValidEntries(entries)
+		// 新しいエントリを追加
+		newEntry := tokenWhitelistEntry{
+			TokenId:   refreshToken.Id.String(),
+			ExpiresIn: refreshToken.ExpiresIn,
+		}
+		entries = append(entries, newEntry)
+		// JSONにシリアライズして保存
+		data, err := json.Marshal(entries)
+		if err != nil {
+			return err
+		}
+		// 180日のTTLを設定
+		ttl := time.Second * time.Duration(user.REFRESH_TOKEN_EXPIRE)
+		_, err = tx.TxPipelined(ctx, func(p redis.Pipeliner) error {
+			return p.Set(ctx, key, data, ttl).Err()
+		})
 		return err
-	}
-
-	// 期限切れトークンを除外
-	entries = filterValidEntries(entries)
-
-	// 新しいエントリを追加
-	newEntry := tokenWhitelistEntry{
-		TokenId:   refreshToken.Id.String(),
-		ExpiresIn: refreshToken.ExpiresIn,
-	}
-	entries = append(entries, newEntry)
-
-	// JSONにシリアライズして保存
-	data, err := json.Marshal(entries)
-	if err != nil {
-		return err
-	}
-
-	// 180日のTTLを設定
-	ttl := time.Second * time.Duration(user.REFRESH_TOKEN_EXPIRE)
-	return r.client.Set(ctx, key, data, ttl).Err()
+	})
+	return err
 }
 
 // 指定されたトークンがホワイトリストに存在するか確認する
 func (r *TokenRedisRepository) IsWhitelisted(ctx context.Context, userId uuid.UUID, tokenId uuid.UUID) error {
-	key := r.getWhitelistKey(userId)
-
-	entries, err := r.getWhitelistEntries(ctx, key)
-	if err != nil {
-		return err
-	}
-
-	// 期限切れトークンを除外
-	validEntries := filterValidEntries(entries)
-
-	// 期限切れトークンがあれば保存し直す
-	if len(validEntries) != len(entries) {
-		data, err := json.Marshal(validEntries)
+	err := r.client.Watch(ctx, func(tx *redis.Tx) error {
+		key := r.getWhitelistKey(userId)
+		entries, err := r.getWhitelistEntries(ctx, tx, key)
 		if err != nil {
 			return err
 		}
-		ttl := time.Second * time.Duration(user.REFRESH_TOKEN_EXPIRE)
-		if err := r.client.Set(ctx, key, data, ttl).Err(); err != nil {
-			return err
-		}
-	}
-
-	for _, entry := range validEntries {
-		if entry.TokenId == tokenId.String() {
-			// 成功時もTTLを延長
-			ttl := time.Second * time.Duration(user.REFRESH_TOKEN_EXPIRE)
-			_ = r.client.Expire(ctx, key, ttl)
-			return nil
-		}
-	}
-
-	return apperr.UnauthorizedError(tokenId.String() + " is not in whitelist")
+		// 期限切れトークンを除外
+		validEntries := filterValidEntries(entries)
+		_, err = r.client.TxPipelined(ctx, func(p redis.Pipeliner) error {
+			// 期限切れトークンがあれば保存し直す
+			if len(validEntries) != len(entries) {
+				data, err := json.Marshal(validEntries)
+				if err != nil {
+					return err
+				}
+				ttl := time.Second * time.Duration(user.REFRESH_TOKEN_EXPIRE)
+				if err := r.client.Set(ctx, key, data, ttl).Err(); err != nil {
+					return err
+				}
+			}
+			for _, entry := range validEntries {
+				if entry.TokenId == tokenId.String() {
+					// 成功時もTTLを延長
+					ttl := time.Second * time.Duration(user.REFRESH_TOKEN_EXPIRE)
+					_ = r.client.Expire(ctx, key, ttl)
+					return nil
+				}
+			}
+			return apperr.UnauthorizedError(tokenId.String() + " is not in whitelist")
+		})
+		return err
+	})
+	return err
 }
 
 // Redisからホワイトリストのエントリ一覧を取得する
-func (r *TokenRedisRepository) getWhitelistEntries(ctx context.Context, key string) ([]tokenWhitelistEntry, error) {
-	data, err := r.client.Get(ctx, key).Result()
+func (r *TokenRedisRepository) getWhitelistEntries(ctx context.Context, tx *redis.Tx, key string) ([]tokenWhitelistEntry, error) {
+	data, err := tx.Get(ctx, key).Result()
 	if err == redis.Nil {
 		return []tokenWhitelistEntry{}, nil
 	}
 	if err != nil {
 		return nil, err
 	}
-
 	var entries []tokenWhitelistEntry
 	if err := json.Unmarshal([]byte(data), &entries); err != nil {
 		return nil, err
 	}
-
 	return entries, nil
 }
 
@@ -136,4 +136,3 @@ func filterValidEntries(entries []tokenWhitelistEntry) []tokenWhitelistEntry {
 	}
 	return valid
 }
-
