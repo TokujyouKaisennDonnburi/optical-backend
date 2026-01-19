@@ -9,6 +9,7 @@ import (
 	"github.com/google/uuid"
 
 	"github.com/TokujouKaisenDonburi/optical-backend/internal/calendar"
+	"github.com/TokujouKaisenDonburi/optical-backend/pkg/storage"
 )
 
 const (
@@ -61,6 +62,6 @@ func (c *CalendarCommand) SaveImage(ctx context.Context, input SaveImageCommandI
 	}
 	return &SaveImageCommandOutput{
 		Id:  image.Id,
-		Url: image.Url,
+		Url: storage.GetImageStorageBaseUrl() + "/" + image.Url,
 	}, nil
 }
