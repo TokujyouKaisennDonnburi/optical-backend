@@ -1,0 +1,8 @@
+TokenRefreshResponse:
+  type: object
+  properties:
+    accessToken:
+      type: string
+    expiresIn:
+      type: string
+      format: date-time

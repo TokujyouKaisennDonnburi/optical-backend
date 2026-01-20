@@ -1,0 +1,7 @@
+SuggestOptionResponse:
+  type: object
+  properties:
+    option:
+      type: string
+    reason:
+      type: string

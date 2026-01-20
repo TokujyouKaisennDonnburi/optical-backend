@@ -1,0 +1,38 @@
+CalendarDetailResponse:
+  type: object
+  required:
+    - id
+    - name
+    - color
+    - image
+    - member
+    - option
+  properties:
+    id:
+      type: string
+      format: uuid
+      description: カレンダーID
+      example: "019b1ffe-efd5-7d9b-a13f-f636cfc89c4d"
+    name:
+      type: string
+      description: カレンダー名
+      example: "テストカレンダー"
+    color:
+      type: string
+      description: カレンダーの色 (16進数カラーコード)
+      pattern: '^#[0-9A-Fa-f]{6}$'
+      example: "#FF5733"
+    image:
+      type: string
+      description: カレンダー画像のURL
+      example: ""
+    member:
+      type: array
+      description: カレンダーのメンバー一覧
+      items:
+        $ref: '../members/Member.yml'
+    option:
+      type: array
+      description: カレンダーに設定されたオプション一覧
+      items:
+        $ref: '../options/Option.yml'

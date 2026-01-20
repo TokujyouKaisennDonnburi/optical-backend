@@ -1,0 +1,103 @@
+get:
+  summary: Get Scheduler
+  tags:
+    - schedulers
+  security:
+    - bearerAuth: []
+  parameters:
+    - name: calendarId
+      in: path
+      required: true
+      description: Calendar ID (UUID format)
+      schema:
+        type: string
+        format: uuid
+    - name: schedulerId
+      in: path
+      required: true
+      description: Scheduler ID (UUID format)
+      schema:
+        type: string
+        format: uuid
+  responses:
+    "200":
+      description: Attendance retrieved successfully
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/AttendanceQueryResponse"
+    "400":
+      description: Invalid request
+    "401":
+      description: Unauthorized
+    "403":
+      description: Forbidden
+    "404":
+      description: Scheduler not found
+    "500":
+      description: Internal server error
+
+components:
+  schemas:
+    AttendanceQueryResponse:
+      type: object
+      required:
+        - schedulerId
+        - calendarId
+        - userId
+        - title
+        - memo
+        - limitTime
+        - isAllDay
+        - possibleDate
+      properties:
+        schedulerId:
+          type: string
+          format: uuid
+          description: Scheduler ID
+        calendarId:
+          type: string
+          format: uuid
+          description: Calendar ID
+        userId:
+          type: string
+          format: uuid
+          description: User ID who created the scheduler
+        title:
+          type: string
+          description: Scheduler title
+        memo:
+          type: string
+          description: Scheduler memo/description
+        limitTime:
+          type: string
+          format: date-time
+          description: Deadline for responses
+        isAllDay:
+          type: boolean
+          description: Whether this is an all-day scheduler
+        possibleDate:
+          type: array
+          description: List of possible dates for the scheduler
+          items:
+            $ref: "#/components/schemas/PossibleDateResponse"
+    PossibleDateResponse:
+      type: object
+      required:
+        - date
+        - startTime
+        - endTime
+      properties:
+        date:
+          type: string
+          format: date-time
+          description: The date of the possible time slot
+        startTime:
+          type: string
+          format: date-time
+          description: Start time of the possible time slot
+        endTime:
+          type: string
+          format: date-time
+          description: End time of the possible time slot
+          example: "2026-03-20T00:00:00Z"

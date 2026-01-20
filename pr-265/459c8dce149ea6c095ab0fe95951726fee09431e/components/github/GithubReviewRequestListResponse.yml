@@ -1,0 +1,17 @@
+GithubReviewRequestListResponse:
+  type: object
+  properties:
+    id:
+      type: integer
+      format: int64
+    url:
+      type: string
+      format: url
+    title:
+      type: string
+    number:
+      type: integer
+    assignees:
+      type: array
+      items:
+        $ref: "./GithubReviewRequestListResponseUser.yml"

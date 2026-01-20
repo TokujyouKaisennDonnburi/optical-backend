@@ -1,0 +1,25 @@
+post:
+  summary: Create GitHub OAuth state
+  description: Creates an OAuth state URL for GitHub user authentication.
+  tags:
+    - github
+  security:
+    - bearerAuth: []
+  responses:
+    "200":
+      description: OAuth state created
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/GithubStateResponse"
+    "500":
+      description: Internal server error
+
+components:
+  schemas:
+    GithubStateResponse:
+      type: object
+      properties:
+        url:
+          type: string
+          format: url

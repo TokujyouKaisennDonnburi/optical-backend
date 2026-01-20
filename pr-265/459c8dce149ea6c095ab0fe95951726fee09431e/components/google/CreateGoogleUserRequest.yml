@@ -1,0 +1,10 @@
+CreateGoogleUserRequest:
+  type: object
+  required:
+    - code
+    - state
+  properties:
+    code:
+      type: string
+    state:
+      type: string
