@@ -467,12 +467,6 @@ paths:
       responses:
         "200":
           description: Schedulers retrieved successfully
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/AllSchedulerResponse"
         "400":
           description: Invalid request
         "401":
