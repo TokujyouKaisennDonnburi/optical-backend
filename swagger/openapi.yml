@@ -467,6 +467,12 @@ paths:
       responses:
         "200":
           description: Schedulers retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AllSchedulerResponse"
         "400":
           description: Invalid request
         "401":
@@ -1903,6 +1909,38 @@ components:
           type: string
           format: date-time
         isAllDay:
+          type: boolean
+    AllSchedulerResponse:
+      type: object
+      required:
+        - id
+        - calendar_id
+        - user_id
+        - title
+        - memo
+        - limit_time
+        - is_all_day
+        - is_done
+      properties:
+        id:
+          type: string
+          format: uuid
+        calendar_id:
+          type: string
+          format: uuid
+        user_id:
+          type: string
+          format: uuid
+        title:
+          type: string
+        memo:
+          type: string
+        limit_time:
+          type: string
+          format: date-time
+        is_all_day:
+          type: boolean
+        is_done:
           type: boolean
     MemberCreateRequest:
       type: object
