@@ -17,7 +17,7 @@ type SchedulerCreateRequest struct {
 	Title     string    `json:"title"`
 	Memo      string    `json:"memo"`
 	LimitTime time.Time `json:"limit_time"`
-	IsAllDay  bool      `json:"is_allday"`
+	IsAllDay  bool      `json:"is_all_day"`
 	Dates     []SchedulerCreateDateRequest `json:"dates"`
 }
 
