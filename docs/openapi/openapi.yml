@@ -87,6 +87,8 @@ paths:
     $ref: "./tags/github/milestones.yml"
   /github/oauth/status:
     $ref: "./tags/github/oauth-status.yml"
+  /github/calendars/{calendarId}/installation-status:
+    $ref: "./tags/github/installation-status.yml"
   /calendars/{calendarId}/todos:
     $ref: "./tags/todos/todos.yml"
   /calendars/{calendarId}/todos/{todoListId}/items:
@@ -187,6 +189,8 @@ components:
       $ref: "./components/schedulers/GetAttendanceStatusResponse.yml"
     PossibleDateResponse:
       $ref: "./components/schedulers/PossibleDateResponse.yml"
+    AllSchedulerResponse:
+      $ref: "./components/schedulers/AllSchedulerResponse.yml"
     MemberCreateRequest:
       $ref: "./components/members/MemberCreateRequest.yml"
     Member:
@@ -221,6 +225,8 @@ components:
       $ref: "./components/github/GithubMilestoneResponse.yml"
     GithubLinkStatusResponse:
       $ref: "./components/github/GithubLinkStatusResponse.yml"
+    GithubInstallationStatusResponse:
+      $ref: "./components/github/GithubInstallationStatusResponse.yml"
     GoogleOauthStateResponse:
       $ref: "./components/google/GoogleOauthStateResponse.yml"
     CreateGoogleUserRequest:
@@ -229,3 +235,15 @@ components:
       $ref: "./components/google/CreateGoogleUserResponse.yml"
     UpdateTodoItemRequest:
       $ref: "./components/todos/UpdateTodoItemRequest.yml"
+    CreateTodoItemRequest:
+      $ref: "./components/todos/CreateTodoItemRequest.yml"
+    CreateTodoItemResponse:
+      $ref: "./components/todos/CreateTodoItemResponse.yml"
+    CreateTodoListRequest:
+      $ref: "./components/todos/CreateTodoListRequest.yml"
+    CreateTodoListResponse:
+      $ref: "./components/todos/CreateTodoListResponse.yml"
+    TodoListResponse:
+      $ref: "./components/todos/TodoListResponse.yml"
+    TodoListResponseItem:
+      $ref: "./components/todos/TodoListResponseItem.yml"

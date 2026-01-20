@@ -12,21 +12,8 @@ get:
           schema:
             type: array
             items:
-              $ref: "#/components/schemas/Option"
+              $ref: "../../components/options/OptionResponse.yml"
     "401":
       description: Unauthorized
     "500":
       description: Internal server error
-
-components:
-  schemas:
-    Option:
-      type: object
-      properties:
-        id:
-          type: integer
-          format: int32
-        name:
-          type: string
-        deprecated:
-          type: boolean
