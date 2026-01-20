@@ -12,7 +12,7 @@ import (
 	"github.com/google/uuid"
 )
 
-type SchedulerRequest struct {
+type SchedulerResponse struct {
 	Id           uuid.UUID             `json:"id"`
 	CalendarId   uuid.UUID             `json:"calendar_id"`
 	UserId       uuid.UUID             `json:"user_id"`
@@ -20,9 +20,9 @@ type SchedulerRequest struct {
 	Memo         string                `json:"memo"`
 	LimitTime    time.Time             `json:"limit_time"`
 	IsAllDay     bool                  `json:"is_all_day"`
-	PossibleDate []PossibleDateRequest `json:"possible_date"`
+	PossibleDate []PossibleDateResponse `json:"possible_date"`
 }
-type PossibleDateRequest struct {
+type PossibleDateResponse struct {
 	Date      time.Time `json:"date"`
 	StartTime time.Time `json:"start_time"`
 	EndTime   time.Time `json:"end_time"`
@@ -56,15 +56,15 @@ func (h *SchedulerHttpHandler) GetScheduler(w http.ResponseWriter, r *http.Reque
 		apperr.HandleAppError(w, r, err)
 		return
 	}
-	responseDates := make([]PossibleDateRequest, len(result.PossibleDate))
+	responseDates := make([]PossibleDateResponse, len(result.PossibleDate))
 	for i, v := range result.PossibleDate {
-		responseDates[i] = PossibleDateRequest{
+		responseDates[i] = PossibleDateResponse{
 			Date:      v.Date,
 			StartTime: v.StartTime,
 			EndTime:   v.EndTime,
 		}
 	}
-	responseResult := SchedulerRequest{
+	responseResult := SchedulerResponse{
 		Id:           result.Id,
 		CalendarId:   result.CalendarId,
 		UserId:       result.UserId,
