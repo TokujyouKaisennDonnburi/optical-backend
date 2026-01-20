@@ -1,6 +1,0 @@
-GoogleOauthStateResponse:
-  type: object
-  properties:
-    url:
-      type: string
-      format: url

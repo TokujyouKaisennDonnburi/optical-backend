@@ -1,8 +1,0 @@
-UploadAvatarResponse:
-  type: object
-  properties:
-    id:
-      type: string
-    url:
-      type: string
-      format: url

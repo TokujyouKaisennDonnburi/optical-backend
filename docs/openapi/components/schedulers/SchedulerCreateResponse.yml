@@ -1,6 +1,0 @@
-SchedulerCreateResponse:
-  type: object
-  properties:
-    schedulerId:
-      type: string
-      format: uuid

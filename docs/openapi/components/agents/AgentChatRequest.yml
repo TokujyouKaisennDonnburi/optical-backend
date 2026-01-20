@@ -1,5 +1,0 @@
-AgentChatRequest:
-  type: object
-  properties:
-    message:
-      type: string

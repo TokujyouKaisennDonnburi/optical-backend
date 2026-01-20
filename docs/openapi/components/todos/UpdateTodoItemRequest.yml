@@ -1,7 +1,0 @@
-UpdateTodoItemRequest:
-  type: object
-  properties:
-    content:
-      type: string
-    isCompleted:
-      type: boolean

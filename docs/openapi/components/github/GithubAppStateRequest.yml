@@ -1,8 +1,0 @@
-GithubAppStateRequest:
-  type: object
-  required:
-    - calendarId
-  properties:
-    calendarId:
-      type: string
-      format: uuid

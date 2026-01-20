@@ -1,8 +1,0 @@
-CreateTodoListRequest:
-  type: object
-  required:
-    - name
-  properties:
-    name:
-      type: string
-      example: "My Todo List"

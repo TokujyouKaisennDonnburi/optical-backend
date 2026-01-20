@@ -1,9 +1,0 @@
-UserCreateResponse:
-  type: object
-  properties:
-    user:
-      $ref: "./UserCreateResponseUser.yml"
-    accessToken:
-      type: string
-    refreshToken:
-      type: string
