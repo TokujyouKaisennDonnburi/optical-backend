@@ -22,7 +22,11 @@ func (q *UserQuery) GetUser(
 		return nil, err
 	}
 	if output.Avatar.Valid {
-		output.AvatarUrl = storage.GetImageStorageBaseUrl() + "/" + output.Avatar.Url
+		if output.Avatar.IsFullURL {
+			output.AvatarUrl = storage.GetImageStorageBaseUrl() + "/" + output.Avatar.Url
+		} else {
+			output.AvatarUrl = output.Avatar.Url
+		}
 	}
 	return output, nil
 }

@@ -45,7 +45,7 @@ func (c *UserCommand) UploadAvatar(ctx context.Context, input UploadAvatarInput)
 		return nil, apperr.ValidationError("invalid image ext")
 	}
 	// アバター情報を作成
-	avatar, err := user.NewAvatar("")
+	avatar, err := user.NewAvatar("", true)
 	if err != nil {
 		return nil, err
 	}

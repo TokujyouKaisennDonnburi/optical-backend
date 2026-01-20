@@ -40,7 +40,7 @@ func (r *GithubApiRepository) CreateUser(
 			if err != nil {
 				return err
 			}
-			avatar, err := user.NewAvatar(githubUser.AvatarUrl)
+			avatar, err := user.NewAvatar(githubUser.AvatarUrl, false)
 			if err != nil {
 				return err
 			}

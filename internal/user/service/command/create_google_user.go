@@ -63,7 +63,7 @@ func (c *UserCommand) CreateGoogleUser(
 		if err != nil {
 			return nil, err
 		}
-		avatar, err := user.NewAvatar(googleUser.AvatarUrl)
+		avatar, err := user.NewAvatar(googleUser.AvatarUrl, false)
 		if err != nil {
 			return nil, err
 		}
