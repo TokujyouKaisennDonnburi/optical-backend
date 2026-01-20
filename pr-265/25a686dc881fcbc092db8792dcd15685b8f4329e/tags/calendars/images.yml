@@ -1,0 +1,39 @@
+post:
+  summary: Upload an image
+  tags:
+    - calendars
+  security:
+    - bearerAuth: []
+  requestBody:
+    required: true
+    content:
+      multipart/form-data:
+        schema:
+          type: object
+          properties:
+            image:
+              type: string
+              format: binary
+  responses:
+    "200":
+      description: Image uploaded successfully
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ImageUploadResponse"
+    "400":
+      description: Invalid request
+    "500":
+      description: Internal server error
+
+components:
+  schemas:
+    ImageUploadResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        url:
+          type: string
+          format: url

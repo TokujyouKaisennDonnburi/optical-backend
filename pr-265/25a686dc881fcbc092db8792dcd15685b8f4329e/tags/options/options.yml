@@ -1,0 +1,19 @@
+get:
+  summary: Get list of options
+  tags:
+    - options
+  security:
+    - bearerAuth: []
+  responses:
+    "200":
+      description: Options retrieved successfully
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: "../../components/options/OptionResponse.yml"
+    "401":
+      description: Unauthorized
+    "500":
+      description: Internal server error

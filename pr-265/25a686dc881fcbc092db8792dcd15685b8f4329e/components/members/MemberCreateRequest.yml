@@ -1,0 +1,13 @@
+MemberCreateRequest:
+  type: object
+  required:
+    - email
+  properties:
+    email:
+      type: array
+      items:
+        type: string
+        format: email
+      example:
+        - optical-user1@example.com
+        - optical-user2@example.com
