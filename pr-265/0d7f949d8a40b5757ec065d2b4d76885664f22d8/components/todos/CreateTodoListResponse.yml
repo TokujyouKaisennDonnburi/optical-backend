@@ -1,0 +1,7 @@
+CreateTodoListResponse:
+  type: object
+  properties:
+    id:
+      type: string
+      format: uuid
+      example: "019b1ffe-efd5-7d9b-a13f-f636cfc89c4d"

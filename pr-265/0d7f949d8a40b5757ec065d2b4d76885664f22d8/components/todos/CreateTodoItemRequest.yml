@@ -1,0 +1,8 @@
+CreateTodoItemRequest:
+  type: object
+  required:
+    - name
+  properties:
+    name:
+      type: string
+      example: "Buy groceries"
