@@ -28,6 +28,11 @@ type CalendarRepository interface {
 			options []option.Option,
 		) (*calendar.Calendar, error),
 	) error
+	Delete(
+		ctx context.Context,
+		calendarId uuid.UUID,
+		userId uuid.UUID,
+	) error
 
 	FindByUserId(ctx context.Context, userId uuid.UUID) ([]output.CalendarListQueryOutput, error)
 	FindByUserCalendarId(ctx context.Context, userId, calendarId uuid.UUID) (*calendar.Calendar, error)
