@@ -115,7 +115,7 @@ paths:
                 $ref: "#/components/schemas/UserResponse"
     patch:
       summary: Update current user information
-      tags: 
+      tags:
         - users
       security:
         - bearerAuth: []
@@ -124,13 +124,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UserUpdateRequest'
+              $ref: "#/components/schemas/UserUpdateRequest"
       responses:
-        '204':
+        "204":
           description: User information updated successfully
-        '400':
+        "400":
           description: Invalid request
-        '500':
+        "500":
           description: Internal server error
   /agents/chat:
     post:
@@ -146,13 +146,13 @@ paths:
             schema:
               $ref: "#/components/schemas/AgentChatRequest"
       responses:
-        '200':
+        "200":
           description: messages from AI Agent
           content:
             text/event-stream:
               schema:
                 type: string
-                example: "data: {\"content\":\"来週の\"}"
+                example: 'data: {"content":"来週の"}'
   /agents/options:
     post:
       summary: Suggest options based on message
@@ -262,21 +262,21 @@ paths:
             format: uuid
             example: "019b1ffe-efd5-7d9b-a13f-f636cfc89c4d"
       responses:
-        '200':
+        "200":
           description: Calendar retrieved successfully
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CalendarDetailResponse'
-        '400':
+                $ref: "#/components/schemas/CalendarDetailResponse"
+        "400":
           description: Invalid request
-        '401':
+        "401":
           description: Unauthorized
-        '403':
+        "403":
           description: Forbidden - User is not a member of this calendar
-        '404':
+        "404":
           description: Calendar not found
-        '500':
+        "500":
           description: Internal server error
     patch:
       summary: Update calendar
@@ -299,19 +299,19 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CalendarUpdateRequest'
+              $ref: "#/components/schemas/CalendarUpdateRequest"
       responses:
-        '204':
+        "204":
           description: Calendar updated successfully
-        '400':
+        "400":
           description: Invalid request
-        '401':
+        "401":
           description: Unauthorized
-        '403':
+        "403":
           description: Forbidden - User is not a member of this calendar
-        '404':
+        "404":
           description: Calendar not found
-        '500':
+        "500":
           description: Internal server error
   /calendars/{calendarId}/events:
     get:
@@ -443,9 +443,9 @@ paths:
         "400":
           description: Invalid request
           "401":
-             description: Unauthorized
+            description: Unauthorized
           "403":
-             description: Forbidden - Scheduler option not enabled
+            description: Forbidden - Scheduler option not enabled
         "500":
           description: Internal server error
     get:
@@ -482,37 +482,37 @@ paths:
         "500":
           description: Internal server error
   /schedulers/{schedulerId}/result:
-     get:
-       summary: Get scheduler result
-       tags:
-         - schedulers
-       security:
-         - bearerAuth: []
-       parameters:
-         - name: schedulerId
-           in: path
-           required: true
-           description: Scheduler ID (UUID format)
-           schema:
-             type: string
-             format: uuid
-       responses:
-         "200":
-           description: Scheduler result retrieved successfully
-           content:
-             application/json:
-               schema:
-                 $ref: "#/components/schemas/SchedulerResultResponse"
-         "400":
-           description: Invalid request
-         "401":
-           description: Unauthorized
-         "403":
-           description: Forbidden
-         "404":
-           description: Scheduler not found
-         "500":
-           description: Internal server error
+    get:
+      summary: Get scheduler result
+      tags:
+        - schedulers
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: schedulerId
+          in: path
+          required: true
+          description: Scheduler ID (UUID format)
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Scheduler result retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SchedulerResultResponse"
+        "400":
+          description: Invalid request
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+        "404":
+          description: Scheduler not found
+        "500":
+          description: Internal server error
   /calendars/{calendarId}/schedulers/{schedulerId}/attendance:
     get:
       summary: Get Attendance
@@ -587,44 +587,44 @@ paths:
         "500":
           description: Internal server error
   /calendars/{calendarId}/schedulers/{schedulerId}:
-      get:
-        summary: Get Scheduler
-        tags:
-          - schedulers
-        security:
-          - bearerAuth: []
-        parameters:
-          - name: calendarId
-            in: path
-            required: true
-            description: Calendar ID (UUID format)
-            schema:
-              type: string
-              format: uuid
-          - name: schedulerId
-            in: path
-            required: true
-            description: Scheduler ID (UUID format)
-            schema:
-              type: string
-              format: uuid
-        responses:
-          "200":
-            description: Attendance retrieved successfully
-            content:
-              application/json:
-                schema:
-                  $ref: "#/components/schemas/AttendanceQueryResponse"
-          "400":
-            description: Invalid request
-          "401":
-            description: Unauthorized
-          "403":
-            description: Forbidden
-          "404":
-            description: Scheduler not found
-          "500":
-            description: Internal server error
+    get:
+      summary: Get Scheduler
+      tags:
+        - schedulers
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: calendarId
+          in: path
+          required: true
+          description: Calendar ID (UUID format)
+          schema:
+            type: string
+            format: uuid
+        - name: schedulerId
+          in: path
+          required: true
+          description: Scheduler ID (UUID format)
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Attendance retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AttendanceQueryResponse"
+        "400":
+          description: Invalid request
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+        "404":
+          description: Scheduler not found
+        "500":
+          description: Internal server error
   /calendars/images:
     post:
       summary: Upload an image
@@ -878,17 +878,17 @@ paths:
             type: string
             format: uuid
       responses:
-        '200':
+        "200":
           description: Review requests retrieved successfully
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/GithubReviewRequestListResponse'
-        '400':
+                  $ref: "#/components/schemas/GithubReviewRequestListResponse"
+        "400":
           description: Invalid request
-        '500':
+        "500":
           description: Internal server error
   /github/calendars/{calendarId}/review-load-status:
     get:
@@ -904,17 +904,17 @@ paths:
             type: string
             format: uuid
       responses:
-        '200':
+        "200":
           description: Review load status retrieved successfully
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/GithubReviewLoadStatusListResponse'
-        '400':
+                  $ref: "#/components/schemas/GithubReviewLoadStatusListResponse"
+        "400":
           description: Invalid request
-        '500':
+        "500":
           description: Internal server error
   /github/calendars/{calendarId}/milestones:
     get:
@@ -930,17 +930,17 @@ paths:
             type: string
             format: uuid
       responses:
-        '200':
+        "200":
           description: Milestones retrieved successfully
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/GithubMilestoneResponse'
-        '400':
+                  $ref: "#/components/schemas/GithubMilestoneResponse"
+        "400":
           description: Invalid request
-        '500':
+        "500":
           description: Internal server error
   /github/oauth/status:
     get:
@@ -950,13 +950,13 @@ paths:
       security:
         - bearerAuth: []
       responses:
-        '200':
+        "200":
           description: GitHub link status retrieved successfully
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/GithubLinkStatusResponse'
-        '401':
+                $ref: "#/components/schemas/GithubLinkStatusResponse"
+        "401":
           description: Unauthorized
   /github/calendars/{calendarId}/installation-status:
     get:
@@ -974,19 +974,19 @@ paths:
             type: string
             format: uuid
       responses:
-        '200':
+        "200":
           description: Installation status retrieved successfully
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/GithubInstallationStatusResponse'
-        '400':
+                $ref: "#/components/schemas/GithubInstallationStatusResponse"
+        "400":
           description: Invalid request
-        '401':
+        "401":
           description: Unauthorized
-        '403':
+        "403":
           description: Forbidden - User is not a member of this calendar
-        '500':
+        "500":
           description: Internal server error
   /google/oauth/state:
     post:
@@ -1355,7 +1355,7 @@ components:
         color:
           type: string
           description: カレンダーの色 (16進数カラーコード)
-          pattern: '^#[0-9A-Fa-f]{6}$'
+          pattern: "^#[0-9A-Fa-f]{6}$"
           example: "#FF5733"
         image:
           type: string
@@ -1365,12 +1365,12 @@ components:
           type: array
           description: カレンダーのメンバー一覧
           items:
-            $ref: '#/components/schemas/Member'
+            $ref: "#/components/schemas/Member"
         option:
           type: array
           description: カレンダーに設定されたオプション一覧
           items:
-            $ref: '#/components/schemas/Option'
+            $ref: "#/components/schemas/Option"
     EventCreateRequest:
       type: object
       required:
@@ -1791,6 +1791,16 @@ components:
           format: date-time
         isAllDay:
           type: boolean
+    EventDeleteRequest:
+      type: object
+      description: 削除するイベントを指定するリクエスト
+      required:
+        - eventId
+      properties:
+        eventId:
+          type: string
+          format: uuid
+          description: 削除対象のイベントID
     EventMonthResponse:
       type: object
       properties:
@@ -1944,7 +1954,7 @@ components:
         assignees:
           type: array
           items:
-            $ref: '#/components/schemas/GithubReviewRequestListResponseUser'
+            $ref: "#/components/schemas/GithubReviewRequestListResponseUser"
     GithubReviewRequestListResponseUser:
       type: object
       properties:
@@ -1972,7 +1982,7 @@ components:
         reviewers:
           type: array
           items:
-            $ref: '#/components/schemas/GithubReviewLoadStatusListResponseItem'
+            $ref: "#/components/schemas/GithubReviewLoadStatusListResponseItem"
     GithubReviewLoadStatusListResponseItem:
       type: object
       properties:
@@ -2270,13 +2280,3 @@ components:
         isDone:
           type: boolean
           example: false
-    EventDeleteRequest:
-      type: object
-      required:
-        - event_id
-      properties:
-        event_id:
-          type: string
-          format: uuid
-          description: Event ID to delete
-          example: "019b1ffe-efd5-7d9b-a13f-f636cfc89c4d"
