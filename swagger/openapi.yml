@@ -412,6 +412,34 @@ paths:
           description: Invalid request
         "500":
           description: Internal server error
+    delete:
+      summary: Delete an event
+      tags:
+        - events
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: calendarId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: eventId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "204":
+          description: Event deleted successfully
+        "400":
+          description: Invalid request
+        "401":
+          description: Unauthorized
+        "500":
+          description: Internal server error
 
   /calendars/{calendarId}/schedulers:
     post:
@@ -700,26 +728,7 @@ paths:
           description: Invalid request
         "401":
           description: Unauthorized
-  /events/delete:
-    delete:
-      summary: Delete an event
-      tags:
-        - events
-      security:
-        - bearerAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/EventDeleteRequest"
-      responses:
-        "204":
-          description: Event deleted successfully
-        "400":
-          description: Invalid request
-        "500":
-          description: Internal server error
+
   /calendars/{calendarId}/members:
     post:
       summary: Add a member to a calendar
@@ -1791,16 +1800,6 @@ components:
           format: date-time
         isAllDay:
           type: boolean
-    EventDeleteRequest:
-      type: object
-      description: 削除するイベントを指定するリクエスト
-      required:
-        - eventId
-      properties:
-        eventId:
-          type: string
-          format: uuid
-          description: 削除対象のイベントID
     EventMonthResponse:
       type: object
       properties:
