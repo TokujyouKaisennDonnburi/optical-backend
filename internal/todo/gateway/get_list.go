@@ -12,18 +12,18 @@ import (
 )
 
 type TodoListAndItemAndAvatarModel struct {
-	Id                  uuid.UUID      `db:"id"`
-	UserId              uuid.UUID      `db:"user_id"`
-	AvatarUrl           sql.NullString `db:"avatar_url"`
-	AvatarIsFullURL     sql.NullBool   `db:"avatar_is_full_url"`
-	CalendarId          uuid.UUID      `db:"calendar_id"`
-	Name                string         `db:"name"`
-	ItemId              uuid.NullUUID  `db:"item_id"`
-	ItemUserId          uuid.NullUUID  `db:"item_user_id"`
-	ItemName            sql.NullString `db:"item_name"`
-	ItemAvatarUrl       sql.NullString `db:"item_avatar_url"`
-	ItemAvatarIsFullURL sql.NullBool   `db:"item_avatar_is_full_url"`
-	ItemIsDone          sql.NullBool   `db:"item_is_done"`
+	Id                     uuid.UUID      `db:"id"`
+	UserId                 uuid.UUID      `db:"user_id"`
+	AvatarUrl              sql.NullString `db:"avatar_url"`
+	AvatarIsRelativePath   sql.NullBool   `db:"avatar_is_relative_path"`
+	CalendarId             uuid.UUID      `db:"calendar_id"`
+	Name                   string         `db:"name"`
+	ItemId                 uuid.NullUUID  `db:"item_id"`
+	ItemUserId             uuid.NullUUID  `db:"item_user_id"`
+	ItemName               sql.NullString `db:"item_name"`
+	ItemAvatarUrl          sql.NullString `db:"item_avatar_url"`
+	ItemAvatarIsRelativePath sql.NullBool   `db:"item_avatar_is_relative_path"`
+	ItemIsDone             sql.NullBool   `db:"item_is_done"`
 }
 
 // TODOリストをカレンダーから取得
@@ -33,10 +33,10 @@ func (r *TodoPsqlRepository) FindByCalendarId(
 ) ([]output.TodoListQueryOutput, error) {
 	query := `
 		SELECT
-			lists.id, lists.user_id, lists.calendar_id, lists.name, 
-			avatars.url AS avatar_url, avatars.is_full_url AS avatar_is_full_url,
-			items.id AS item_id, items.user_id AS item_user_id, items.name AS item_name, 
-			item_avatars.url AS item_avatar_url, item_avatars.is_full_url AS item_avatar_is_full_url, 
+			lists.id, lists.user_id, lists.calendar_id, lists.name,
+			avatars.url AS avatar_url, avatars.is_relative_path AS avatar_is_relative_path,
+			items.id AS item_id, items.user_id AS item_user_id, items.name AS item_name,
+			item_avatars.url AS item_avatar_url, item_avatars.is_relative_path AS item_avatar_is_relative_path,
 			items.is_done as item_is_done
 		FROM todo_lists lists
 		JOIN calendar_members
@@ -64,7 +64,7 @@ func (r *TodoPsqlRepository) FindByCalendarId(
 	for _, todoListModel := range todoListModels {
 		model, ok := todoListMap[todoListModel.Id]
 		userAvatarUrl := todoListModel.AvatarUrl.String
-		if todoListModel.AvatarUrl.Valid && todoListModel.AvatarIsFullURL.Bool {
+		if todoListModel.AvatarUrl.Valid && todoListModel.AvatarIsRelativePath.Bool {
 			userAvatarUrl = storage.GetImageStorageBaseUrl() + "/" + userAvatarUrl
 		}
 
@@ -82,7 +82,7 @@ func (r *TodoPsqlRepository) FindByCalendarId(
 			continue
 		}
 		itemUserAvatarUrl := todoListModel.ItemAvatarUrl.String
-		if todoListModel.ItemAvatarUrl.Valid && todoListModel.ItemAvatarIsFullURL.Bool {
+		if todoListModel.ItemAvatarUrl.Valid && todoListModel.ItemAvatarIsRelativePath.Bool {
 			itemUserAvatarUrl = storage.GetImageStorageBaseUrl() + "/" + itemUserAvatarUrl
 		}
 		model.Items = append(model.Items, output.TodoListQueryOutputItem{

@@ -7,20 +7,20 @@ import (
 )
 
 type Avatar struct {
-	Id        uuid.UUID
-	Url       string
-	Valid     bool
-	IsFullURL bool
+	Id             uuid.UUID
+	Url            string
+	Valid          bool
+	IsRelativePath bool
 }
 
-func NewAvatar(url string, isFullURL bool) (*Avatar, error) {
+func NewAvatar(url string, isRelativePath bool) (*Avatar, error) {
 	id, err := uuid.NewV7()
 	if err != nil {
 		return nil, err
 	}
 	img := &Avatar{}
 	img.Id = id
-	img.IsFullURL = isFullURL
+	img.IsRelativePath = isRelativePath
 	img.SetUrl(url)
 	return img, nil
 }
