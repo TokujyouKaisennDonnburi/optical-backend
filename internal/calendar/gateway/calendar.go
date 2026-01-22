@@ -215,6 +215,7 @@ func (r *CalendarPsqlRepository) Delete(
 				id = :id
 		`
 		_, err = tx.NamedExecContext(ctx, query, map[string]any{
+			"id":        calendarId,
 			"deletedAt": time.Now().UTC(),
 		})
 		if err != nil {
