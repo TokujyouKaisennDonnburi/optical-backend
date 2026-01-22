@@ -234,7 +234,7 @@ func main() {
 		r.Get("/events/todays", calendarHandler.GetToday)
 		r.Get("/events/months", calendarHandler.GetByMonth)
 		r.Get("/events/search", calendarHandler.SearchEvents)
-		r.Delete("events/delete", calendarHandler.DeleteEvent)
+		r.Delete("/events/delete", calendarHandler.DeleteEvent)
 
 		// Options
 		r.Get("/options", optionHandler.GetList)
