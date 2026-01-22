@@ -2,8 +2,8 @@ package main
 
 import (
 	"context"
-	"encoding/base64"
 	"crypto/tls"
+	"encoding/base64"
 	"fmt"
 	"github.com/rubenv/sql-migrate"
 	"net/http"
@@ -162,7 +162,7 @@ func main() {
 
 	r.Use(logs.HttpLogger)
 	r.Use(cors.Handler(cors.Options{
-		AllowedOrigins:   []string{"http://localhost:3000", "https://tokujyoukaisenndonnburi.github.io", "https://opti-cal.org", },
+		AllowedOrigins:   []string{"http://localhost:3000", "https://tokujyoukaisenndonnburi.github.io", "https://opti-cal.org"},
 		AllowedMethods:   []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
 		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
 		AllowCredentials: false,
@@ -221,6 +221,7 @@ func main() {
 		r.Get("/calendars/{calendarId}", calendarHandler.GetCalendar)
 		r.Get("/calendars", calendarHandler.GetCalendars)
 		r.Patch("/calendars/{calendarId}", calendarHandler.UpdateCalendar)
+		r.Delete("/calendars/{calendarId}", calendarHandler.DeleteCalendar)
 
 		// Members
 		r.Post("/calendars/{calendarId}/members", calendarHandler.CreateMembers)
@@ -340,9 +341,9 @@ func GetMinIOClient() *minio.Client {
 			InsecureSkipVerify: skipVerify,
 		}
 		client, err := minio.New(endpoint, &minio.Options{
-			Region: getMinioRegion(),
-			Secure: true,
-			Creds:  credentials.NewIAM(""),
+			Region:    getMinioRegion(),
+			Secure:    true,
+			Creds:     credentials.NewIAM(""),
 			Transport: customTransport,
 		})
 		if err != nil {
