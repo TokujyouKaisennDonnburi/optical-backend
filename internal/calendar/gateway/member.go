@@ -2,7 +2,9 @@ package gateway
 
 import (
 	"context"
+	"time"
 
+	"github.com/TokujouKaisenDonburi/optical-backend/internal/calendar/service/query/output"
 	"github.com/TokujouKaisenDonburi/optical-backend/internal/user"
 	"github.com/TokujouKaisenDonburi/optical-backend/pkg/apperr"
 	"github.com/google/uuid"
@@ -12,6 +14,12 @@ import (
 
 type MemberPsqlRepository struct {
 	db *sqlx.DB
+}
+
+type MemberQueryModel struct {
+	UserId   uuid.UUID `db:"user_id"`
+	UserName string    `db:"user_name"`
+	JoinedAt time.Time `db:"joined_at"`
 }
 
 func NewMemberPsqlRepository(db *sqlx.DB) *MemberPsqlRepository {
@@ -100,4 +108,49 @@ func (r *MemberPsqlRepository) Reject(ctx context.Context, userId, calendarId uu
 		return apperr.NotFoundError("user or calendar or joined not found")
 	}
 	return nil
+}
+
+// カレンダーのメンバーかの権限チェック
+func (r *MemberPsqlRepository) ExistsMemberByUserIdAndCalendarId(ctx context.Context, userId, calendarId uuid.UUID) (bool, error) {
+	query := `
+          SELECT EXISTS (
+              SELECT 1 FROM calendar_members
+              WHERE user_id = $1
+              AND calendar_id = $2
+              AND joined_at IS NOT NULL
+          )
+      `
+	var exists bool
+	err := r.db.GetContext(ctx, &exists, query, userId, calendarId)
+	return exists, err
+}
+
+// カレンダーメンバー一覧取得
+func (r *MemberPsqlRepository) FindParticipantsMembers(ctx context.Context, calendarId uuid.UUID) ([]output.ParticipantsMembersQueryOutput, error) {
+	query := `
+		SELECT
+			cm.user_id,
+			u.name AS user_name,
+			cm.joined_at
+		FROM calendar_members cm
+		INNER JOIN users u ON u.id = cm.user_id
+		WHERE cm.calendar_id = $1
+		AND cm.joined_at IS NOT NULL
+		ORDER BY cm.joined_at ASC
+	`
+	var rows []MemberQueryModel
+	err := r.db.SelectContext(ctx, &rows, query, calendarId)
+	if err != nil {
+		return nil, err
+	}
+
+	members := make([]output.ParticipantsMembersQueryOutput, len(rows))
+	for i, row := range rows {
+		members[i] = output.ParticipantsMembersQueryOutput{
+			UserId:   row.UserId,
+			Name:     row.UserName,
+			JoinedAt: row.JoinedAt,
+		}
+	}
+	return members, nil
 }
