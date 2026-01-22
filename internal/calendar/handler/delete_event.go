@@ -1,37 +1,31 @@
 package handler
 
 import (
-	"encoding/json"
 	"net/http"
 
 	"github.com/TokujouKaisenDonburi/optical-backend/internal/calendar/service/command"
 	"github.com/TokujouKaisenDonburi/optical-backend/pkg/apperr"
 	"github.com/TokujouKaisenDonburi/optical-backend/pkg/auth"
+	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
 	"github.com/google/uuid"
 )
 
-type CalendarEventInput struct {
-	EventId uuid.UUID `json:"event_id"`
-}
-
 func (h *CalendarHttpHandler) DeleteEvent(w http.ResponseWriter, r *http.Request) {
+	eventId, err := uuid.Parse(chi.URLParam(r, "eventId"))
+	if err != nil {
+		_ = render.Render(w, r, apperr.ErrInvalidRequest(err))
+		return
+	}
 	// UserId
 	userId, err := auth.GetUserIdFromContext(r)
 	if err != nil {
 		_ = render.Render(w, r, apperr.ErrInternalServerError(err))
 		return
 	}
-	// body
-	var request CalendarEventInput
-	err = json.NewDecoder(r.Body).Decode(&request)
-	if err != nil {
-		_ = render.Render(w, r, apperr.ErrInvalidRequest(err))
-		return
-	}
 	// service
 	err = h.eventCommand.Delete(r.Context(), command.EventDeleteInput{
-		EventId: request.EventId,
+		EventId: eventId,
 		UserId:  userId,
 	})
 	if err != nil {
