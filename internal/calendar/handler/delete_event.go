@@ -30,9 +30,12 @@ func (h *CalendarHttpHandler) DeleteEvent(w http.ResponseWriter, r *http.Request
 		return
 	}
 	// service
-	h.eventCommand.Delete(r.Context(), command.EventDeleteInput{
+	err = h.eventCommand.Delete(r.Context(), command.EventDeleteInput{
 		EventId: request.EventId,
 		UserId:  userId,
 	})
+	if err != nil {
+		apperr.HandleAppError(w, r, err)
+	}
 	render.NoContent(w, r)
 }
