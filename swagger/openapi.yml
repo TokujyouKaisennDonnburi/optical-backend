@@ -1781,6 +1781,9 @@ components:
         calendarId:
           type: string
           format: uuid
+        userId:
+          type: string
+          format: uuid
         calendarName:
           type: string
         calendarColor:
@@ -1844,6 +1847,9 @@ components:
       properties:
         calendarId:
           type: string
+        userId:
+          type: string
+          format: uuid
         calendarName:
           type: string
         calendarColor:

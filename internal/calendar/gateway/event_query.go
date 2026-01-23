@@ -97,6 +97,7 @@ func (r *EventPsqlRepository) ExistsCalendarByUserIdAndCalendarId(
 
 type EventTodayQueryModel struct {
 	CalendarId    uuid.UUID `db:"calendar_id"`
+	UserId        uuid.UUID `db:"user_id"`
 	CalendarName  string    `db:"calendar_name"`
 	CalendarColor string    `db:"calendar_color"`
 	EventId       uuid.UUID `db:"event_id"`
@@ -116,7 +117,7 @@ func (r *EventPsqlRepository) GetEventsByDate(
 	query := `
 		SELECT 
 			calendars.id AS calendar_id, calendars.name AS calendar_name, calendars.color AS calendar_color,
-			events.id AS event_id, events.title AS event_title, location, memo, start_at, end_at, all_day
+			events.id AS event_id, events.user_id, events.title AS event_title, location, memo, start_at, end_at, all_day
 		FROM events
 		JOIN event_locations
 			ON events.id = event_locations.event_id
@@ -146,6 +147,7 @@ func (r *EventPsqlRepository) GetEventsByDate(
 	for i, model := range models {
 		outputs[i] = output.EventTodayQueryOutputItem{
 			CalendarId:    model.CalendarId,
+			UserId:        model.UserId,
 			CalendarName:  model.CalendarName,
 			CalendarColor: model.CalendarColor,
 			Id:            model.EventId,
@@ -168,7 +170,7 @@ func (r *EventPsqlRepository) GetEventsByMonth(
 	query := `
 		SELECT 
 			calendars.id AS calendar_id, calendars.name AS calendar_name, calendars.color AS calendar_color,
-			events.id AS event_id, events.title AS event_title, location, memo, start_at, end_at, all_day
+			events.id AS event_id, events.user_id, events.title AS event_title, location, memo, start_at, end_at, all_day
 		FROM events
 		JOIN event_locations
 			ON events.id = event_locations.event_id
@@ -200,6 +202,7 @@ func (r *EventPsqlRepository) GetEventsByMonth(
 	for i, model := range models {
 		outputs[i] = output.EventTodayQueryOutputItem{
 			CalendarId:    model.CalendarId,
+			UserId:        model.UserId,
 			CalendarName:  model.CalendarName,
 			CalendarColor: model.CalendarColor,
 			Id:            model.EventId,

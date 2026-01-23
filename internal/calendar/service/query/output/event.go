@@ -28,6 +28,7 @@ type EventTodayQueryOutput struct {
 
 type EventTodayQueryOutputItem struct {
 	CalendarId    uuid.UUID
+	UserId        uuid.UUID
 	CalendarName  string
 	CalendarColor string
 	Id            uuid.UUID
@@ -46,6 +47,7 @@ type EventMonthQueryOutput struct {
 
 type EventMonthQueryOutputItem struct {
 	CalendarId    uuid.UUID
+	UserId        uuid.UUID
 	CalendarName  string
 	CalendarColor string
 	Id            uuid.UUID
