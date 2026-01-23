@@ -82,6 +82,10 @@ func main() {
 		})
 		logrus.SetFormatter(formatter)
 	}
+	if level, err := logrus.ParseLevel(os.Getenv("LOGGER_LEVEL")); err == nil {
+		logrus.SetLevel(level)
+		logrus.WithField("level", level.String()).Info("loglevel updated")
+	}
 
 	r := chi.NewRouter()
 	jwtMiddleware := userHandler.NewUserAuthMiddleware()
