@@ -18,6 +18,7 @@ const (
 type Event struct {
 	Id            uuid.UUID
 	CalendarId    uuid.UUID
+	UserId        uuid.UUID
 	Title         string
 	Memo          string
 	Location      string
@@ -30,7 +31,7 @@ type ScheduledTime struct {
 	EndTime   time.Time
 }
 
-func NewEvent(calendarId uuid.UUID, title, memo, location string, scheduledTime ScheduledTime) (*Event, error) {
+func NewEvent(calendarId, userId uuid.UUID, title, memo, location string, scheduledTime ScheduledTime) (*Event, error) {
 	id, err := uuid.NewV7()
 	if err != nil {
 		return nil, errors.New("Event `id` is nil")
@@ -38,9 +39,13 @@ func NewEvent(calendarId uuid.UUID, title, memo, location string, scheduledTime 
 	if calendarId == uuid.Nil {
 		return nil, errors.New("Evnet `calendarId` is nil")
 	}
+	if userId == uuid.Nil {
+		return nil, errors.New("Evnet `userId` is nil")
+	}
 	event := Event{
 		Id:         id,
 		CalendarId: calendarId,
+		UserId:     userId,
 	}
 	err = event.SetTitle(title)
 	if err != nil {
@@ -100,8 +105,8 @@ func NewScheduledTime(allDay bool, startTime, endTime time.Time) (*ScheduledTime
 	if allDay {
 		return &ScheduledTime{
 			StartTime: startTime,
-			EndTime: endTime,
-			AllDay: true,
+			EndTime:   endTime,
+			AllDay:    true,
 		}, nil
 	}
 	if startTime.IsZero() {
