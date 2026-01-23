@@ -17,7 +17,7 @@ type CalendarResponse struct {
 	Id      string                    `json:"id"`
 	Name    string                    `json:"name"`
 	Color   string                    `json:"color"`
-	Image   string                    `json:"imageUrl"`
+	Image   string                    `json:"imageUrl,omitempty"`
 	Members []CalendarMemberResponse  `json:"member"`
 	Options []CalendarOptionsResponse `json:"option"`
 }

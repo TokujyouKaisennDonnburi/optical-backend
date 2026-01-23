@@ -1260,7 +1260,6 @@ components:
         avatarUrl:
           type: string
           format: url
-          nullable: true
         createdAt:
           type: string
           format: date-time
@@ -1376,7 +1375,6 @@ components:
         - id
         - name
         - color
-        - image
         - member
         - option
       properties:
