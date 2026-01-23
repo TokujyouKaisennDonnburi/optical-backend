@@ -141,7 +141,7 @@ func (t EventCreateTool) Call(ctx context.Context, input string) (string, error)
 				if err != nil {
 					return nil, err
 				}
-				newEvent, err := calendar.NewEvent(c.Id, event.Title, event.Memo, event.Location, *scheduledTime)
+				newEvent, err := calendar.NewEvent(c.Id, t.userId, event.Title, event.Memo, event.Location, *scheduledTime)
 				if err != nil {
 					return nil, err
 				}
