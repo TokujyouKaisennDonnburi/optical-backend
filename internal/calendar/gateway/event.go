@@ -114,3 +114,26 @@ func (r *EventPsqlRepository) Update(
 		return err
 	})
 }
+
+func (r *EventPsqlRepository) Delete(
+	ctx context.Context,
+	eventId, userId uuid.UUID,
+) error {
+	return db.RunInTx(r.db, func(tx *sqlx.Tx) error {
+		event, err := psql.FindEventByUserIdAndId(ctx, tx, userId, eventId)
+		if err != nil {
+			return err
+		}
+		query := `
+			UPDATE events SET
+				deleted_at = :deletedAt
+			WHERE
+				id = :id
+		`
+		_, err = r.db.NamedExecContext(ctx, query, map[string]any{
+			"id":        event.Id,
+			"deletedAt": time.Now().UTC(),
+		})
+		return err
+	})
+}
