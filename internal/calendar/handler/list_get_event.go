@@ -16,6 +16,7 @@ import (
 type ListGetEventResponse struct {
 	Id            string `json:"id"`
 	CalendarId    string `json:"calendarId"`
+	UserId        string `json:"userId"`
 	CalendarColor string `json:"calendarColor"`
 	Title         string `json:"title"`
 	Memo          string `json:"memo"`
@@ -58,6 +59,7 @@ func (h *CalendarHttpHandler) ListGetEvents(w http.ResponseWriter, r *http.Reque
 		response = append(response, ListGetEventResponse{
 			Id:            event.Id.String(),
 			CalendarId:    event.CalendarId.String(),
+			UserId:        event.UserId.String(),
 			CalendarColor: event.CalendarColor,
 			Title:         event.Title,
 			Memo:          event.Memo,

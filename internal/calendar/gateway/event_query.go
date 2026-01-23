@@ -14,6 +14,7 @@ import (
 type EventListQueryModel struct {
 	Id            uuid.UUID `db:"id"`
 	CalendarId    uuid.UUID `db:"calendar_id"`
+	UserId        uuid.UUID `db:"user_id"`
 	CalendarColor string    `db:"calendar_color"`
 	Title         string    `db:"title"`
 	Memo          string    `db:"memo"`
@@ -30,7 +31,7 @@ func (r *EventPsqlRepository) ListEventsByCalendarId(
 	calendarId uuid.UUID,
 ) ([]output.EventQueryOutput, error) {
 	query := `
-		SELECT e.id, e.calendar_id, c.color as calendar_color, e.title, e.memo, COALESCE(el.location, '') as location, e.all_day, e.start_at, e.end_at, e.created_at
+		SELECT e.id, e.calendar_id, e.user_id, c.color as calendar_color, e.title, e.memo, COALESCE(el.location, '') as location, e.all_day, e.start_at, e.end_at, e.created_at
 		FROM events e
 		JOIN event_locations el ON e.id = el.event_id
 		JOIN calendars c ON e.calendar_id = c.id
@@ -52,6 +53,7 @@ func (r *EventPsqlRepository) ListEventsByCalendarId(
 		events[i] = output.EventQueryOutput{
 			Id:            row.Id,
 			CalendarId:    row.CalendarId,
+			UserId:        row.UserId,
 			CalendarColor: row.CalendarColor,
 			Title:         row.Title,
 			Memo:          row.Memo,

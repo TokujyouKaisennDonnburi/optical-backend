@@ -10,6 +10,7 @@ import (
 type EventQueryOutput struct {
 	Id            uuid.UUID
 	CalendarId    uuid.UUID
+	UserId        uuid.UUID
 	CalendarColor string
 	Title         string
 	Memo          string
