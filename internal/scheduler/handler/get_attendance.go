@@ -13,7 +13,7 @@ import (
 )
 
 type AttendanceResponse struct {
-	UserId  uuid.UUID        `json:"user_id"`
+	UserId  uuid.UUID        `json:"userId"`
 	Comment string           `json:"comment"`
 	Status  []StatusResponse `json:"status"`
 }

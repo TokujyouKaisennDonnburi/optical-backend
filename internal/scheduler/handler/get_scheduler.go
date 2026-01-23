@@ -14,18 +14,18 @@ import (
 
 type SchedulerResponse struct {
 	Id           uuid.UUID             `json:"id"`
-	CalendarId   uuid.UUID             `json:"calendar_id"`
-	UserId       uuid.UUID             `json:"user_id"`
+	CalendarId   uuid.UUID             `json:"calendarId"`
+	UserId       uuid.UUID             `json:"userId"`
 	Title        string                `json:"title"`
 	Memo         string                `json:"memo"`
-	LimitTime    time.Time             `json:"limit_time"`
-	IsAllDay     bool                  `json:"is_all_day"`
-	PossibleDate []PossibleDateResponse `json:"possible_date"`
+	LimitTime    time.Time             `json:"limitTime"`
+	IsAllDay     bool                  `json:"isAllDay"`
+	PossibleDate []PossibleDateResponse `json:"possibleDate"`
 }
 type PossibleDateResponse struct {
 	Date      time.Time `json:"date"`
-	StartTime time.Time `json:"start_time"`
-	EndTime   time.Time `json:"end_time"`
+	StartTime time.Time `json:"startTime"`
+	EndTime   time.Time `json:"endTime"`
 }
 
 func (h *SchedulerHttpHandler) GetScheduler(w http.ResponseWriter, r *http.Request) {
