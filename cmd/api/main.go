@@ -2,8 +2,8 @@ package main
 
 import (
 	"context"
-	"encoding/base64"
 	"crypto/tls"
+	"encoding/base64"
 	"fmt"
 	"github.com/rubenv/sql-migrate"
 	"net/http"
@@ -166,7 +166,7 @@ func main() {
 
 	r.Use(logs.HttpLogger)
 	r.Use(cors.Handler(cors.Options{
-		AllowedOrigins:   []string{"http://localhost:3000", "https://tokujyoukaisenndonnburi.github.io", "https://opti-cal.org", },
+		AllowedOrigins:   []string{"http://localhost:3000", "https://tokujyoukaisenndonnburi.github.io", "https://opti-cal.org"},
 		AllowedMethods:   []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
 		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
 		AllowCredentials: false,
@@ -256,6 +256,7 @@ func main() {
 		// Todos
 		r.Get("/calendars/{calendarId}/todos", todoHandler.GetList)
 		r.Post("/calendars/{calendarId}/todos", todoHandler.CreateList)
+		r.Patch("/calendars/{calendarId}/todos/{todoListId}", todoHandler.UpdateList)
 		r.Post("/calendars/{calendarId}/todos/{todoListId}/items", todoHandler.AddItem)
 		r.Patch("/calendars/{calendarId}/todos/{todoListId}/items/{todoItemId}", todoHandler.UpdateItem)
 	})
@@ -344,9 +345,9 @@ func GetMinIOClient() *minio.Client {
 			InsecureSkipVerify: skipVerify,
 		}
 		client, err := minio.New(endpoint, &minio.Options{
-			Region: getMinioRegion(),
-			Secure: true,
-			Creds:  credentials.NewIAM(""),
+			Region:    getMinioRegion(),
+			Secure:    true,
+			Creds:     credentials.NewIAM(""),
 			Transport: customTransport,
 		})
 		if err != nil {
