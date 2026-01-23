@@ -313,6 +313,34 @@ paths:
           description: Calendar not found
         '500':
           description: Internal server error
+    delete:
+      summary: Delete calendar
+      description: カレンダーを削除します。ユーザーはカレンダーのメンバーである必要があります。
+      tags:
+        - calendars
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: calendarId
+          in: path
+          required: true
+          description: カレンダーID (UUID形式)
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Calendar updated successfully
+        '400':
+          description: Invalid request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden - User is not a member of this calendar
+        '404':
+          description: Calendar not found
+        '500':
+          description: Internal server error
   /calendars/{calendarId}/events:
     get:
       summary: Get events list by calendar ID

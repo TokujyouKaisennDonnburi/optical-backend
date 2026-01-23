@@ -3,6 +3,7 @@ package gateway
 import (
 	"context"
 	"database/sql"
+	"time"
 
 	"github.com/TokujouKaisenDonburi/optical-backend/internal/calendar"
 	"github.com/TokujouKaisenDonburi/optical-backend/internal/option"
@@ -191,6 +192,35 @@ func (r *CalendarPsqlRepository) Update(
 			}
 		}
 
+		return nil
+	})
+}
+
+func (r *CalendarPsqlRepository) Delete(
+	ctx context.Context,
+	calendarId uuid.UUID,
+	userId uuid.UUID,
+) error {
+	return db.RunInTx(r.db, func(tx *sqlx.Tx) error {
+		// user calendar check
+		_, err := psql.FindCalendarByUserIdAndId(ctx, tx, userId, calendarId)
+		if err != nil {
+			return err
+		}
+		// delete
+		query := `
+			UPDATE calendars SET
+				deleted_at = :deletedAt
+			WHERE
+				id = :id
+		`
+		_, err = tx.NamedExecContext(ctx, query, map[string]any{
+			"id":        calendarId,
+			"deletedAt": time.Now().UTC(),
+		})
+		if err != nil {
+			return err
+		}
 		return nil
 	})
 }
