@@ -22,6 +22,11 @@ type TodoRepository interface {
 		listId uuid.UUID,
 		todoItem *todo.Item,
 	) error
+	UpdateList(
+		ctx context.Context,
+		userId, listId uuid.UUID,
+		updateFn func(*todo.List) (*todo.List, error),
+	) error
 	UpdateItem(
 		ctx context.Context,
 		userId, itemId uuid.UUID,
