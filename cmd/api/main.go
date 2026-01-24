@@ -5,11 +5,12 @@ import (
 	"crypto/tls"
 	"encoding/base64"
 	"fmt"
-	"github.com/rubenv/sql-migrate"
 	"net/http"
 	"os"
 	"strconv"
 	"strings"
+
+	migrate "github.com/rubenv/sql-migrate"
 
 	agentGateway "github.com/TokujouKaisenDonburi/optical-backend/internal/agent/gateway"
 	agentHandler "github.com/TokujouKaisenDonburi/optical-backend/internal/agent/handler"
@@ -154,8 +155,9 @@ func main() {
 	eventCommand := calendarCommand.NewEventCommand(eventRepository)
 	eventQuery := calendarQuery.NewEventQuery(eventRepository)
 	calendarCommand := calendarCommand.NewCalendarCommand(calendarRepository, optionRepository, imageRepository, memberRepository, gmailRepository)
+	memberQuery := calendarQuery.NewMemberQuery(memberRepository)
 	calendarQuery := calendarQuery.NewCalendarQuery(calendarRepository)
-	calendarHandler := calendarHandler.NewCalendarHttpHandler(eventCommand, eventQuery, calendarCommand, calendarQuery)
+	calendarHandler := calendarHandler.NewCalendarHttpHandler(eventCommand, eventQuery, calendarCommand, calendarQuery, memberQuery)
 	noticeRepository := noticeRepository.NewNoticePsqlRepository(db)
 	noticeQueryService := noticeQuery.NewNoticeQuery(noticeRepository)
 	noticeHttpHandler := noticeHandler.NewNoticeHttpHandler(noticeQueryService)
@@ -228,6 +230,7 @@ func main() {
 		r.Delete("/calendars/{calendarId}", calendarHandler.DeleteCalendar)
 
 		// Members
+		r.Get("/calendars/{calendarId}/members", calendarHandler.FindParticipantsMembers)
 		r.Post("/calendars/{calendarId}/members", calendarHandler.CreateMembers)
 		r.Patch("/calendars/{calendarId}/members", calendarHandler.JoinMember)
 		r.Delete("/calendars/{calendarId}/members", calendarHandler.RejectMember)
