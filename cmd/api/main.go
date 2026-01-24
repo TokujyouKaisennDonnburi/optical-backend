@@ -160,11 +160,26 @@ func main() {
 	schedulerQuery := schedulerQuery.NewSchedulerQuery(schedulerRepository, optionRepository)
 	schedulerHandler := schedulerHandler.NewSchedulerHttpHandler(schedulerCommand, schedulerQuery)
 
+	allowedMethods := []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"}
+	allowedHeaders := []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token", "Signature", "X-Signature", "X-Requested-With"}
+
+	// Security headers
+	r.Use(func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+			w.Header().Set("X-Content-Type-Options", "nosniff")
+			w.Header().Set("X-Frame-Options", "DENY")
+			w.Header().Set("Referrer-Policy", "no-referrer")
+			w.Header().Set("Permissions-Policy", "geolocation=(), microphone=(), camera=(), payment=(), usb=()")
+			w.Header().Set("Strict-Transport-Security", "max-age=63072000")
+			next.ServeHTTP(w, req)
+		})
+	})
+
 	r.Use(logs.HttpLogger)
 	r.Use(cors.Handler(cors.Options{
-		AllowedOrigins:   []string{"http://localhost:3000", "https://tokujyoukaisenndonnburi.github.io", "https://opti-cal.org"},
-		AllowedMethods:   []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
-		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
+		AllowedOrigins:   []string{"http://localhost:3000", "https://opti-cal.org"},
+		AllowedMethods:   allowedMethods,
+		AllowedHeaders:   allowedHeaders,
 		AllowCredentials: false,
 		MaxAge:           300,
 	}))
