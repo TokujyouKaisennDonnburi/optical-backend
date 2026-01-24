@@ -780,7 +780,9 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ParticipantsMembersResponse"
+                type: array
+                items:
+                  $ref: "#/components/schemas/GetMemberResponse"
         "400":
           description: Invalid request
         "401":
@@ -2138,16 +2140,40 @@ components:
         joinedAt:
           type: string
           format: date-time
-    ParticipantsMembersResponse:
+    GetMemberResponse:
       type: object
       required:
-        - items
+        - userId
+        - name
+        - joinedAt
       properties:
-        items:
-          type: array
-          description: メンバー一覧
-          items:
-            $ref: "#/components/schemas/ParticipantsMember"
+        userId:
+          type: string
+          format: uuid
+          description: ユーザーID
+          example: "019b1ffe-99a2-7b4b-b013-64596fbbdb70"
+        name:
+          type: string
+          description: ユーザー名
+          example: "TestUser"
+        joinedAt:
+          $ref: "#/components/schemas/NullTime"
+    NullTime:
+      type: object
+      description: sql.NullTime形式。Validがfalseの場合は未参加
+      required:
+        - Time
+        - Valid
+      properties:
+        Time:
+          type: string
+          format: date-time
+          description: 参加日時
+          example: "2025-01-15T10:30:00Z"
+        Valid:
+          type: boolean
+          description: 参加済みかどうか
+          example: true
     ParticipantsMember:
       type: object
       required:
