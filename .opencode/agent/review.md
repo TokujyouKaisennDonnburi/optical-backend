@@ -1,7 +1,7 @@
 ---
 description: Reviews code for quality and best practices
 mode: primary
-model: opencode/glm-4.7-free
+model: opencode/big-pickle
 temperature: 0.1
 tools:
   write: false
@@ -54,7 +54,7 @@ tools:
 
 ## 出力テンプレート
 
-# GLM-4.7によるレビュー
+# AIによるレビュー
 
 画像ここに添付する
 
