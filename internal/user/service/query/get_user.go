@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/TokujouKaisenDonburi/optical-backend/internal/user/service/query/output"
+	"github.com/TokujouKaisenDonburi/optical-backend/pkg/storage"
 	"github.com/google/uuid"
 )
 
@@ -16,5 +17,16 @@ func (q *UserQuery) GetUser(
 	ctx context.Context,
 	input UserQueryInput,
 ) (*output.UserQueryOutput, error) {
-	return q.userRepository.FindProfileById(ctx, input.UserId)
+	output, err := q.userRepository.FindProfileById(ctx, input.UserId)
+	if err != nil {
+		return nil, err
+	}
+	if output.Avatar.Valid {
+		if output.Avatar.IsRelativePath {
+			output.AvatarUrl = storage.GetImageStorageBaseUrl() + "/" + output.Avatar.Url
+		} else {
+			output.AvatarUrl = output.Avatar.Url
+		}
+	}
+	return output, nil
 }

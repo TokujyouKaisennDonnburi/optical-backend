@@ -48,12 +48,13 @@ func (r *AvatarPsqlAndMinioRepository) Upload(ctx context.Context, file multipar
 func (r *AvatarPsqlAndMinioRepository) Save(ctx context.Context, userId uuid.UUID, avatar *user.Avatar) error {
 	return db.RunInTx(r.db, func(tx *sqlx.Tx) error {
 		query := `
-			INSERT INTO avatars(id, url)
-			VALUES(:id, :url)
+			INSERT INTO avatars(id, url, is_relative_path)
+			VALUES(:id, :url, :isRelativePath)
 		`
 		_, err := tx.NamedExecContext(ctx, query, map[string]any{
-			"id":  avatar.Id,
-			"url": avatar.Url,
+			"id":             avatar.Id,
+			"url":            avatar.Url,
+			"isRelativePath": avatar.IsRelativePath,
 		})
 		if err != nil {
 			return err

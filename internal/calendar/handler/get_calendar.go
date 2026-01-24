@@ -17,7 +17,7 @@ type CalendarResponse struct {
 	Id      string                    `json:"id"`
 	Name    string                    `json:"name"`
 	Color   string                    `json:"color"`
-	Image   string                    `json:"imageUrl"`
+	Image   string                    `json:"imageUrl,omitempty"`
 	Members []CalendarMemberResponse  `json:"member"`
 	Options []CalendarOptionsResponse `json:"option"`
 }
@@ -74,7 +74,7 @@ func (h *CalendarHttpHandler) GetCalendar(w http.ResponseWriter, r *http.Request
 		Id:      output.Id.String(),
 		Name:    output.Name,
 		Color:   string(output.Color),
-		Image:   output.Image.Url,
+		Image:   output.ImageUrl,
 		Members: members,
 		Options: options,
 	}

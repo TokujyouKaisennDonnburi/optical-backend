@@ -6,8 +6,9 @@ import (
 )
 
 type CalendarListQueryOutput struct {
-	Id    uuid.UUID
-	Name  string
-	Color string
-	Image calendar.Image
+	Id       uuid.UUID
+	Name     string
+	Color    string
+	Image    calendar.Image
+	ImageUrl string
 }

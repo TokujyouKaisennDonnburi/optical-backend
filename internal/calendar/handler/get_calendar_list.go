@@ -11,10 +11,10 @@ import (
 
 
 type CalendarListResponse struct {
-	Id       string  `json:"id"`
-	Name     string  `json:"name"`
-	Color    string  `json:"color"`
-	ImageUrl *string `json:"imageUrl"`
+	Id       string `json:"id"`
+	Name     string `json:"name"`
+	Color    string `json:"color"`
+	ImageUrl string `json:"imageUrl"`
 }
 
 // カレンダー一覧を取得する
@@ -36,15 +36,11 @@ func (h *CalendarHttpHandler) GetCalendars(w http.ResponseWriter, r *http.Reques
 	// レスポンスに変換
 	calendars := make([]CalendarListResponse, len(output))
 	for i, cal := range output {
-		var imageUrl *string = nil
-		if cal.Image.Valid {
-			imageUrl = &cal.Image.Url
-		}
 		calendars[i] = CalendarListResponse{
 			Id:       cal.Id.String(),
 			Name:     cal.Name,
 			Color:    cal.Color,
-			ImageUrl: imageUrl,
+			ImageUrl: cal.ImageUrl,
 		}
 	}
 	render.JSON(w, r, calendars)

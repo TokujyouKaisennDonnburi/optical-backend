@@ -14,7 +14,7 @@ type UserResponse struct {
 	Id        string    `json:"id"`
 	Name      string    `json:"name"`
 	Email     string    `json:"email"`
-	AvatarUrl *string   `json:"avatarUrl"`
+	AvatarUrl string    `json:"avatarUrl,omitempty"`
 	CreatedAt time.Time `json:"createdAt"`
 	UpdatedAt time.Time `json:"updatedAt"`
 }
@@ -39,11 +39,10 @@ func (h *UserHttpHandler) GetMe(w http.ResponseWriter, r *http.Request) {
 		Id:        output.Id.String(),
 		Name:      output.Name,
 		Email:     output.Email,
+		AvatarUrl: output.AvatarUrl,
 		CreatedAt: output.CreatedAt,
 		UpdatedAt: output.UpdatedAt,
 	}
-	if output.Avatar.Valid {
-		response.AvatarUrl = &output.Avatar.Url
-	}
+
 	render.JSON(w, r, response)
 }

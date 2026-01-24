@@ -15,13 +15,13 @@ type Profile struct {
 }
 
 // NewProfile
-func NewProfile(userId uuid.UUID, imageUrl string) (*Profile, error) {
+func NewProfile(userId uuid.UUID, imageUrl string, isRelativePath bool) (*Profile, error) {
 	now := time.Now().UTC()
 	id, err := uuid.NewV7()
 	if err != nil {
 		return nil, err
 	}
-	avatar, err := NewAvatar(imageUrl)
+	avatar, err := NewAvatar(imageUrl, isRelativePath)
 	if err != nil {
 		return nil, err
 	}

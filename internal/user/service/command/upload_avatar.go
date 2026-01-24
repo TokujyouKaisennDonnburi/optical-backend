@@ -44,16 +44,19 @@ func (c *UserCommand) UploadAvatar(ctx context.Context, input UploadAvatarInput)
 	if !found {
 		return nil, apperr.ValidationError("invalid image ext")
 	}
+	// アバター情報を作成
+	avatar, err := user.NewAvatar("", true)
+	if err != nil {
+		return nil, err
+	}
+	input.Header.Filename = avatar.Id.String() + ".png"
 	// 画像をストレージにアップロード
 	url, err := c.avatarRepository.Upload(ctx, input.File, input.Header)
 	if err != nil {
 		return nil, err
 	}
-	// URLを元にアバター作成
-	avatar, err := user.NewAvatar(storage.GetImageStorageBaseUrl() + "/" + url)
-	if err != nil {
-		return nil, err
-	}
+	// URLを設定（ベースURLなしのパスを保存）
+	avatar.SetUrl(url)
 	// アバターをリポジトリに保存
 	err = c.avatarRepository.Save(ctx, input.UserId, avatar)
 	if err != nil {
@@ -61,6 +64,6 @@ func (c *UserCommand) UploadAvatar(ctx context.Context, input UploadAvatarInput)
 	}
 	return &UploadAvatarOutput{
 		Id:  avatar.Id,
-		Url: avatar.Url,
+		Url: storage.GetImageStorageBaseUrl() + "/" + avatar.Url,
 	}, nil
 }
