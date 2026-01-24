@@ -16,15 +16,23 @@ type MemberQueryInput struct {
 
 // メンバー一覧取得
 func (q *MemberQuery) GetMembers(ctx context.Context, input MemberQueryInput) ([]output.MembersQueryOutput, error) {
-	// 権限チェック: ユーザーがカレンダーのメンバーか確認
-	exists, err := q.memberRepository.ExistsMemberByUserIdAndCalendarId(ctx, input.UserId, input.CalendarId)
+	// メンバー一覧取得
+	members, err := q.memberRepository.FindMembers(ctx, input.CalendarId)
 	if err != nil {
 		return nil, err
 	}
-	if !exists {
+
+	// 権限チェック: ユーザーがカレンダーのメンバーか確認
+	isMember := false
+	for _, m := range members {
+		if m.UserId == input.UserId {
+			isMember = true
+			break
+		}
+	}
+	if !isMember {
 		return nil, apperr.ForbiddenError("not a member of this calendar")
 	}
 
-	// メンバー一覧取得
-	return q.memberRepository.FindMembers(ctx, input.CalendarId)
+	return members, nil
 }

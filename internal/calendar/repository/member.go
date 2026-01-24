@@ -11,9 +11,6 @@ type MemberRepository interface {
 	Invite(ctx context.Context, userId, calendarId uuid.UUID, emails []user.Email) error
 	Join(ctx context.Context, userId, calendarId uuid.UUID) error
 	Reject(ctx context.Context, userId, calendarId uuid.UUID) error
-
-	// 権限チェック
-	ExistsMemberByUserIdAndCalendarId(ctx context.Context, userId, calendarId uuid.UUID) (bool, error)
-	// メンバー
+	// カレンダーメンバー取得
 	FindMembers(ctx context.Context, calendarId uuid.UUID) ([]output.MembersQueryOutput, error)
 }

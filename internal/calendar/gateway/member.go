@@ -110,21 +110,6 @@ func (r *MemberPsqlRepository) Reject(ctx context.Context, userId, calendarId uu
 	return nil
 }
 
-// カレンダーのメンバーかの権限チェック
-func (r *MemberPsqlRepository) ExistsMemberByUserIdAndCalendarId(ctx context.Context, userId, calendarId uuid.UUID) (bool, error) {
-	query := `
-          SELECT EXISTS (
-              SELECT 1 FROM calendar_members
-              WHERE user_id = $1
-              AND calendar_id = $2
-              AND joined_at IS NOT NULL
-          )
-      `
-	var exists bool
-	err := r.db.GetContext(ctx, &exists, query, userId, calendarId)
-	return exists, err
-}
-
 // カレンダーメンバー一覧取得
 func (r *MemberPsqlRepository) FindMembers(ctx context.Context, calendarId uuid.UUID) ([]output.MembersQueryOutput, error) {
 	query := `
