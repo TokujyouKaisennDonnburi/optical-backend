@@ -12,16 +12,11 @@ import (
 	"github.com/google/uuid"
 )
 
-// 個々のメンバー
-type ParticipantsMemberResponse struct {
+// 返却
+type GetMemberResponse struct {
 	UserId   uuid.UUID    `json:"userId"`
 	Name     string       `json:"name"`
 	JoinedAt sql.NullTime `json:"joinedAt"`
-}
-
-// レスポンス全体
-type FindMembersResponse struct {
-	Items []ParticipantsMemberResponse `json:"items"`
 }
 
 // メンバー一覧
@@ -51,9 +46,9 @@ func (h *CalendarHttpHandler) GetMembers(w http.ResponseWriter, r *http.Request)
 	}
 
 	// レスポンスデータの作成
-	items := make([]ParticipantsMemberResponse, len(outputs))
+	items := make([]GetMemberResponse, len(outputs))
 	for i, o := range outputs {
-		items[i] = ParticipantsMemberResponse{
+		items[i] = GetMemberResponse{
 			UserId:   o.UserId,
 			Name:     o.Name,
 			JoinedAt: o.JoinedAt,
@@ -61,7 +56,5 @@ func (h *CalendarHttpHandler) GetMembers(w http.ResponseWriter, r *http.Request)
 	}
 
 	// 返却
-	render.JSON(w, r, &FindMembersResponse{
-		Items: items,
-	})
+	render.JSON(w, r, items)
 }
