@@ -760,7 +760,7 @@ paths:
   /calendars/{calendarId}/members:
     get:
       summary: Get participants members of a calendar
-      description: カレンダーの参加済みメンバー一覧を取得します。ユーザーはカレンダーのメンバーである必要があります。
+      description: カレンダーメンバー一覧を取得します。ユーザーはカレンダーのメンバーである必要があります。
       tags:
         - members
       security:
@@ -2145,7 +2145,7 @@ components:
       properties:
         items:
           type: array
-          description: 参加済みメンバー一覧
+          description: メンバー一覧
           items:
             $ref: "#/components/schemas/ParticipantsMember"
     ParticipantsMember:

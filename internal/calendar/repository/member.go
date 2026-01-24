@@ -14,8 +14,6 @@ type MemberRepository interface {
 
 	// 権限チェック
 	ExistsMemberByUserIdAndCalendarId(ctx context.Context, userId, calendarId uuid.UUID) (bool, error)
-	// 参加済み
-	FindParticipantsMembers(ctx context.Context, calendarId uuid.UUID) ([]output.ParticipantsMembersQueryOutput, error)
-	// 招待中(ToDo)
+	// メンバー
+	FindMembers(ctx context.Context, calendarId uuid.UUID) ([]output.MembersQueryOutput, error)
 }
-

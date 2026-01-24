@@ -20,12 +20,12 @@ type ParticipantsMemberResponse struct {
 }
 
 // レスポンス全体
-type FindParticipantsMembersResponse struct {
+type FindMembersResponse struct {
 	Items []ParticipantsMemberResponse `json:"items"`
 }
 
-// 参加済みメンバー
-func (h *CalendarHttpHandler) FindParticipantsMembers(w http.ResponseWriter, r *http.Request) {
+// メンバー一覧
+func (h *CalendarHttpHandler) GetMembers(w http.ResponseWriter, r *http.Request) {
 	// user認証
 	userId, err := auth.GetUserIdFromContext(r)
 	if err != nil {
@@ -40,8 +40,8 @@ func (h *CalendarHttpHandler) FindParticipantsMembers(w http.ResponseWriter, r *
 		return
 	}
 
-	// 参加済みメンバーの取得
-	outputs, err := h.memberQuery.GetParticipantsMembers(r.Context(), query.MemberQueryInput{
+	// メンバーの取得
+	outputs, err := h.memberQuery.GetMembers(r.Context(), query.MemberQueryInput{
 		UserId:     userId,
 		CalendarId: calendarId,
 	})
@@ -61,7 +61,7 @@ func (h *CalendarHttpHandler) FindParticipantsMembers(w http.ResponseWriter, r *
 	}
 
 	// 返却
-	render.JSON(w, r, &FindParticipantsMembersResponse{
+	render.JSON(w, r, &FindMembersResponse{
 		Items: items,
 	})
 }

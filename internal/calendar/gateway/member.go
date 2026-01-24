@@ -126,7 +126,7 @@ func (r *MemberPsqlRepository) ExistsMemberByUserIdAndCalendarId(ctx context.Con
 }
 
 // カレンダーメンバー一覧取得
-func (r *MemberPsqlRepository) FindParticipantsMembers(ctx context.Context, calendarId uuid.UUID) ([]output.ParticipantsMembersQueryOutput, error) {
+func (r *MemberPsqlRepository) FindMembers(ctx context.Context, calendarId uuid.UUID) ([]output.MembersQueryOutput, error) {
 	query := `
 		SELECT
 			cm.user_id,
@@ -144,9 +144,9 @@ func (r *MemberPsqlRepository) FindParticipantsMembers(ctx context.Context, cale
 		return nil, err
 	}
 
-	members := make([]output.ParticipantsMembersQueryOutput, len(rows))
+	members := make([]output.MembersQueryOutput, len(rows))
 	for i, row := range rows {
-		members[i] = output.ParticipantsMembersQueryOutput{
+		members[i] = output.MembersQueryOutput{
 			UserId:   row.UserId,
 			Name:     row.UserName,
 			JoinedAt: row.JoinedAt,

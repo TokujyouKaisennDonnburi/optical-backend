@@ -14,8 +14,8 @@ type MemberQueryInput struct {
 	CalendarId uuid.UUID
 }
 
-// 参加済みメンバー一覧取得
-func (q *MemberQuery) GetParticipantsMembers(ctx context.Context, input MemberQueryInput) ([]output.ParticipantsMembersQueryOutput, error) {
+// メンバー一覧取得
+func (q *MemberQuery) GetMembers(ctx context.Context, input MemberQueryInput) ([]output.MembersQueryOutput, error) {
 	// 権限チェック: ユーザーがカレンダーのメンバーか確認
 	exists, err := q.memberRepository.ExistsMemberByUserIdAndCalendarId(ctx, input.UserId, input.CalendarId)
 	if err != nil {
@@ -26,5 +26,5 @@ func (q *MemberQuery) GetParticipantsMembers(ctx context.Context, input MemberQu
 	}
 
 	// メンバー一覧取得
-	return q.memberRepository.FindParticipantsMembers(ctx, input.CalendarId)
+	return q.memberRepository.FindMembers(ctx, input.CalendarId)
 }

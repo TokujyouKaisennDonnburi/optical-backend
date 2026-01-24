@@ -230,7 +230,7 @@ func main() {
 		r.Delete("/calendars/{calendarId}", calendarHandler.DeleteCalendar)
 
 		// Members
-		r.Get("/calendars/{calendarId}/members", calendarHandler.FindParticipantsMembers)
+		r.Get("/calendars/{calendarId}/members", calendarHandler.GetMembers)
 		r.Post("/calendars/{calendarId}/members", calendarHandler.CreateMembers)
 		r.Patch("/calendars/{calendarId}/members", calendarHandler.JoinMember)
 		r.Delete("/calendars/{calendarId}/members", calendarHandler.RejectMember)
