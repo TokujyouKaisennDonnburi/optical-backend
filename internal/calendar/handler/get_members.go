@@ -1,8 +1,8 @@
 package handler
 
 import (
+	"database/sql"
 	"net/http"
-	"time"
 
 	"github.com/TokujouKaisenDonburi/optical-backend/internal/calendar/service/query"
 	"github.com/TokujouKaisenDonburi/optical-backend/pkg/apperr"
@@ -14,9 +14,9 @@ import (
 
 // 個々のメンバー
 type ParticipantsMemberResponse struct {
-	UserId   uuid.UUID `json:"userId"`
-	Name     string    `json:"name"`
-	JoinedAt time.Time `json:"joinedAt"`
+	UserId   uuid.UUID    `json:"userId"`
+	Name     string       `json:"name"`
+	JoinedAt sql.NullTime `json:"joinedAt"`
 }
 
 // レスポンス全体

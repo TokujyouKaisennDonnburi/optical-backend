@@ -2,7 +2,7 @@ package gateway
 
 import (
 	"context"
-	"time"
+	"database/sql"
 
 	"github.com/TokujouKaisenDonburi/optical-backend/internal/calendar/service/query/output"
 	"github.com/TokujouKaisenDonburi/optical-backend/internal/user"
@@ -17,9 +17,9 @@ type MemberPsqlRepository struct {
 }
 
 type MemberQueryModel struct {
-	UserId   uuid.UUID `db:"user_id"`
-	UserName string    `db:"user_name"`
-	JoinedAt time.Time `db:"joined_at"`
+	UserId   uuid.UUID    `db:"user_id"`
+	UserName string       `db:"user_name"`
+	JoinedAt sql.NullTime `db:"joined_at"`
 }
 
 func NewMemberPsqlRepository(db *sqlx.DB) *MemberPsqlRepository {
@@ -135,7 +135,6 @@ func (r *MemberPsqlRepository) FindMembers(ctx context.Context, calendarId uuid.
 		FROM calendar_members cm
 		INNER JOIN users u ON u.id = cm.user_id
 		WHERE cm.calendar_id = $1
-		AND cm.joined_at IS NOT NULL
 		ORDER BY cm.joined_at ASC
 	`
 	var rows []MemberQueryModel
