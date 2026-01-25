@@ -239,8 +239,10 @@ func main() {
 
 		// Members
 		r.Get("/calendars/{calendarId}/members", calendarHandler.GetMembers)
-		r.Post("/calendars/{calendarId}/members", calendarHandler.CreateMembers)
-		r.Patch("/calendars/{calendarId}/members", calendarHandler.JoinMember)
+		r.Post("/calendars/{calendarId}/members", calendarHandler.CreateMembers) // 使わない
+		r.Post("/calendars/{calendarId}/invitations", calendarHandler.CreateInvitations)
+		r.Patch("/calendars/{calendarId}/members", calendarHandler.JoinMember) // 使わない
+		r.Post("/calendars/{calendarId}/join", calendarHandler.JoinMemberWithToken)
 		r.Delete("/calendars/{calendarId}/members", calendarHandler.RejectMember)
 
 		// Events
