@@ -9,7 +9,7 @@ import (
 )
 
 type UserRepository interface {
-	Create(ctx context.Context, user *user.User) error
+	Create(ctx context.Context, user *user.User, createFn... func(ctx context.Context)) error
 	Update(
 		ctx context.Context,
 		userId uuid.UUID,

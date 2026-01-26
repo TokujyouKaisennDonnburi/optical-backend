@@ -26,22 +26,24 @@ func NewUserPsqlRepository(db *sqlx.DB) *UserPsqlRepository {
 }
 
 func (r *UserPsqlRepository) Create(ctx context.Context, user *user.User) error {
-	query := `
-		INSERT INTO users(id, name, email, password_hash, created_at, updated_at)
-		VALUES(:id, :name, :email, :password, :createdAt, :updatedAt)
-	`
-	_, err := r.db.NamedExecContext(ctx, query, map[string]any{
-		"id":        user.Id,
-		"name":      user.Name,
-		"email":     user.Email,
-		"password":  user.Password,
-		"createdAt": user.CreatedAt,
-		"updatedAt": user.UpdatedAt,
-	})
-	if err != nil {
+	return db.RunInTx(r.db, func(tx *sqlx.Tx) error {
+		query := `
+			INSERT INTO users(id, name, email, password_hash, created_at, updated_at)
+			VALUES(:id, :name, :email, :password, :createdAt, :updatedAt)
+		`
+		_, err := tx.NamedExecContext(ctx, query, map[string]any{
+			"id":        user.Id,
+			"name":      user.Name,
+			"email":     user.Email,
+			"password":  user.Password,
+			"createdAt": user.CreatedAt,
+			"updatedAt": user.UpdatedAt,
+		})
+		if err != nil {
+			return err
+		}
 		return err
-	}
-	return nil
+	})
 }
 
 func (r *UserPsqlRepository) Update(
