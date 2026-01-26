@@ -1,7 +1,7 @@
 package output
 
 import (
-	"database/sql"
+	"time"
 
 	"github.com/google/uuid"
 )
@@ -10,5 +10,5 @@ import (
 type MembersQueryOutput struct {
 	UserId   uuid.UUID
 	Name     string
-	JoinedAt sql.NullTime
+	JoinedAt time.Time
 }

@@ -133,7 +133,7 @@ func (r *MemberPsqlRepository) FindMembers(ctx context.Context, calendarId uuid.
 		members[i] = output.MembersQueryOutput{
 			UserId:   row.UserId,
 			Name:     row.UserName,
-			JoinedAt: row.JoinedAt,
+			JoinedAt: row.JoinedAt.Time,
 		}
 	}
 	return members, nil

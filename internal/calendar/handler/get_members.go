@@ -1,8 +1,8 @@
 package handler
 
 import (
-	"database/sql"
 	"net/http"
+	"time"
 
 	"github.com/TokujouKaisenDonburi/optical-backend/internal/calendar/service/query"
 	"github.com/TokujouKaisenDonburi/optical-backend/pkg/apperr"
@@ -14,9 +14,9 @@ import (
 
 // 返却
 type GetMemberResponse struct {
-	UserId   uuid.UUID    `json:"userId"`
-	Name     string       `json:"name"`
-	JoinedAt sql.NullTime `json:"joinedAt"`
+	UserId   uuid.UUID `json:"userId"`
+	Name     string    `json:"name"`
+	JoinedAt time.Time `json:"joinedAt,omitempty"`
 }
 
 // メンバー一覧
@@ -55,6 +55,5 @@ func (h *CalendarHttpHandler) GetMembers(w http.ResponseWriter, r *http.Request)
 		}
 	}
 
-	// 返却
 	render.JSON(w, r, items)
 }

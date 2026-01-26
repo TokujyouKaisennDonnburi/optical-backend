@@ -2145,7 +2145,6 @@ components:
       required:
         - userId
         - name
-        - joinedAt
       properties:
         userId:
           type: string
@@ -2157,23 +2156,10 @@ components:
           description: ユーザー名
           example: "TestUser"
         joinedAt:
-          $ref: "#/components/schemas/NullTime"
-    NullTime:
-      type: object
-      description: sql.NullTime形式。Validがfalseの場合は未参加
-      required:
-        - Time
-        - Valid
-      properties:
-        Time:
           type: string
           format: date-time
-          description: 参加日時
+          description: 参加日時（未参加の場合はフィールドが省略される）
           example: "2025-01-15T10:30:00Z"
-        Valid:
-          type: boolean
-          description: 参加済みかどうか
-          example: true
     ParticipantsMember:
       type: object
       required:
