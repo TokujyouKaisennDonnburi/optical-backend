@@ -1,6 +1,6 @@
 
 -- +migrate Up
-ALTER TABLE events ADD COLUMN user_id VARCHAR(255) NOT NULL;
+ALTER TABLE events ADD COLUMN user_id UUID NOT NULL;
 COMMENT ON COLUMN events.user_id IS '作成者ID';
 
 -- +migrate Down
