@@ -1,0 +1,55 @@
+get:
+  summary: Get review load status for a calendar
+  tags: [github]
+  security:
+    - bearerAuth: []
+  parameters:
+    - name: calendarId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+  responses:
+    '200':
+      description: Review load status retrieved successfully
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/GithubReviewLoadStatusListResponse'
+    '400':
+      description: Invalid request
+    '500':
+      description: Internal server error
+
+components:
+  schemas:
+    GithubReviewLoadStatusListResponse:
+      type: object
+      properties:
+        repositoryId:
+          type: integer
+          format: int64
+        repositoryName:
+          type: string
+        total:
+          type: integer
+        reviewers:
+          type: array
+          items:
+            $ref: '#/components/schemas/GithubReviewLoadStatusListResponseItem'
+    GithubReviewLoadStatusListResponseItem:
+      type: object
+      properties:
+        githubId:
+          type: integer
+          format: int64
+        githubName:
+          type: string
+        githubUrl:
+          type: string
+          format: url
+        assigned:
+          type: integer
