@@ -2,6 +2,7 @@ package handler
 
 import (
 	"net/http"
+	"time"
 
 	"github.com/TokujouKaisenDonburi/optical-backend/internal/scheduler/service/query"
 	"github.com/TokujouKaisenDonburi/optical-backend/pkg/apperr"
@@ -10,6 +11,22 @@ import (
 	"github.com/go-chi/render"
 	"github.com/google/uuid"
 )
+
+type SchedulerResponse struct {
+	Id           uuid.UUID             `json:"id"`
+	CalendarId   uuid.UUID             `json:"calendarId"`
+	UserId       uuid.UUID             `json:"userId"`
+	Title        string                `json:"title"`
+	Memo         string                `json:"memo"`
+	LimitTime    time.Time             `json:"limitTime"`
+	IsAllDay     bool                  `json:"isAllDay"`
+	PossibleDate []PossibleDateResponse `json:"possibleDate"`
+}
+type PossibleDateResponse struct {
+	Date      time.Time `json:"date"`
+	StartTime time.Time `json:"startTime"`
+	EndTime   time.Time `json:"endTime"`
+}
 
 func (h *SchedulerHttpHandler) GetScheduler(w http.ResponseWriter, r *http.Request) {
 	// userId
@@ -39,6 +56,24 @@ func (h *SchedulerHttpHandler) GetScheduler(w http.ResponseWriter, r *http.Reque
 		apperr.HandleAppError(w, r, err)
 		return
 	}
+	responseDates := make([]PossibleDateResponse, len(result.PossibleDate))
+	for i, v := range result.PossibleDate {
+		responseDates[i] = PossibleDateResponse{
+			Date:      v.Date,
+			StartTime: v.StartTime,
+			EndTime:   v.EndTime,
+		}
+	}
+	responseResult := SchedulerResponse{
+		Id:           result.Id,
+		CalendarId:   result.CalendarId,
+		UserId:       result.UserId,
+		Title:        result.Title,
+		Memo:         result.Memo,
+		LimitTime:    result.LimitTime,
+		IsAllDay:     result.IsAllDay,
+		PossibleDate: responseDates,
+	}
 	// response
-	render.JSON(w, r, result)
+	render.JSON(w, r, responseResult)
 }

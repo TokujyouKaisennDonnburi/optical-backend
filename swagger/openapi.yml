@@ -1492,15 +1492,15 @@ components:
     SchedulerResultResponse:
       type: object
       required:
-        - owner_id
+        - ownerId
         - title
         - memo
-        - limit_time
-        - is_allday
+        - limitTime
+        - isAllDay
         - members
         - date
       properties:
-        owner_id:
+        ownerId:
           type: string
           format: uuid
           description: Owner user ID
@@ -1510,11 +1510,11 @@ components:
         memo:
           type: string
           description: Scheduler memo/description
-        limit_time:
+        limitTime:
           type: string
           format: date-time
           description: Deadline for responses
-        is_allday:
+        isAllDay:
           type: boolean
           description: Whether this is an all-day scheduler
         members:
@@ -1530,32 +1530,32 @@ components:
     SchedulerMemberResponse:
       type: object
       required:
-        - user_id
-        - user_name
+        - userId
+        - userName
       properties:
-        user_id:
+        userId:
           type: string
           format: uuid
           description: User ID
         user_name:
           type: string
-          description: User name
+          deScription: User name
     SchedulerDateResponse:
       type: object
       required:
         - date
-        - start_time
-        - end_time
+        - startTime
+        - endTime
       properties:
         date:
           type: string
           format: date-time
           description: The date of the possible time slot
-        start_time:
+        startTime:
           type: string
           format: date-time
           description: Start time of the possible time slot
-        end_time:
+        endTime:
           type: string
           format: date-time
           description: End time of the possible time slot
@@ -1645,11 +1645,11 @@ components:
     GetAttendanceResponse:
       type: object
       required:
-        - user_id
+        - userId
         - comment
         - status
       properties:
-        user_id:
+        userId:
           type: string
           format: uuid
         comment:
@@ -1696,10 +1696,10 @@ components:
         id:
           type: string
           format: uuid
-        calendarId:
+        calendar_id:
           type: string
           format: uuid
-        calendarColor:
+        calendar_color:
           type: string
         title:
           type: string
@@ -1707,15 +1707,15 @@ components:
           type: string
         location:
           type: string
-        isAllDay:
+        is_all_day:
           type: boolean
-        startAt:
+        start_at:
           type: string
           format: date-time
         endAt:
           type: string
           format: date-time
-        createdAt:
+        created_at:
           type: string
           format: date-time
     TokenRefreshRequest:
@@ -1902,6 +1902,38 @@ components:
           type: string
           format: date-time
         isAllDay:
+          type: boolean
+    AllSchedulerResponse:
+      type: object
+      required:
+        - id
+        - calendar_id
+        - user_id
+        - title
+        - memo
+        - limit_time
+        - is_all_day
+        - is_done
+      properties:
+        id:
+          type: string
+          format: uuid
+        calendar_id:
+          type: string
+          format: uuid
+        user_id:
+          type: string
+          format: uuid
+        title:
+          type: string
+        memo:
+          type: string
+        limit_time:
+          type: string
+          format: date-time
+        is_all_day:
+          type: boolean
+        is_done:
           type: boolean
     MemberCreateRequest:
       type: object

@@ -14,13 +14,13 @@ import (
 
 type AllSchedulerResponse struct {
 	Id         uuid.UUID `json:"id"`
-	CalendarId uuid.UUID `json:"calendar_id"`
-	UserId     uuid.UUID `json:"user_id"`
+	CalendarId uuid.UUID `json:"calendarId"`
+	UserId     uuid.UUID `json:"userId"`
 	Title      string    `json:"title"`
 	Memo       string    `json:"memo"`
-	LimitTime  time.Time `json:"limit_time"`
-	IsAllDay   bool      `json:"is_allday"`
-	IsDone     bool      `json:"is_done"`
+	LimitTime  time.Time `json:"limitTime"`
+	IsAllDay   bool      `json:"isAllDay"`
+	IsDone     bool      `json:"isDone"`
 }
 
 func (h *SchedulerHttpHandler) GetAllScheduler(w http.ResponseWriter, r *http.Request) {

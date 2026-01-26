@@ -13,17 +13,17 @@ import (
 )
 
 type SchedulerResultResponse struct {
-	OwnerId   uuid.UUID        `json:"owner_id"`
+	OwnerId   uuid.UUID        `json:"ownerId"`
 	Title     string           `json:"title"`
 	Memo      string           `json:"memo"`
-	LimitTime time.Time        `json:"limit_time"`
-	IsAllDay  bool             `json:"is_allday"`
+	LimitTime time.Time        `json:"limitTime"`
+	IsAllDay  bool             `json:"isAllDay"`
 	Members   []MemberResponse `json:"members"`
 	Date      []DateResponse   `json:"date"`
 }
 type MemberResponse struct {
-	UserId   uuid.UUID `json:"user_id"`
-	UserName string    `json:"user_name"`
+	UserId   uuid.UUID `json:"userId"`
+	UserName string    `json:"userName"`
 }
 type DateResponse struct {
 	Date      time.Time `json:"date"`
