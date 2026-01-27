@@ -27,8 +27,8 @@ type MemberResponse struct {
 }
 type DateResponse struct {
 	Date      time.Time `json:"date"`
-	StartTime time.Time `json:"start_time"`
-	EndTime   time.Time `json:"end_time"`
+	StartTime time.Time `json:"startTime"`
+	EndTime   time.Time `json:"endTime"`
 }
 
 func (h *SchedulerHttpHandler) GetResult(w http.ResponseWriter, r *http.Request) {
