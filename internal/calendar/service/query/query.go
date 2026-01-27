@@ -27,3 +27,17 @@ func NewCalendarQuery(calendarRepository repository.CalendarRepository) *Calenda
 	}
 }
 
+// メンバー関連のクエリサービス
+type MemberQuery struct {
+	memberRepository repository.MemberRepository
+}
+
+// MemberQueryのコンストラクタ
+func NewMemberQuery(memberRepository repository.MemberRepository) *MemberQuery {
+	if memberRepository == nil {
+		panic("MemberRepository is nil")
+	}
+	return &MemberQuery{
+		memberRepository: memberRepository,
+	}
+}

@@ -2,7 +2,9 @@ package gateway
 
 import (
 	"context"
+	"database/sql"
 
+	"github.com/TokujouKaisenDonburi/optical-backend/internal/calendar/service/query/output"
 	"github.com/TokujouKaisenDonburi/optical-backend/internal/user"
 	"github.com/TokujouKaisenDonburi/optical-backend/pkg/apperr"
 	"github.com/google/uuid"
@@ -12,6 +14,12 @@ import (
 
 type MemberPsqlRepository struct {
 	db *sqlx.DB
+}
+
+type MemberQueryModel struct {
+	UserId   uuid.UUID    `db:"user_id"`
+	UserName string       `db:"user_name"`
+	JoinedAt sql.NullTime `db:"joined_at"`
 }
 
 func NewMemberPsqlRepository(db *sqlx.DB) *MemberPsqlRepository {
@@ -100,4 +108,33 @@ func (r *MemberPsqlRepository) Reject(ctx context.Context, userId, calendarId uu
 		return apperr.NotFoundError("user or calendar or joined not found")
 	}
 	return nil
+}
+
+// カレンダーメンバー一覧取得
+func (r *MemberPsqlRepository) FindMembers(ctx context.Context, calendarId uuid.UUID) ([]output.MembersQueryOutput, error) {
+	query := `
+		SELECT
+			cm.user_id,
+			u.name AS user_name,
+			cm.joined_at
+		FROM calendar_members cm
+		INNER JOIN users u ON u.id = cm.user_id
+		WHERE cm.calendar_id = $1
+		ORDER BY cm.joined_at ASC
+	`
+	var rows []MemberQueryModel
+	err := r.db.SelectContext(ctx, &rows, query, calendarId)
+	if err != nil {
+		return nil, err
+	}
+
+	members := make([]output.MembersQueryOutput, len(rows))
+	for i, row := range rows {
+		members[i] = output.MembersQueryOutput{
+			UserId:   row.UserId,
+			Name:     row.UserName,
+			JoinedAt: row.JoinedAt.Time,
+		}
+	}
+	return members, nil
 }
