@@ -17,7 +17,7 @@ func (r *TodoPsqlRepository) AddItem(
 	listId uuid.UUID,
 	todoItem *todo.Item,
 ) error {
-	return db.RunInTx(r.db, func(tx *sqlx.Tx) error {
+	return db.RunInTx(ctx, r.db, func(ctx context.Context, tx *sqlx.Tx) error {
 		todoList, err := psql.FindTodoListById(ctx, tx, listId)
 		if err != nil {
 			return err

@@ -31,7 +31,7 @@ func (r *GithubApiRepository) CreateUser(
 		return nil, err
 	}
 	var newUser *user.User
-	err = db.RunInTx(r.db, func(tx *sqlx.Tx) error {
+	err = db.RunInTx(ctx, r.db, func(ctx context.Context, tx *sqlx.Tx) error {
 		newUser, err = psql.FindUserByGithubSSO(ctx, tx, githubUser.Id)
 		if err == nil {
 			return updateGithubUser(ctx, tx, newUser.Id, githubUser)

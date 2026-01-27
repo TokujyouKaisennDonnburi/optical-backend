@@ -13,7 +13,7 @@ import (
 func (r *UserPsqlRepository) FindByEmail(ctx context.Context, email string) (*user.User, error) {
 	var err error
 	var user *user.User
-	err = db.RunInTx(r.db, func(tx *sqlx.Tx) error {
+	err = db.RunInTx(ctx, r.db, func(ctx context.Context, tx *sqlx.Tx) error {
 		user, err = psql.FindUserByEmail(ctx, tx, email)
 		return err
 	})
@@ -23,7 +23,7 @@ func (r *UserPsqlRepository) FindByEmail(ctx context.Context, email string) (*us
 func (r *UserPsqlRepository) FindById(ctx context.Context, id uuid.UUID) (*user.User, error) {
 	var err error
 	var user *user.User
-	err = db.RunInTx(r.db, func(tx *sqlx.Tx) error {
+	err = db.RunInTx(ctx, r.db, func(ctx context.Context, tx *sqlx.Tx) error {
 		user, err = psql.FindUserById(ctx, tx, id)
 		return err
 	})

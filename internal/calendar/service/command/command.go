@@ -3,9 +3,11 @@ package command
 import (
 	calendarRepo "github.com/TokujouKaisenDonburi/optical-backend/internal/calendar/repository"
 	optionRepo "github.com/TokujouKaisenDonburi/optical-backend/internal/option/repository"
+	"github.com/TokujouKaisenDonburi/optical-backend/pkg/transact"
 )
 
 type CalendarCommand struct {
+	transactor         transact.TransactionProvider
 	calendarRepository calendarRepo.CalendarRepository
 	optionRepository   optionRepo.OptionRepository
 	imageRepository    calendarRepo.ImageRepository
@@ -14,16 +16,22 @@ type CalendarCommand struct {
 }
 
 type EventCommand struct {
-	eventRepository calendarRepo.EventRepository
+	transactor         transact.TransactionProvider
+	eventRepository    calendarRepo.EventRepository
+	calendarRepository calendarRepo.CalendarRepository
 }
 
 func NewCalendarCommand(
+	transactor transact.TransactionProvider,
 	calendarRepository calendarRepo.CalendarRepository,
 	optionRepository optionRepo.OptionRepository,
 	imageRepository calendarRepo.ImageRepository,
 	memberRepository calendarRepo.MemberRepository,
 	emailRepository calendarRepo.EmailRepository,
 ) *CalendarCommand {
+	if transactor == nil {
+		panic("transactor is nil")
+	}
 	if calendarRepository == nil {
 		panic("calendarRepository is nil")
 	}
@@ -40,6 +48,7 @@ func NewCalendarCommand(
 		panic("emailRepository is nil")
 	}
 	return &CalendarCommand{
+		transactor:         transactor,
 		calendarRepository: calendarRepository,
 		optionRepository:   optionRepository,
 		imageRepository:    imageRepository,
@@ -48,11 +57,23 @@ func NewCalendarCommand(
 	}
 }
 
-func NewEventCommand(eventRepository calendarRepo.EventRepository) *EventCommand {
+func NewEventCommand(
+	transactor transact.TransactionProvider,
+	eventRepository calendarRepo.EventRepository,
+	calendarRepository calendarRepo.CalendarRepository,
+) *EventCommand {
+	if transactor == nil {
+		panic("transactor is nil")
+	}
 	if eventRepository == nil {
 		panic("eventRepository is nil")
 	}
+	if calendarRepository == nil {
+		panic("calendarRepository is nil")
+	}
 	return &EventCommand{
+		transactor: transactor,
 		eventRepository: eventRepository,
+		calendarRepository: calendarRepository,
 	}
 }

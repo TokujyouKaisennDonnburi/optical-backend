@@ -24,23 +24,14 @@ func NewEventPsqlRepository(db *sqlx.DB) *EventPsqlRepository {
 func (r *EventPsqlRepository) Create(
 	ctx context.Context,
 	calendarId uuid.UUID,
-	userId uuid.UUID,
-	createFn func(calendar *calendar.Calendar) (*calendar.Event, error),
+	event *calendar.Event,
 ) error {
-	return db.RunInTx(r.db, func(tx *sqlx.Tx) error {
-		calendar, err := psql.FindCalendarById(ctx, tx, calendarId)
-		if err != nil {
-			return err
-		}
-		event, err := createFn(calendar)
-		if err != nil {
-			return err
-		}
+	return db.RunInTx(ctx, r.db, func(ctx context.Context, tx *sqlx.Tx) error {
 		query := `
 			INSERT INTO events(id, calendar_id, user_id, title, memo, all_day, start_at, end_at, created_at, updated_at)
 			VALUES(:id, :calendarId, :userId, :title, :memo, :allDay, :startAt, :endAt, :createdAt, :updatedAt)
 		`
-		_, err = tx.NamedExecContext(ctx, query, map[string]any{
+		_, err := tx.NamedExecContext(ctx, query, map[string]any{
 			"id":         event.Id,
 			"calendarId": event.CalendarId,
 			"userId":     event.UserId,
@@ -72,7 +63,7 @@ func (r *EventPsqlRepository) Update(
 	userId, eventId uuid.UUID,
 	updateFn func(event *calendar.Event) (*calendar.Event, error),
 ) error {
-	return db.RunInTx(r.db, func(tx *sqlx.Tx) error {
+	return db.RunInTx(ctx, r.db, func(ctx context.Context, tx *sqlx.Tx) error {
 		event, err := psql.FindEventByUserIdAndId(ctx, tx, userId, eventId)
 		if err != nil {
 			return err
@@ -121,7 +112,7 @@ func (r *EventPsqlRepository) Delete(
 	ctx context.Context,
 	eventId, userId uuid.UUID,
 ) error {
-	return db.RunInTx(r.db, func(tx *sqlx.Tx) error {
+	return db.RunInTx(ctx, r.db, func(ctx context.Context, tx *sqlx.Tx) error {
 		event, err := psql.FindEventByUserIdAndId(ctx, tx, userId, eventId)
 		if err != nil {
 			return err

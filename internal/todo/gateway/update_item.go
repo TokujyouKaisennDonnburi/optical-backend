@@ -17,7 +17,7 @@ func (r *TodoPsqlRepository) UpdateItem(
 	userId, itemId uuid.UUID,
 	updateFn func(*todo.Item) (*todo.Item, error),
 ) error {
-	return db.RunInTx(r.db, func(tx *sqlx.Tx) error {
+	return db.RunInTx(ctx, r.db, func(ctx context.Context, tx *sqlx.Tx) error {
 		todoItem, err := psql.FindTodoItemById(ctx, tx, itemId)
 		if err != nil {
 			return err

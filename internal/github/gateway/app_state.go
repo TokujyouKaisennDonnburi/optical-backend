@@ -36,7 +36,7 @@ func (r *StateRedisRepository) SaveAppState(
 	userId, calendarId uuid.UUID,
 	state string,
 ) error {
-	return db.RunInTx(r.db, func(tx *sqlx.Tx) error {
+	return db.RunInTx(ctx, r.db, func(ctx context.Context, tx *sqlx.Tx) error {
 		var isMember bool
 		query := `
 			SELECT 1 

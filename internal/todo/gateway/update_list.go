@@ -16,7 +16,7 @@ func (r *TodoPsqlRepository) UpdateList(
 	userId, listId uuid.UUID,
 	updateFn func(*todo.List) (*todo.List, error),
 ) error {
-	return db.RunInTx(r.db, func(tx *sqlx.Tx) error {
+	return db.RunInTx(ctx, r.db, func(ctx context.Context, tx *sqlx.Tx) error {
 		todoList, err := psql.FindTodoListByIdAndUserId(ctx, tx, listId, userId)
 		if err != nil {
 			return err

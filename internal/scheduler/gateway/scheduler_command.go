@@ -32,12 +32,12 @@ func (r *SchedulerPsqlRepository) CreateScheduler(
 	limitTime time.Time,
 	isAllDay bool,
 ) error {
-	return db.RunInTx(r.db, func(tx *sqlx.Tx) error {
+	return db.RunInTx(ctx, r.db, func(ctx context.Context, tx *sqlx.Tx) error {
 		// scheduler
 		sql := `
-		INSERT INTO scheduler(id, calendar_id, user_id, title, memo, limit_time, is_allday)
-		VALUES(:id, :calendarId, :userId, :title, :memo, :limitTime, :isAllDay)
-	`
+			INSERT INTO scheduler(id, calendar_id, user_id, title, memo, limit_time, is_allday)
+			VALUES(:id, :calendarId, :userId, :title, :memo, :limitTime, :isAllDay)
+		`
 		_, err := tx.NamedExecContext(ctx, sql, map[string]any{
 			"id":         id,
 			"calendarId": calendarId,
@@ -54,9 +54,9 @@ func (r *SchedulerPsqlRepository) CreateScheduler(
 
 		// possibleDate
 		sql = `
-		INSERT INTO scheduler_possible_date(scheduler_id, date, start_time, end_time)
-		VALUES(:schedulerId, :date, :startTime, :endTime)
-	`
+			INSERT INTO scheduler_possible_date(scheduler_id, date, start_time, end_time)
+			VALUES(:schedulerId, :date, :startTime, :endTime)
+		`
 		for _, db := range possibleDates {
 			_, err = tx.NamedExecContext(ctx, sql, map[string]any{
 				"schedulerId": id,

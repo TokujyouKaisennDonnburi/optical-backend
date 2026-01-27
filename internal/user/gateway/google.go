@@ -113,7 +113,7 @@ func (r *GooglePsqlAndApiRepository) CreateUser(
 	avatar *user.Avatar,
 	googleUser *user.GoogleUser,
 ) error {
-	return db.RunInTx(r.db, func(tx *sqlx.Tx) error {
+	return db.RunInTx(ctx, r.db, func(ctx context.Context, tx *sqlx.Tx) error {
 		query := `
 			INSERT INTO users(id, name, email, password_hash, created_at, updated_at)
 			VALUES(:id, :name, :email, :password, :createdAt, :updatedAt)
@@ -174,7 +174,7 @@ func (r *GooglePsqlAndApiRepository) FindUserByGoogleId(
 	googleId string,
 ) (*user.User, error) {
 	var appUser *user.User
-	err := db.RunInTx(r.db, func(tx *sqlx.Tx) error {
+	err := db.RunInTx(ctx, r.db, func(ctx context.Context, tx *sqlx.Tx) error {
 		var err error
 		appUser, err = psql.FindUserByGoogleId(ctx, tx, googleId)
 		return err

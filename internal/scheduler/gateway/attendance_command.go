@@ -15,7 +15,7 @@ func (r *SchedulerPsqlRepository) AddAttendance(
 	comment string,
 	schedulerStatus []scheduler.SchedulerStatus,
 ) error {
-	return db.RunInTx(r.db, func(tx *sqlx.Tx) error {
+	return db.RunInTx(ctx, r.db, func(ctx context.Context, tx *sqlx.Tx) error {
 		// attendance
 		query := `
 			INSERT INTO scheduler_attendance(id, scheduler_id, user_id, comment)

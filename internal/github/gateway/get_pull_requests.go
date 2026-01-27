@@ -23,7 +23,7 @@ func (r *GithubApiRepository) GetPullRequests(
 	error,
 ) {
 	var outputs []output.GithubPullRequestListQueryOutput
-	err := db.RunInTx(r.db, func(tx *sqlx.Tx) error {
+	err := db.RunInTx(ctx, r.db, func(ctx context.Context, tx *sqlx.Tx) error {
 		// データベースからインストールIDを取得
 		githubId, installationId, err := psql.FindInstallationIdAndGithubId(ctx, tx, userId, calendarId, r.installationIdEncryptionKey)
 		if err != nil {
