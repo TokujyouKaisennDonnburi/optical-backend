@@ -2,7 +2,6 @@ package gateway
 
 import (
 	"context"
-	"errors"
 	"time"
 
 	"github.com/TokujouKaisenDonburi/optical-backend/internal/scheduler/service/query/output"
@@ -36,7 +35,7 @@ func (r *SchedulerPsqlRepository) FindAttendanceById(ctx context.Context, calend
 		return nil, err
 	}
 	if len(rows) == 0 {
-		return nil, errors.New("scheduler status is not found")
+		return []output.SchedulerAttendanceOutput{}, nil
 	}
 	results := make([]output.SchedulerAttendanceOutput, 0)
 	indexByUser := make(map[uuid.UUID]int)
