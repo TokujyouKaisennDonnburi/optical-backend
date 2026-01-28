@@ -9,6 +9,7 @@ import (
 	"github.com/TokujouKaisenDonburi/optical-backend/internal/calendar"
 	"github.com/TokujouKaisenDonburi/optical-backend/internal/calendar/service/query/output"
 	"github.com/TokujouKaisenDonburi/optical-backend/internal/option"
+	"github.com/TokujouKaisenDonburi/optical-backend/pkg/apperr"
 	"github.com/TokujouKaisenDonburi/optical-backend/pkg/storage"
 	"github.com/google/uuid"
 )
@@ -96,29 +97,27 @@ func (r *CalendarPsqlRepository) FindByUserCalendarId(ctx context.Context, userI
 	avatars.url AS avatar_url, avatars.is_relative_path AS avatar_is_relative_path
 	FROM calendars
 	LEFT JOIN calendar_images ON calendar_images.id = calendars.image_id
-	LEFT JOIN calendar_members ON calendar_members.calendar_id = calendars.id
+	INNER JOIN calendar_members ON calendar_members.calendar_id = calendars.id
 	INNER JOIN users ON users.id = calendar_members.user_id
 	LEFT JOIN user_profiles ON user_profiles.user_id = users.id
 	LEFT JOIN avatars ON avatars.id = user_profiles.avatar_id
-	WHERE calendars.id = $2
+	WHERE calendars.id = $1
 	AND calendar_members.joined_at IS NOT NULL
-	AND calendars.deleted_at IS NULL
-	AND EXISTS (
-		SELECT 1 FROM calendar_members cm
-		WHERE cm.calendar_id = calendars.id
-		AND cm.user_id = $1
-		AND cm.joined_at IS NOT NULL
-	)`
+	AND calendars.deleted_at IS NULL`
 	calRow := []CalendarImageMember{}
-	err := r.db.SelectContext(ctx, &calRow, query, userId, calendarId)
+	err := r.db.SelectContext(ctx, &calRow, query, calendarId)
 	if err != nil {
 		return nil, err
 	}
 	if len(calRow) == 0 {
 		return nil, errors.New("calendar member is not found")
 	}
+	exists := false
 	members := make([]calendar.Member, len(calRow))
 	for i, row := range calRow {
+		if row.UserId == userId {
+			exists = true
+		}
 		avatarUrl := row.AvatarUrl.String
 		if row.AvatarUrl.Valid && row.AvatarIsRelativePath.Bool {
 			avatarUrl = storage.GetImageStorageBaseUrl() + "/" + avatarUrl
@@ -129,6 +128,9 @@ func (r *CalendarPsqlRepository) FindByUserCalendarId(ctx context.Context, userI
 			JoinedAt:  row.JoinedAt,
 			AvatarUrl: avatarUrl,
 		}
+	}
+	if !exists {
+		return nil, apperr.ForbiddenError("user is not a member of this calendar")
 	}
 	// option
 	query = `
