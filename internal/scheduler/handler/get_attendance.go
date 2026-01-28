@@ -66,5 +66,5 @@ func (h *SchedulerHttpHandler) GetAttendance(w http.ResponseWriter, r *http.Requ
 		Status:  statuses,
 	}
 	// response
-	render.JSON(w, r, response)
+	render.JSON(w, r, []AttendanceResponse{response})
 }
