@@ -50,7 +50,7 @@ func (r *OptionPsqlRepository) FindsByIds(ctx context.Context, ids []int32) ([]o
 			AND deprecated = FALSE
 			ORDER BY id
 		`
-		err := r.db.SelectContext(ctx, &rows, query, pq.Array(ids))
+		err := tx.SelectContext(ctx, &rows, query, pq.Array(ids))
 		return err
 	})
 	if err != nil {
