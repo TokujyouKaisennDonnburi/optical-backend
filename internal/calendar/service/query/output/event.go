@@ -10,6 +10,7 @@ import (
 type EventQueryOutput struct {
 	Id            uuid.UUID
 	CalendarId    uuid.UUID
+	UserId        uuid.UUID
 	CalendarColor string
 	Title         string
 	Memo          string
@@ -27,6 +28,7 @@ type EventTodayQueryOutput struct {
 
 type EventTodayQueryOutputItem struct {
 	CalendarId    uuid.UUID
+	UserId        uuid.UUID
 	CalendarName  string
 	CalendarColor string
 	Id            uuid.UUID
@@ -45,6 +47,7 @@ type EventMonthQueryOutput struct {
 
 type EventMonthQueryOutputItem struct {
 	CalendarId    uuid.UUID
+	UserId        uuid.UUID
 	CalendarName  string
 	CalendarColor string
 	Id            uuid.UUID

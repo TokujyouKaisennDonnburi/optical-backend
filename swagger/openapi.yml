@@ -329,17 +329,17 @@ paths:
             type: string
             format: uuid
       responses:
-        '204':
+        "204":
           description: Calendar updated successfully
-        '400':
+        "400":
           description: Invalid request
-        '401':
+        "401":
           description: Unauthorized
-        '403':
+        "403":
           description: Forbidden - User is not a member of this calendar
-        '404':
+        "404":
           description: Calendar not found
-        '500':
+        "500":
           description: Internal server error
   /calendars/{calendarId}/events:
     get:
@@ -1732,7 +1732,10 @@ components:
         calendar_id:
           type: string
           format: uuid
-        calendar_color:
+        userId:
+          type: string
+          format: uuid
+        calendarColor:
           type: string
         title:
           type: string
@@ -1811,6 +1814,9 @@ components:
         calendarId:
           type: string
           format: uuid
+        userId:
+          type: string
+          format: uuid
         calendarName:
           type: string
         calendarColor:
@@ -1874,6 +1880,9 @@ components:
       properties:
         calendarId:
           type: string
+        userId:
+          type: string
+          format: uuid
         calendarName:
           type: string
         calendarColor:

@@ -18,6 +18,7 @@ type EventMonthResponse struct {
 
 type EventMonthResponseItem struct {
 	CalendarId    string    `json:"calendarId"`
+	UserId        string    `json:"userId"`
 	CalendarName  string    `json:"calendarName"`
 	CalendarColor string    `json:"calendarColor"`
 	Id            string    `json:"id"`
@@ -55,6 +56,7 @@ func (h *CalendarHttpHandler) GetByMonth(w http.ResponseWriter, r *http.Request)
 	for i, item := range output.Items {
 		items[i] = EventMonthResponseItem{
 			CalendarId:    item.CalendarId.String(),
+			UserId:        item.UserId.String(),
 			CalendarName:  item.CalendarName,
 			CalendarColor: item.CalendarColor,
 			Id:            item.Id.String(),

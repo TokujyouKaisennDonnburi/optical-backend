@@ -24,6 +24,7 @@ func NewEventPsqlRepository(db *sqlx.DB) *EventPsqlRepository {
 func (r *EventPsqlRepository) Create(
 	ctx context.Context,
 	calendarId uuid.UUID,
+	userId uuid.UUID,
 	createFn func(calendar *calendar.Calendar) (*calendar.Event, error),
 ) error {
 	return db.RunInTx(r.db, func(tx *sqlx.Tx) error {
@@ -36,12 +37,13 @@ func (r *EventPsqlRepository) Create(
 			return err
 		}
 		query := `
-			INSERT INTO events(id, calendar_id, title, memo, all_day, start_at, end_at, created_at, updated_at)
-			VALUES(:id, :calendarId, :title, :memo, :allDay, :startAt, :endAt, :createdAt, :updatedAt)
+			INSERT INTO events(id, calendar_id, user_id, title, memo, all_day, start_at, end_at, created_at, updated_at)
+			VALUES(:id, :calendarId, :userId, :title, :memo, :allDay, :startAt, :endAt, :createdAt, :updatedAt)
 		`
 		_, err = tx.NamedExecContext(ctx, query, map[string]any{
 			"id":         event.Id,
 			"calendarId": event.CalendarId,
+			"userId":     event.UserId,
 			"title":      event.Title,
 			"memo":       event.Memo,
 			"allDay":     event.ScheduledTime.AllDay,

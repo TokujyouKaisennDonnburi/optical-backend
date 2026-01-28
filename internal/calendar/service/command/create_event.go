@@ -32,12 +32,12 @@ func (c *EventCommand) Create(ctx context.Context, input EventCreateInput) (*Eve
 		return nil, err
 	}
 	// 予定を作成
-	event, err := calendar.NewEvent(input.CalendarId, input.Title, input.Memo, input.Location, *scheduledTime)
+	event, err := calendar.NewEvent(input.CalendarId, input.UserId, input.Title, input.Memo, input.Location, *scheduledTime)
 	if err != nil {
 		return nil, err
 	}
 	// リポジトリに保存
-	err = c.eventRepository.Create(ctx, event.CalendarId, func(cal *calendar.Calendar) (*calendar.Event, error) {
+	err = c.eventRepository.Create(ctx, event.CalendarId, event.UserId, func(cal *calendar.Calendar) (*calendar.Event, error) {
 		// ユーザーがカレンダーのメンバーかチェック
 		for _, member := range cal.Members {
 			if member.UserId == input.UserId {
