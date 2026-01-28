@@ -27,7 +27,6 @@ func (r *SchedulerPsqlRepository) FindAttendanceById(ctx context.Context, calend
 		SELECT 1 FROM calendar_members cm_req
 		WHERE cm_req.calendar_id = $1 AND cm_req.user_id = $3 AND cm_req.joined_at IS NOT NULL
 	  )
-	ORDER BY sa.user_id, ss.date
 	`
 	var rows []UserStatusModel
 	err := r.db.SelectContext(ctx, &rows, sql, calendarId, schedulerId, userId)
