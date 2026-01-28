@@ -29,3 +29,21 @@ func (r *UserPsqlRepository) FindById(ctx context.Context, id uuid.UUID) (*user.
 	})
 	return user, err
 }
+
+// 複数のメールアドレスから登録ユーザーがいるか確認
+func (r *UserPsqlRepository) FindByEmails(ctx context.Context, emails []string) ([]*user.User, error) {
+	var users []user.User
+	err := db.RunInTx(r.db, func(tx *sqlx.Tx) error {
+		var err error
+		users, err = psql.FindUsersByEmails(ctx, tx, emails)
+		return err
+	})
+	if err != nil {
+		return nil, err
+	}
+	result := make([]*user.User, len(users))
+	for i := range users {
+		result[i] = &users[i]
+	}
+	return result, nil
+}

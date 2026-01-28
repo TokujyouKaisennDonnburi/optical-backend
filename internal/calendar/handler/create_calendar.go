@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"context"
 	"encoding/json"
 	"net/http"
 
@@ -26,6 +25,8 @@ type CalendarCreateResponse struct {
 }
 
 func (h *CalendarHttpHandler) CreateCalendar(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
 	userId, err := auth.GetUserIdFromContext(r)
 	if err != nil {
 		_ = render.Render(w, r, apperr.ErrInternalServerError(err))
@@ -36,13 +37,14 @@ func (h *CalendarHttpHandler) CreateCalendar(w http.ResponseWriter, r *http.Requ
 		_ = render.Render(w, r, apperr.ErrInternalServerError(err))
 		return
 	}
+
 	var request CalendarCreateRequest
-	// リクエストJSONをバインド
 	err = json.NewDecoder(r.Body).Decode(&request)
 	if err != nil {
 		_ = render.Render(w, r, apperr.ErrInvalidRequest(err))
 		return
 	}
+
 	var imageId uuid.UUID
 	if request.ImageId != "" {
 		imageId, err = uuid.Parse(request.ImageId)
@@ -51,8 +53,9 @@ func (h *CalendarHttpHandler) CreateCalendar(w http.ResponseWriter, r *http.Requ
 			return
 		}
 	}
+
 	// カレンダーを作成
-	output, err := h.calendarCommand.CreateCalendar(context.Background(), command.CalendarCreateInput{
+	output, err := h.calendarCommand.CreateCalendar(ctx, command.CalendarCreateInput{
 		UserId:        userId,
 		UserName:      userName,
 		ImageId:       imageId,
@@ -62,10 +65,15 @@ func (h *CalendarHttpHandler) CreateCalendar(w http.ResponseWriter, r *http.Requ
 		OptionIds:     request.OptionIds,
 	})
 	if err != nil {
-		apperr.HandleAppError(w,r,err)
+		apperr.HandleAppError(w, r, err)
 		return
 	}
-	// レスポンスに変換
+
+	// 招待されたメンバーへ通知
+	if len(request.Members) > 0 {
+		_ = h.calendarNoticeService.NotifyCalendarInvited(ctx, output.Id, output.Name, userId, request.Members)
+	}
+
 	render.JSON(w, r, CalendarCreateResponse{
 		Id:   output.Id.String(),
 		Name: output.Name,

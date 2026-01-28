@@ -76,3 +76,37 @@ func (s *CalendarNoticeService) NotifyCalendarDeleted(
 
 	return nil
 }
+
+// カレンダー招待時に登録済みユーザーへ通知を送信
+func (s *CalendarNoticeService) NotifyCalendarInvited(
+	ctx context.Context,
+	calendarId uuid.UUID,
+	calendarName string,
+	invitedByUserId uuid.UUID,
+	emails []string,
+) error {
+	// 招待実行者の情報を取得
+	inviter, err := s.userRepository.FindById(ctx, invitedByUserId)
+	if err != nil {
+		return err
+	}
+
+	// メールアドレスから登録済みユーザーを取得
+	users, err := s.userRepository.FindByEmails(ctx, emails)
+	if err != nil {
+		return err
+	}
+
+	// 登録済みユーザーに通知を送信
+	for _, user := range users {
+		_ = s.noticeCreator.CreateNotice(
+			ctx,
+			user.Id,
+			"カレンダーに招待されました",
+			fmt.Sprintf("%sさんから「%s」に招待されました。\n招待メールを確認してください。", inviter.Name, calendarName),
+			creator.WithCalendarID(calendarId),
+		)
+	}
+
+	return nil
+}
