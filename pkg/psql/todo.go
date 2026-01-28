@@ -59,6 +59,48 @@ func FindTodoListById(ctx context.Context, tx *sqlx.Tx, id uuid.UUID) (*todo.Lis
 	}, nil
 }
 
+func FindTodoListByIdAndUserId(ctx context.Context, tx *sqlx.Tx, id, userId uuid.UUID) (*todo.List, error) {
+	query := `
+		SELECT lists.id AS id, lists.user_id AS user_id, lists.calendar_id AS calendar_id, lists.name AS name,
+			items.id AS item_id, items.user_id AS item_user_id, items.name AS item_name, items.is_done AS item_is_done
+		FROM todo_lists lists
+		LEFT JOIN todo_items items
+			ON lists.id = items.todo_list_id
+		JOIN calendar_members
+			ON calendar_members.calendar_id = lists.calendar_id
+		WHERE lists.id = $1
+			AND calendar_members.user_id = $2
+			AND calendar_members.joined_at IS NOT NULL
+	`
+	var models []TodoListAndItemModel
+	err := tx.SelectContext(ctx, &models, query, id, userId)
+	if err != nil {
+		return nil, err
+	}
+	if len(models) == 0 {
+		return nil, apperr.NotFoundError("todo list not found")
+	}
+	todoItems := make([]todo.Item, 0)
+	for _, model := range models {
+		if !model.ItemId.Valid {
+			continue
+		}
+		todoItems = append(todoItems, todo.Item{
+			Id:     model.ItemId.UUID,
+			UserId: model.ItemUserId.UUID,
+			Name:   model.ItemName.String,
+			IsDone: model.ItemIsDone.Bool,
+		})
+	}
+	return &todo.List{
+		Id:         models[0].Id,
+		UserId:     models[0].UserId,
+		CalendarId: models[0].CalendarId,
+		Name:       models[0].Name,
+		Items:      todoItems,
+	}, nil
+}
+
 func IsUserInTodoListMembers(ctx context.Context, tx *sqlx.Tx, userId, todoListId uuid.UUID) (bool, error) {
 	exists := false
 	query := `
