@@ -110,3 +110,43 @@ func (s *CalendarNoticeService) NotifyCalendarInvited(
 
 	return nil
 }
+
+// カレンダー名変更時にメンバーへ通知を送信
+func (s *CalendarNoticeService) NotifyCalendarNameUpdated(
+	ctx context.Context,
+	calendarId uuid.UUID,
+	oldName string,
+	newName string,
+	updatedByUserId uuid.UUID,
+) error {
+	// 更新実行者の情報を取得
+	user, err := s.userRepository.FindById(ctx, updatedByUserId)
+	if err != nil {
+		return err
+	}
+
+	// メンバー一覧を取得
+	members, err := s.memberRepository.FindMembers(ctx, calendarId)
+	if err != nil {
+		return err
+	}
+
+	// 参加済みメンバーに通知を送信（更新実行者を除く）
+	for _, member := range members {
+		if member.UserId == updatedByUserId {
+			continue
+		}
+		if member.JoinedAt.IsZero() {
+			continue
+		}
+		_ = s.noticeCreator.CreateNotice(
+			ctx,
+			member.UserId,
+			"カレンダー名が変更されました",
+			fmt.Sprintf("%sさんにより「%s」から「%s」に変更されました", user.Name, oldName, newName),
+			creator.WithCalendarID(calendarId),
+		)
+	}
+
+	return nil
+}
