@@ -12,6 +12,7 @@ import (
 	"github.com/TokujouKaisenDonburi/optical-backend/pkg/apperr"
 	"github.com/TokujouKaisenDonburi/optical-backend/pkg/storage"
 	"github.com/google/uuid"
+	"github.com/jmoiron/sqlx"
 )
 
 type CalendarListQueryModel struct {
@@ -154,88 +155,130 @@ func (r *CalendarPsqlRepository) FindByUserCalendarId(ctx context.Context, userI
 			Name:       row.Name,
 			Deprecated: row.Deprecated,
 		}
-	}
-	// bind
-	return &calendar.Calendar{
-		Id:    calRow[0].Id,
-		Name:  calRow[0].Name,
-		Color: calRow[0].Color,
-		Image: calendar.Image{
-			Id:    calRow[0].ImageId.UUID,
-			Url:   calRow[0].ImageUrl.String,
-			Valid: calRow[0].ImageId.Valid,
-		},
-		Members: members,
-		Options: options,
-	}, nil
+		members := make([]calendar.Member, len(calRow))
+		for i, row := range calRow {
+			members[i] = calendar.Member{
+				UserId:   row.UserId,
+				Name:     row.UserName,
+				JoinedAt: row.JoinedAt,
+			}
+		}
+		// option
+		query = `
+		SELECT id, name, deprecated 
+		FROM options
+		WHERE options.id IN (
+			SELECT option_id
+			FROM calendar_options
+			WHERE calendar_id = $1
+		);
+		`
+		optionModels := []OptionModel{}
+		err = r.db.SelectContext(ctx, &optionModels, query, calendarId)
+		if err != nil {
+			return err
+		}
+		options := make([]option.Option, len(optionModels))
+		for i, row := range optionModels {
+			options[i] = option.Option{
+				Id:         row.Id,
+				Name:       row.Name,
+				Deprecated: row.Deprecated,
+			}
+		}
+		// bind
+		cal = &calendar.Calendar{
+			Id:    calRow[0].Id,
+			Name:  calRow[0].Name,
+			Color: calRow[0].Color,
+			Image: calendar.Image{
+				Id:    calRow[0].ImageId.UUID,
+				Url:   calRow[0].ImageUrl.String,
+				Valid: calRow[0].ImageId.Valid,
+			},
+			Members: members,
+			Options: options,
+		}
+		return nil
+	})
+	return cal, err
 }
 
 // calendar単体取得
 func (r *CalendarPsqlRepository) FindById(ctx context.Context, calendarId uuid.UUID) (*calendar.Calendar, error) {
-	// calendar & image & member & users
-	query := `
-	SELECT
-		calendars.id, calendars.name, calendars.color,
-		calendars.image_id, calendar_images.url AS image_url,
-		calendar_members.user_id, calendar_members.joined_at,
-		users.name AS user_name
-	FROM calendars
-	LEFT JOIN calendar_images ON calendar_images.id = calendars.image_id
-	LEFT JOIN calendar_members ON calendar_members.calendar_id = calendars.id
-	INNER JOIN users ON users.id = calendar_members.user_id
-	WHERE calendars.id = $1
-	AND calendar_members.joined_at IS NOT NULL
-	AND calendars.deleted_at IS NULL `
-	calRow := []CalendarImageMember{}
-	err := r.db.SelectContext(ctx, &calRow, query, calendarId)
-	if err != nil {
-		return nil, err
-	}
-	if len(calRow) == 0 {
-		return nil, errors.New("calendar member is not found")
-	}
-	members := make([]calendar.Member, len(calRow))
-	for i, row := range calRow {
-		members[i] = calendar.Member{
-			UserId:   row.UserId,
-			Name:     row.UserName,
-			JoinedAt: row.JoinedAt,
+	var cal *calendar.Calendar
+	err := db.RunInTx(ctx, r.db, func(ctx context.Context, tx *sqlx.Tx) error {
+		// calendar & image & member & users
+		query := `
+		SELECT
+			calendars.id, calendars.name, calendars.color,
+			calendars.image_id, calendar_images.url AS image_url,
+			calendar_members.user_id, calendar_members.joined_at,
+			users.name AS user_name
+		FROM calendars
+		LEFT JOIN calendar_images 
+			ON calendar_images.id = calendars.image_id
+		LEFT JOIN calendar_members 
+			ON calendar_members.calendar_id = calendars.id
+		INNER JOIN users 
+			ON users.id = calendar_members.user_id
+		WHERE 
+			calendars.id = $1
+			AND calendar_members.joined_at IS NOT NULL
+			AND calendars.deleted_at IS NULL `
+		calRow := []CalendarImageMember{}
+		err := r.db.SelectContext(ctx, &calRow, query, calendarId)
+		if err != nil {
+			return err
 		}
-	}
-	// option
-	query = `
-	SELECT id, name, deprecated 
-	FROM options
-	WHERE options.id IN (
-		SELECT option_id
-		FROM calendar_options
-		WHERE calendar_id = $1
-	);
-	`
-	optionModels := []OptionModel{}
-	err = r.db.SelectContext(ctx, &optionModels, query, calendarId)
-	if err != nil {
-		return nil, err
-	}
-	options := make([]option.Option, len(optionModels))
-	for i, row := range optionModels {
-		options[i] = option.Option{
-			Id:         row.Id,
-			Name:       row.Name,
-			Deprecated: row.Deprecated,
+		if len(calRow) == 0 {
+			return errors.New("calendar member is not found")
 		}
-	}
-	// bind
-	return &calendar.Calendar{
-		Id:    calRow[0].Id,
-		Name:  calRow[0].Name,
-		Color: calRow[0].Color,
-		Image: calendar.Image{
-			Id:    calRow[0].ImageId.UUID,
-			Url:   calRow[0].ImageUrl.String,
-			Valid: calRow[0].ImageId.Valid,
-		},
-		Members: members,
-		Options: options,
-	}, nil
+		members := make([]calendar.Member, len(calRow))
+		for i, row := range calRow {
+			members[i] = calendar.Member{
+				UserId:   row.UserId,
+				Name:     row.UserName,
+				JoinedAt: row.JoinedAt,
+			}
+		}
+		// option
+		query = `
+		SELECT id, name, deprecated 
+		FROM options
+		WHERE options.id IN (
+			SELECT option_id
+			FROM calendar_options
+			WHERE calendar_id = $1
+		);
+		`
+		optionModels := []OptionModel{}
+		err = r.db.SelectContext(ctx, &optionModels, query, calendarId)
+		if err != nil {
+			return err
+		}
+		options := make([]option.Option, len(optionModels))
+		for i, row := range optionModels {
+			options[i] = option.Option{
+				Id:         row.Id,
+				Name:       row.Name,
+				Deprecated: row.Deprecated,
+			}
+		}
+		// bind
+		cal = &calendar.Calendar{
+			Id:    calRow[0].Id,
+			Name:  calRow[0].Name,
+			Color: calRow[0].Color,
+			Image: calendar.Image{
+				Id:    calRow[0].ImageId.UUID,
+				Url:   calRow[0].ImageUrl.String,
+				Valid: calRow[0].ImageId.Valid,
+			},
+			Members: members,
+			Options: options,
+		}
+		return nil
+	})
+	return cal, err
 }
