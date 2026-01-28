@@ -19,12 +19,14 @@ import (
 	agentQuery "github.com/TokujouKaisenDonburi/optical-backend/internal/agent/service/query"
 	calendarGateway "github.com/TokujouKaisenDonburi/optical-backend/internal/calendar/gateway"
 	calendarHandler "github.com/TokujouKaisenDonburi/optical-backend/internal/calendar/handler"
+	calendarNotice "github.com/TokujouKaisenDonburi/optical-backend/internal/calendar/notice"
 	calendarCommand "github.com/TokujouKaisenDonburi/optical-backend/internal/calendar/service/command"
 	calendarQuery "github.com/TokujouKaisenDonburi/optical-backend/internal/calendar/service/query"
 	githubGateway "github.com/TokujouKaisenDonburi/optical-backend/internal/github/gateway"
 	githubHandler "github.com/TokujouKaisenDonburi/optical-backend/internal/github/handler"
 	githubCommand "github.com/TokujouKaisenDonburi/optical-backend/internal/github/service/command"
 	githubQuery "github.com/TokujouKaisenDonburi/optical-backend/internal/github/service/query"
+	noticeCreator "github.com/TokujouKaisenDonburi/optical-backend/internal/notice/creator"
 	noticeRepository "github.com/TokujouKaisenDonburi/optical-backend/internal/notice/gateway"
 	noticeHandler "github.com/TokujouKaisenDonburi/optical-backend/internal/notice/handler"
 	noticeQuery "github.com/TokujouKaisenDonburi/optical-backend/internal/notice/service/query"
@@ -167,8 +169,10 @@ func main() {
 	calendarCommand := calendarCommand.NewCalendarCommand(transactionProvider, calendarRepository, optionRepository, imageRepository, memberRepository, gmailRepository)
 	memberQuery := calendarQuery.NewMemberQuery(memberRepository)
 	calendarQuery := calendarQuery.NewCalendarQuery(calendarRepository)
-	calendarHandler := calendarHandler.NewCalendarHttpHandler(eventCommand, eventQuery, calendarCommand, calendarQuery, memberQuery)
 	noticeRepository := noticeRepository.NewNoticePsqlRepository(db)
+	noticeCreator := noticeCreator.NewNoticeCreator(noticeRepository)
+	calendarNoticeService := calendarNotice.NewCalendarNoticeService(memberRepository, userRepository, noticeCreator)
+	calendarHandler := calendarHandler.NewCalendarHttpHandler(eventCommand, eventQuery, calendarCommand, calendarQuery, memberQuery, calendarNoticeService)
 	noticeQueryService := noticeQuery.NewNoticeQuery(noticeRepository)
 	noticeHttpHandler := noticeHandler.NewNoticeHttpHandler(noticeQueryService)
 	schedulerRepository := schedulerGateway.NewSchedulerPsqlRepository(db)
