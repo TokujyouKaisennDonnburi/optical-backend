@@ -6,6 +6,7 @@ import (
 
 	"github.com/TokujouKaisenDonburi/optical-backend/internal/calendar/service/command"
 	"github.com/TokujouKaisenDonburi/optical-backend/internal/calendar/service/query"
+	"github.com/TokujouKaisenDonburi/optical-backend/internal/option"
 	"github.com/TokujouKaisenDonburi/optical-backend/pkg/apperr"
 	"github.com/TokujouKaisenDonburi/optical-backend/pkg/auth"
 	"github.com/go-chi/chi/v5"
@@ -74,5 +75,34 @@ func (h *CalendarHttpHandler) UpdateCalendar(w http.ResponseWriter, r *http.Requ
 		_ = h.calendarNoticeService.NotifyCalendarColorUpdated(ctx, calendarId, oldCalendar.Name, string(oldCalendar.Color), request.Color, userId)
 	}
 
+	// オプションが変更された場合、メンバーへ通知
+	if hasOptionChanges(oldCalendar.Options, request.OptionIds) {
+		// 更新後のカレンダー情報を取得（新オプション名取得用）
+		newCalendar, err := h.calendarQuery.GetCalendar(ctx, query.GetCalendarInput{
+			UserId:     userId,
+			CalendarId: calendarId,
+		})
+		if err == nil {
+			_ = h.calendarNoticeService.NotifyCalendarOptionsUpdated(ctx, calendarId, oldCalendar.Name, oldCalendar.Options, newCalendar.Options, userId)
+		}
+	}
+
 	render.NoContent(w, r)
+}
+
+// オプションの変更があったかチェック
+func hasOptionChanges(oldOptions []option.Option, newOptionIds []int32) bool {
+	if len(oldOptions) != len(newOptionIds) {
+		return true
+	}
+	oldIds := make(map[int32]bool)
+	for _, opt := range oldOptions {
+		oldIds[opt.Id] = true
+	}
+	for _, id := range newOptionIds {
+		if !oldIds[id] {
+			return true
+		}
+	}
+	return false
 }

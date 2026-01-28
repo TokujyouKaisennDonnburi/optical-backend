@@ -3,9 +3,11 @@ package notice
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	"github.com/TokujouKaisenDonburi/optical-backend/internal/calendar/repository"
 	"github.com/TokujouKaisenDonburi/optical-backend/internal/notice/creator"
+	"github.com/TokujouKaisenDonburi/optical-backend/internal/option"
 	userRepo "github.com/TokujouKaisenDonburi/optical-backend/internal/user/repository"
 	"github.com/google/uuid"
 )
@@ -185,6 +187,101 @@ func (s *CalendarNoticeService) NotifyCalendarColorUpdated(
 			member.UserId,
 			"カラーが変更されました",
 			fmt.Sprintf("%sさんにより「%s」から「%s」に変更されました", user.Name, oldColor, newColor),
+			creator.WithCalendarID(calendarId),
+		)
+	}
+
+	return nil
+}
+
+// カレンダーオプション変更時にメンバーへ通知を送信
+func (s *CalendarNoticeService) NotifyCalendarOptionsUpdated(
+	ctx context.Context,
+	calendarId uuid.UUID,
+	calendarName string,
+	oldOptions []option.Option,
+	newOptions []option.Option,
+	updatedByUserId uuid.UUID,
+) error {
+	// 追加・削除されたオプションを検出
+	oldOptionIds := make(map[int32]string)
+	for _, opt := range oldOptions {
+		oldOptionIds[opt.Id] = opt.Name
+	}
+
+	newOptionIds := make(map[int32]string)
+	for _, opt := range newOptions {
+		newOptionIds[opt.Id] = opt.Name
+	}
+
+	var addedNames []string
+	var deletedNames []string
+
+	// 削除されたオプション（古いにあって新しいにない）
+	for id, name := range oldOptionIds {
+		if _, exists := newOptionIds[id]; !exists {
+			deletedNames = append(deletedNames, name)
+		}
+	}
+
+	// 追加されたオプション（新しいにあって古いにない）
+	for id, name := range newOptionIds {
+		if _, exists := oldOptionIds[id]; !exists {
+			addedNames = append(addedNames, name)
+		}
+	}
+
+	// 変更がなければ何もしない
+	if len(addedNames) == 0 && len(deletedNames) == 0 {
+		return nil
+	}
+
+	// 更新実行者の情報を取得
+	user, err := s.userRepository.FindById(ctx, updatedByUserId)
+	if err != nil {
+		return err
+	}
+
+	// メンバー一覧を取得
+	members, err := s.memberRepository.FindMembers(ctx, calendarId)
+	if err != nil {
+		return err
+	}
+
+	// タイトルとコンテンツを決定
+	var title string
+	var content string
+
+	if len(addedNames) > 0 && len(deletedNames) > 0 {
+		// パターン3: 追加&削除
+		title = "オプションが変更されました"
+		content = fmt.Sprintf("%sさんにより「%s」のオプションが変更されました\n追加されたオプション: %s\n削除されたオプション: %s",
+			user.Name, calendarName, strings.Join(addedNames, ", "), strings.Join(deletedNames, ", "))
+	} else if len(addedNames) > 0 {
+		// パターン1: 追加のみ
+		title = "オプションが追加されました"
+		content = fmt.Sprintf("%sさんにより「%s」にオプションが追加されました\n追加されたオプション: %s",
+			user.Name, calendarName, strings.Join(addedNames, ", "))
+	} else {
+		// パターン2: 削除のみ
+		title = "オプションが削除されました"
+		content = fmt.Sprintf("%sさんにより「%s」からオプションが削除されました\n削除されたオプション: %s",
+			user.Name, calendarName, strings.Join(deletedNames, ", "))
+	}
+
+	// 参加済みメンバーに通知を送信（更新実行者を除く）
+	for _, member := range members {
+		if member.UserId == updatedByUserId {
+			continue
+		}
+		if member.JoinedAt.IsZero() {
+			continue
+		}
+		_ = s.noticeCreator.CreateNotice(
+			ctx,
+			member.UserId,
+			title,
+			content,
 			creator.WithCalendarID(calendarId),
 		)
 	}
