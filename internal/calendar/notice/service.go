@@ -150,3 +150,44 @@ func (s *CalendarNoticeService) NotifyCalendarNameUpdated(
 
 	return nil
 }
+
+// カレンダーカラー変更時にメンバーへ通知を送信
+func (s *CalendarNoticeService) NotifyCalendarColorUpdated(
+	ctx context.Context,
+	calendarId uuid.UUID,
+	calendarName string,
+	oldColor string,
+	newColor string,
+	updatedByUserId uuid.UUID,
+) error {
+	// 更新実行者の情報を取得
+	user, err := s.userRepository.FindById(ctx, updatedByUserId)
+	if err != nil {
+		return err
+	}
+
+	// メンバー一覧を取得
+	members, err := s.memberRepository.FindMembers(ctx, calendarId)
+	if err != nil {
+		return err
+	}
+
+	// 参加済みメンバーに通知を送信（更新実行者を除く）
+	for _, member := range members {
+		if member.UserId == updatedByUserId {
+			continue
+		}
+		if member.JoinedAt.IsZero() {
+			continue
+		}
+		_ = s.noticeCreator.CreateNotice(
+			ctx,
+			member.UserId,
+			"カラーが変更されました",
+			fmt.Sprintf("%sさんにより「%s」から「%s」に変更されました", user.Name, oldColor, newColor),
+			creator.WithCalendarID(calendarId),
+		)
+	}
+
+	return nil
+}

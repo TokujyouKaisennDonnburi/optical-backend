@@ -69,5 +69,10 @@ func (h *CalendarHttpHandler) UpdateCalendar(w http.ResponseWriter, r *http.Requ
 		_ = h.calendarNoticeService.NotifyCalendarNameUpdated(ctx, calendarId, oldCalendar.Name, request.Name, userId)
 	}
 
+	// カラーが変更された場合、メンバーへ通知
+	if string(oldCalendar.Color) != request.Color {
+		_ = h.calendarNoticeService.NotifyCalendarColorUpdated(ctx, calendarId, oldCalendar.Name, string(oldCalendar.Color), request.Color, userId)
+	}
+
 	render.NoContent(w, r)
 }
