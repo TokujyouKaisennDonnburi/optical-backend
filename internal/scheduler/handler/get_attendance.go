@@ -51,20 +51,21 @@ func (h *SchedulerHttpHandler) GetAttendance(w http.ResponseWriter, r *http.Requ
 		apperr.HandleAppError(w, r, err)
 		return
 	}
-	// array bind
-	statuses := make([]StatusResponse, len(output.Status))
-	for i, v := range output.Status {
-		statuses[i] = StatusResponse{
-			Date:   v.Date,
-			Status: v.Status,
-		}
-	}
-	// bind
-	response := AttendanceResponse{
-		UserId:  output.UserId,
-		Comment: output.Comment,
-		Status:  statuses,
-	}
 	// response
-	render.JSON(w, r, []AttendanceResponse{response})
+	responses := make([]AttendanceResponse, 0, len(output))
+	for _, attendance := range output {
+		statuses := make([]StatusResponse, len(attendance.Status))
+		for i, v := range attendance.Status {
+			statuses[i] = StatusResponse{
+				Date:   v.Date,
+				Status: v.Status,
+			}
+		}
+		responses = append(responses, AttendanceResponse{
+			UserId:  attendance.UserId,
+			Comment: attendance.Comment,
+			Status:  statuses,
+		})
+	}
+	render.JSON(w, r, responses)
 }
