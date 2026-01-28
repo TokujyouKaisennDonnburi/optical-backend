@@ -34,7 +34,7 @@ func (r *UserPsqlRepository) Create(
 			INSERT INTO users(id, name, email, password_hash, created_at, updated_at)
 			VALUES(:id, :name, :email, :password, :createdAt, :updatedAt)
 		`
-		_, err := r.db.NamedExecContext(ctx, query, map[string]any{
+		_, err := tx.NamedExecContext(ctx, query, map[string]any{
 			"id":        user.Id,
 			"name":      user.Name,
 			"email":     user.Email,
