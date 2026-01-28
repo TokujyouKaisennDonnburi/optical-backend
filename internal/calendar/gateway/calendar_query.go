@@ -65,14 +65,15 @@ type CalendarQueryModel struct {
 	ImageId uuid.NullUUID  `db:"imageId"`
 }
 type CalendarImageMember struct {
-	Id       uuid.UUID      `db:"id"`
-	Name     string         `db:"name"`
-	Color    calendar.Color `db:"color"`
-	ImageId  uuid.NullUUID  `db:"image_id"`
-	ImageUrl sql.NullString `db:"image_url"`
-	UserId   uuid.UUID      `db:"user_id"`
-	UserName string         `db:"user_name"`
-	JoinedAt time.Time      `db:"joined_at"`
+	Id        uuid.UUID      `db:"id"`
+	Name      string         `db:"name"`
+	Color     calendar.Color `db:"color"`
+	ImageId   uuid.NullUUID  `db:"image_id"`
+	ImageUrl  sql.NullString `db:"image_url"`
+	UserId    uuid.UUID      `db:"user_id"`
+	UserName  string         `db:"user_name"`
+	JoinedAt  time.Time      `db:"joined_at"`
+	AvatarUrl sql.NullString `db:"avatar_url"`
 }
 
 type OptionModel struct {
@@ -89,7 +90,7 @@ func (r *CalendarPsqlRepository) FindByUserCalendarId(ctx context.Context, userI
 	calendars.id, calendars.name, calendars.color,
 	calendars.image_id, calendar_images.url AS image_url,
 	calendar_members.user_id, calendar_members.joined_at,
-	users.name AS user_name
+	users.name AS user_name, users.avatar_url
 	FROM calendars
 	LEFT JOIN calendar_images ON calendar_images.id = calendars.image_id
 	LEFT JOIN calendar_members ON calendar_members.calendar_id = calendars.id
@@ -109,9 +110,10 @@ func (r *CalendarPsqlRepository) FindByUserCalendarId(ctx context.Context, userI
 	members := make([]calendar.Member, len(calRow))
 	for i, row := range calRow {
 		members[i] = calendar.Member{
-			UserId:   row.UserId,
-			Name:     row.UserName,
-			JoinedAt: row.JoinedAt,
+			UserId:    row.UserId,
+			Name:      row.UserName,
+			JoinedAt:  row.JoinedAt,
+			AvatarUrl: row.AvatarUrl.String,
 		}
 	}
 	// option
