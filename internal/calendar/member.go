@@ -9,9 +9,10 @@ import (
 
 // スケジュールに参加するユーザー
 type Member struct {
-	UserId   uuid.UUID
-	Name     string
-	JoinedAt time.Time
+	UserId    uuid.UUID
+	Name      string
+	JoinedAt  time.Time
+	AvatarUrl string
 }
 
 func NewMember(userId uuid.UUID, name string) (*Member, error) {

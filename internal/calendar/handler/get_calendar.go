@@ -22,9 +22,10 @@ type CalendarResponse struct {
 	Options []CalendarOptionsResponse `json:"option"`
 }
 type CalendarMemberResponse struct {
-	UserId   string    `json:"userId"`
-	Name     string    `json:"name"`
-	JoinedAt time.Time `json:"joinedAt"`
+	UserId    string    `json:"userId"`
+	Name      string    `json:"name"`
+	JoinedAt  time.Time `json:"joinedAt"`
+	AvatarUrl string    `json:"avatarUrl,omitempty"`
 }
 type CalendarOptionsResponse struct {
 	Id         int32  `json:"id"`
@@ -57,9 +58,10 @@ func (h *CalendarHttpHandler) GetCalendar(w http.ResponseWriter, r *http.Request
 	members := make([]CalendarMemberResponse, len(output.Members))
 	for i, row := range output.Members {
 		members[i] = CalendarMemberResponse{
-			UserId:   row.UserId.String(),
-			Name:     row.Name,
-			JoinedAt: row.JoinedAt,
+			UserId:    row.UserId.String(),
+			Name:      row.Name,
+			JoinedAt:  row.JoinedAt,
+			AvatarUrl: row.AvatarUrl,
 		}
 	}
 	options := make([]CalendarOptionsResponse, len(output.Options))
