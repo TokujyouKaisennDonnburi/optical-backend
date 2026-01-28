@@ -5,6 +5,8 @@ import (
 	"net/http"
 
 	"github.com/TokujouKaisenDonburi/optical-backend/internal/calendar/service/command"
+	"github.com/TokujouKaisenDonburi/optical-backend/internal/calendar/service/query"
+	"github.com/TokujouKaisenDonburi/optical-backend/internal/option"
 	"github.com/TokujouKaisenDonburi/optical-backend/pkg/apperr"
 	"github.com/TokujouKaisenDonburi/optical-backend/pkg/auth"
 	"github.com/go-chi/chi/v5"
@@ -18,10 +20,9 @@ type CalendarUpdateRequest struct {
 	OptionIds []int32 `json:"optionIds"`
 }
 
-// カレンダー更新のためのHTTPハンドラー
 func (h *CalendarHttpHandler) UpdateCalendar(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
 
-	// リクエスト
 	userId, err := auth.GetUserIdFromContext(r)
 	if err != nil {
 		_ = render.Render(w, r, apperr.ErrInternalServerError(err))
@@ -34,7 +35,6 @@ func (h *CalendarHttpHandler) UpdateCalendar(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	// リクエストJSONをGo構造体にバインド
 	var request CalendarUpdateRequest
 	err = json.NewDecoder(r.Body).Decode(&request)
 	if err != nil {
@@ -42,8 +42,18 @@ func (h *CalendarHttpHandler) UpdateCalendar(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
+	// 更新前のカレンダー情報を取得（差分検出用）
+	oldCalendar, err := h.calendarQuery.GetCalendar(ctx, query.GetCalendarInput{
+		UserId:     userId,
+		CalendarId: calendarId,
+	})
+	if err != nil {
+		apperr.HandleAppError(w, r, err)
+		return
+	}
+
 	// カレンダー更新
-	err = h.calendarCommand.UpdateCalendar(r.Context(), command.CalendarUpdateInput{
+	err = h.calendarCommand.UpdateCalendar(ctx, command.CalendarUpdateInput{
 		UserId:        userId,
 		CalendarId:    calendarId,
 		CalendarName:  request.Name,
@@ -55,6 +65,44 @@ func (h *CalendarHttpHandler) UpdateCalendar(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	// レスポンス
+	// カレンダー名が変更された場合、メンバーへ通知
+	if oldCalendar.Name != request.Name {
+		_ = h.calendarNoticeService.NotifyCalendarNameUpdated(ctx, calendarId, oldCalendar.Name, request.Name, userId)
+	}
+
+	// カラーが変更された場合、メンバーへ通知
+	if string(oldCalendar.Color) != request.Color {
+		_ = h.calendarNoticeService.NotifyCalendarColorUpdated(ctx, calendarId, oldCalendar.Name, string(oldCalendar.Color), request.Color, userId)
+	}
+
+	// オプションが変更された場合、メンバーへ通知
+	if hasOptionChanges(oldCalendar.Options, request.OptionIds) {
+		// 更新後のカレンダー情報を取得（新オプション名取得用）
+		newCalendar, err := h.calendarQuery.GetCalendar(ctx, query.GetCalendarInput{
+			UserId:     userId,
+			CalendarId: calendarId,
+		})
+		if err == nil {
+			_ = h.calendarNoticeService.NotifyCalendarOptionsUpdated(ctx, calendarId, oldCalendar.Name, oldCalendar.Options, newCalendar.Options, userId)
+		}
+	}
+
 	render.NoContent(w, r)
+}
+
+// オプションの変更があったかチェック
+func hasOptionChanges(oldOptions []option.Option, newOptionIds []int32) bool {
+	if len(oldOptions) != len(newOptionIds) {
+		return true
+	}
+	oldIds := make(map[int32]bool)
+	for _, opt := range oldOptions {
+		oldIds[opt.Id] = true
+	}
+	for _, id := range newOptionIds {
+		if !oldIds[id] {
+			return true
+		}
+	}
+	return false
 }
