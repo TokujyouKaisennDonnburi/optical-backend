@@ -2172,6 +2172,10 @@ components:
         joinedAt:
           type: string
           format: date-time
+        avatarUrl:
+          type: string
+          description: アバター画像のURL
+          example: "https://example.com/avatar.png"
     GetMemberResponse:
       type: object
       required:
