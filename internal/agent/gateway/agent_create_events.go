@@ -30,6 +30,7 @@ func (*AgentCommandPsqlRepository) CreateEvents(
 		for i, event := range events {
 			eventMapList[i] = map[string]any{
 				"id":         event.Id,
+				"userId":     userId,
 				"calendarId": event.CalendarId,
 				"title":      event.Title,
 				"memo":       event.Memo,
@@ -42,8 +43,8 @@ func (*AgentCommandPsqlRepository) CreateEvents(
 			}
 		}
 		query := `
-			INSERT INTO events(id, calendar_id, title, memo, all_day, start_at, end_at, created_at, updated_at)
-			VALUES(:id, :calendarId, :title, :memo, :allDay, :startAt, :endAt, :createdAt, :updatedAt)
+			INSERT INTO events(id, calendar_id, user_id, title, memo, all_day, start_at, end_at, created_at, updated_at)
+			VALUES(:id, :calendarId, :userId, :title, :memo, :allDay, :startAt, :endAt, :createdAt, :updatedAt)
 		`
 		_, err = tx.NamedExecContext(ctx, query, eventMapList)
 		if err != nil {

@@ -13,6 +13,7 @@ import (
 	migrate "github.com/rubenv/sql-migrate"
 
 	agentGateway "github.com/TokujouKaisenDonburi/optical-backend/internal/agent/gateway"
+	agentTransactor "github.com/TokujouKaisenDonburi/optical-backend/internal/agent/transact"
 	agentHandler "github.com/TokujouKaisenDonburi/optical-backend/internal/agent/handler"
 	agentCommand "github.com/TokujouKaisenDonburi/optical-backend/internal/agent/service/command"
 	agentQuery "github.com/TokujouKaisenDonburi/optical-backend/internal/agent/service/query"
@@ -130,6 +131,7 @@ func main() {
 	redisEncryptionKey := getRedisEncryptionKey()
 	installationIdEncryptionKey := getInstallationIdEncryptionKey()
 	transactionProvider := transact.NewPsqlTransactionProvider(db)
+	agentTransactor := agentTransactor.NewTransactionProvider(db)
 	stateRepository := githubGateway.NewStateRedisRepository(db, redisClient, redisEncryptionKey)
 	optionRepository := optionGateway.NewOptionPsqlRepository(db)
 	githubRepository := githubGateway.NewGithubApiRepository(db, installationIdEncryptionKey)
@@ -142,7 +144,7 @@ func main() {
 	memberRepository := calendarGateway.NewMemberPsqlRepository(db)
 	agentCommandRepository := agentGateway.NewAgentCommandPsqlRepository(db)
 	agentQuery := agentQuery.NewAgentQuery(optionRepository, eventRepository, optionAgentRepository)
-	agentCommand := agentCommand.NewAgentCommand(openRouter, transactionProvider, agentQueryRepository, agentCommandRepository)
+	agentCommand := agentCommand.NewAgentCommand(openRouter, agentTransactor, agentQueryRepository, agentCommandRepository)
 	agentHandler := agentHandler.NewAgentHandler(agentQuery, agentCommand)
 	githubQuery := githubQuery.NewGithubQuery(stateRepository, optionRepository, githubRepository)
 	githubCommand := githubCommand.NewGithubCommand(tokenRepository, stateRepository, githubRepository)
