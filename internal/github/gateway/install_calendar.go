@@ -16,7 +16,7 @@ func (r *GithubApiRepository) InstallToCalendar(
 	userId, calendarId uuid.UUID,
 	code, installationId string,
 ) error {
-	return db.RunInTx(r.db, func(tx *sqlx.Tx) error {
+	return db.RunInTx(ctx, r.db, func(ctx context.Context, tx *sqlx.Tx) error {
 		response, err := api.GetGithubInstallation(ctx, installationId)
 		if err != nil {
 			return err

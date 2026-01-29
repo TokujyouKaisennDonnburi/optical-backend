@@ -16,7 +16,6 @@ import (
 	agentHandler "github.com/TokujouKaisenDonburi/optical-backend/internal/agent/handler"
 	agentCommand "github.com/TokujouKaisenDonburi/optical-backend/internal/agent/service/command"
 	agentQuery "github.com/TokujouKaisenDonburi/optical-backend/internal/agent/service/query"
-	"github.com/TokujouKaisenDonburi/optical-backend/internal/agent/transact"
 	calendarGateway "github.com/TokujouKaisenDonburi/optical-backend/internal/calendar/gateway"
 	calendarHandler "github.com/TokujouKaisenDonburi/optical-backend/internal/calendar/handler"
 	calendarCommand "github.com/TokujouKaisenDonburi/optical-backend/internal/calendar/service/command"
@@ -45,6 +44,7 @@ import (
 	userQuery "github.com/TokujouKaisenDonburi/optical-backend/internal/user/service/query"
 	"github.com/TokujouKaisenDonburi/optical-backend/pkg/logs"
 	"github.com/TokujouKaisenDonburi/optical-backend/pkg/openrouter"
+	"github.com/TokujouKaisenDonburi/optical-backend/pkg/transact"
 	"github.com/minio/minio-go/v7"
 	"github.com/minio/minio-go/v7/pkg/credentials"
 	"github.com/sirupsen/logrus"
@@ -112,7 +112,6 @@ func main() {
 		MigrateMinio(minioClient)
 	}
 	bucketName := getBucketName()
-	transactor := transact.NewTransactionProvider(db)
 	userRepository := userGateway.NewUserPsqlRepository(db)
 	avatarRepository := userGateway.NewAvatarPsqlAndMinioRepository(db, minioClient, bucketName)
 	tokenRepository := userGateway.NewTokenRedisRepository(redisClient)
@@ -130,6 +129,7 @@ func main() {
 	)
 	redisEncryptionKey := getRedisEncryptionKey()
 	installationIdEncryptionKey := getInstallationIdEncryptionKey()
+	transactionProvider := transact.NewPsqlTransactionProvider(db)
 	stateRepository := githubGateway.NewStateRedisRepository(db, redisClient, redisEncryptionKey)
 	optionRepository := optionGateway.NewOptionPsqlRepository(db)
 	githubRepository := githubGateway.NewGithubApiRepository(db, installationIdEncryptionKey)
@@ -137,24 +137,32 @@ func main() {
 	eventRepository := calendarGateway.NewEventPsqlRepository(db)
 	optionAgentRepository := agentGateway.NewOptionAgentOpenRouterRepository(openRouter)
 	agentQueryRepository := agentGateway.NewAgentQueryPsqlRepository(db)
+	calendarRepository := calendarGateway.NewCalendarPsqlRepository(db)
+	imageRepository := calendarGateway.NewImagePsqlAndMinioRepository(db, minioClient, bucketName)
+	memberRepository := calendarGateway.NewMemberPsqlRepository(db)
 	agentCommandRepository := agentGateway.NewAgentCommandPsqlRepository(db)
 	agentQuery := agentQuery.NewAgentQuery(optionRepository, eventRepository, optionAgentRepository)
-	agentCommand := agentCommand.NewAgentCommand(openRouter, transactor, agentQueryRepository, agentCommandRepository)
+	agentCommand := agentCommand.NewAgentCommand(openRouter, transactionProvider, agentQueryRepository, agentCommandRepository)
 	agentHandler := agentHandler.NewAgentHandler(agentQuery, agentCommand)
 	githubQuery := githubQuery.NewGithubQuery(stateRepository, optionRepository, githubRepository)
 	githubCommand := githubCommand.NewGithubCommand(tokenRepository, stateRepository, githubRepository)
 	githubHandler := githubHandler.NewGithubHandler(githubQuery, githubCommand)
 	userQuery := userQuery.NewUserQuery(userRepository)
-	userCommand := userCommand.NewUserCommand(userRepository, tokenRepository, avatarRepository, googleRepository, googleOauthStateRepository)
+	userCommand := userCommand.NewUserCommand(
+		transactionProvider,
+		userRepository,
+		tokenRepository,
+		avatarRepository,
+		googleRepository,
+		calendarRepository,
+		googleOauthStateRepository,
+	)
 	userHandler := userHandler.NewUserHttpHandler(userQuery, userCommand)
 	optionQuery := optionQuery.NewOptionQuery(optionRepository)
 	optionHandler := optionHandler.NewOptionHttpHandler(optionQuery)
-	calendarRepository := calendarGateway.NewCalendarPsqlRepository(db)
-	imageRepository := calendarGateway.NewImagePsqlAndMinioRepository(db, minioClient, bucketName)
-	memberRepository := calendarGateway.NewMemberPsqlRepository(db)
-	eventCommand := calendarCommand.NewEventCommand(eventRepository)
+	eventCommand := calendarCommand.NewEventCommand(transactionProvider, eventRepository, calendarRepository)
 	eventQuery := calendarQuery.NewEventQuery(eventRepository)
-	calendarCommand := calendarCommand.NewCalendarCommand(calendarRepository, optionRepository, imageRepository, memberRepository, gmailRepository)
+	calendarCommand := calendarCommand.NewCalendarCommand(transactionProvider, calendarRepository, optionRepository, imageRepository, memberRepository, gmailRepository)
 	memberQuery := calendarQuery.NewMemberQuery(memberRepository)
 	calendarQuery := calendarQuery.NewCalendarQuery(calendarRepository)
 	calendarHandler := calendarHandler.NewCalendarHttpHandler(eventCommand, eventQuery, calendarCommand, calendarQuery, memberQuery)

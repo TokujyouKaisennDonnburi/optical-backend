@@ -2,10 +2,10 @@ package command
 
 import (
 	"context"
-	"errors"
 	"time"
 
 	"github.com/TokujouKaisenDonburi/optical-backend/internal/calendar"
+	"github.com/TokujouKaisenDonburi/optical-backend/pkg/apperr"
 	"github.com/google/uuid"
 )
 
@@ -36,15 +36,24 @@ func (c *EventCommand) Create(ctx context.Context, input EventCreateInput) (*Eve
 	if err != nil {
 		return nil, err
 	}
-	// リポジトリに保存
-	err = c.eventRepository.Create(ctx, event.CalendarId, event.UserId, func(cal *calendar.Calendar) (*calendar.Event, error) {
-		// ユーザーがカレンダーのメンバーかチェック
-		for _, member := range cal.Members {
+	err = c.transactor.Transact(ctx, func(ctx context.Context) error {
+		calendar, err := c.calendarRepository.FindByUserCalendarId(ctx, input.UserId, input.CalendarId)
+		if err != nil {
+			return err
+		}
+		exists := false
+		for _, member := range calendar.Members {
 			if member.UserId == input.UserId {
-				return event, nil
+				exists = true
+				break
 			}
 		}
-		return nil, errors.New("User is not member.")
+		if !exists {
+			return apperr.ForbiddenError("user is not in calendar members")
+		}
+		// リポジトリに保存
+		err = c.eventRepository.Create(ctx, calendar.Id, event)
+		return err
 	})
 	if err != nil {
 		return nil, err

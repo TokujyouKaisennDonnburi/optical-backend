@@ -29,53 +29,21 @@ func NewCalendarPsqlRepository(db *sqlx.DB) *CalendarPsqlRepository {
 // スケジュールを新規作成する
 func (r *CalendarPsqlRepository) Create(
 	ctx context.Context,
-	imageId uuid.UUID,
-	memberEmails []string,
-	optionIds []int32,
-	createFn func(image *calendar.Image, members []calendar.Member, options []option.Option) (*calendar.Calendar, error),
+	calendar *calendar.Calendar,
 ) error {
-	return db.RunInTx(r.db, func(tx *sqlx.Tx) error {
-		// オプション取得
-		options, err := psql.FindOptionsByIds(ctx, tx, optionIds)
-		if err != nil {
-			return err
-		}
-		// ユーザー取得
-		users, err := psql.FindUsersByEmails(ctx, tx, memberEmails)
-		if err != nil {
-			return err
-		}
-		// メンバーリスト作成
-		members := make([]calendar.Member, len(users))
-		for i, user := range users {
-			member, err := calendar.NewMember(user.Id, user.Name)
-			if err != nil {
-				continue
-			}
-			members[i] = *member
-		}
-		// 画像を取得
-		image, err := psql.FindImageById(ctx, tx, imageId)
-		if err != nil {
-			return err
-		}
-		// スケジュール作成関数を実行
-		calendar, err := createFn(image, members, options)
-		if err != nil {
-			return err
-		}
+	return db.RunInTx(ctx, r.db, func(ctx context.Context, tx *sqlx.Tx) error {
 		// スケジュール作成
 		query := `
 			INSERT INTO calendars(id, name, color, image_id)
 			VALUES (:id, :name, :color, :imageId)
 		`
-		_, err = tx.NamedExecContext(ctx, query, map[string]any{
+		_, err := tx.NamedExecContext(ctx, query, map[string]any{
 			"id":    calendar.Id,
 			"name":  calendar.Name,
 			"color": calendar.Color,
 			"imageId": uuid.NullUUID{
-				UUID:  image.Id,
-				Valid: image.Valid,
+				UUID:  calendar.Image.Id,
+				Valid: calendar.Image.Valid,
 			},
 		})
 		if err != nil {
@@ -102,7 +70,7 @@ func (r *CalendarPsqlRepository) Create(
 			return err
 		}
 		// オプション設定
-		if len(options) > 0 {
+		if len(calendar.Options) > 0 {
 			query = `
 				INSERT INTO calendar_options(calendar_id, option_id)
 				VALUES (:calendarId, :optionId)
@@ -130,7 +98,7 @@ func (r *CalendarPsqlRepository) Update(
 	optionIds []int32,
 	updateFn func(calendar *calendar.Calendar, options []option.Option) (*calendar.Calendar, error),
 ) error {
-	return db.RunInTx(r.db, func(tx *sqlx.Tx) error {
+	return db.RunInTx(ctx, r.db, func(ctx context.Context, tx *sqlx.Tx) error {
 
 		// カレンダー取得
 		existingCalendar, err := psql.FindCalendarByUserIdAndId(ctx, tx, userId, calendarId)
@@ -201,7 +169,7 @@ func (r *CalendarPsqlRepository) Delete(
 	calendarId uuid.UUID,
 	userId uuid.UUID,
 ) error {
-	return db.RunInTx(r.db, func(tx *sqlx.Tx) error {
+	return db.RunInTx(ctx, r.db, func(ctx context.Context, tx *sqlx.Tx) error {
 		// user calendar check
 		_, err := psql.FindCalendarByUserIdAndId(ctx, tx, userId, calendarId)
 		if err != nil {

@@ -5,6 +5,9 @@ import (
 	"mime/multipart"
 
 	"github.com/TokujouKaisenDonburi/optical-backend/internal/calendar"
+	"github.com/TokujouKaisenDonburi/optical-backend/pkg/db"
+	"github.com/TokujouKaisenDonburi/optical-backend/pkg/psql"
+	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
 	"github.com/minio/minio-go/v7"
 )
@@ -30,6 +33,22 @@ func NewImagePsqlAndMinioRepository(db *sqlx.DB, minoiClient *minio.Client, buck
 		minioClient: minoiClient,
 		bucketName:  bucketName,
 	}
+}
+
+func (r *ImagePsqlAndMinioRepository) FindById(
+	ctx context.Context,
+	id uuid.UUID,
+) (*calendar.Image, error) {
+	var image *calendar.Image
+	err := db.RunInTx(ctx, r.db, func(ctx context.Context, tx *sqlx.Tx) error {
+		var err error
+		image, err = psql.FindImageById(ctx, tx, id)
+		return err
+	})
+	if err != nil {
+		return nil, err
+	}
+	return image, nil
 }
 
 func (r *ImagePsqlAndMinioRepository) Upload(ctx context.Context, file multipart.File, header *multipart.FileHeader) (string, error) {

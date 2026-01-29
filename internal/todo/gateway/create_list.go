@@ -15,7 +15,7 @@ func (r *TodoPsqlRepository) CreateList(
 	ctx context.Context,
 	list *todo.List,
 ) error {
-	return db.RunInTx(r.db, func(tx *sqlx.Tx) error {
+	return db.RunInTx(ctx, r.db, func(ctx context.Context, tx *sqlx.Tx) error {
 		exists, err := psql.IsUserInCalendarMembers(ctx, tx, list.UserId, list.CalendarId)
 		if err != nil {
 			return err

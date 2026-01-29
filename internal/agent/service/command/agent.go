@@ -2,20 +2,20 @@ package command
 
 import (
 	"github.com/TokujouKaisenDonburi/optical-backend/internal/agent/repository"
-	"github.com/TokujouKaisenDonburi/optical-backend/internal/agent/transact"
 	"github.com/TokujouKaisenDonburi/optical-backend/pkg/openrouter"
+	"github.com/TokujouKaisenDonburi/optical-backend/pkg/transact"
 )
 
 type AgentCommand struct {
 	openRouter             *openrouter.OpenRouter
-	transactor             *transact.TransactionProvider
+	transactor             transact.TransactionProvider
 	agentQueryRepository   repository.AgentQueryRepository
 	agentCommandRepository repository.AgentCommandRepository
 }
 
 func NewAgentCommand(
 	openRouter *openrouter.OpenRouter,
-	transactor *transact.TransactionProvider,
+	transactor transact.TransactionProvider,
 	agentQueryRepository repository.AgentQueryRepository,
 	agentCommandRepository repository.AgentCommandRepository,
 ) *AgentCommand {
