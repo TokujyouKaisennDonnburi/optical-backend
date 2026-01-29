@@ -5,6 +5,7 @@ import (
 	"database/sql"
 
 	"github.com/TokujouKaisenDonburi/optical-backend/internal/calendar/service/query/output"
+	"github.com/TokujouKaisenDonburi/optical-backend/internal/calendar"
 	"github.com/TokujouKaisenDonburi/optical-backend/internal/user"
 	"github.com/TokujouKaisenDonburi/optical-backend/pkg/apperr"
 	"github.com/google/uuid"
@@ -137,4 +138,80 @@ func (r *MemberPsqlRepository) FindMembers(ctx context.Context, calendarId uuid.
 		}
 	}
 	return members, nil
+}
+
+func (r *MemberPsqlRepository) AddMember(ctx context.Context, calendarId, userId uuid.UUID) error {
+	query := `
+		INSERT INTO calendar_members (calendar_id, user_id, joined_at)
+		VALUES ($1, $2, NOW())
+		ON CONFLICT (calendar_id, user_id)
+		DO UPDATE SET joined_at = NOW()
+		WHERE calendar_members.joined_at IS NULL
+	`
+	_, err := r.db.ExecContext(ctx, query, calendarId, userId)
+	return err
+}
+
+// 招待を一括作成
+func (r *MemberPsqlRepository) CreateInvitations(ctx context.Context, invitations []*calendar.Invitation) error {
+	if len(invitations) == 0 {
+		return nil
+	}
+	query := `
+		INSERT INTO calendar_invitations (id, calendar_id, email, token, expires_at, created_at)
+		VALUES (:id, :calendar_id, :email, :token, :expires_at, :created_at)
+	`
+	invitationMaps := make([]map[string]any, len(invitations))
+	for i, inv := range invitations {
+		invitationMaps[i] = map[string]any{
+			"id":          inv.Id,
+			"calendar_id": inv.CalendarId,
+			"email":       inv.Email,
+			"token":       inv.Token,
+			"expires_at":  inv.ExpiresAt,
+			"created_at":  inv.CreatedAt,
+		}
+	}
+	_, err := r.db.NamedExecContext(ctx, query, invitationMaps)
+	return err
+}
+
+// 招待を使用済みにする
+func (r *MemberPsqlRepository) MarkInvitationAsUsed(ctx context.Context, invitation *calendar.Invitation) error {
+	query := `
+		UPDATE calendar_invitations
+		SET joined_user_id = $1, used_at = $2
+		WHERE id = $3
+	`
+	_, err := r.db.ExecContext(ctx, query,
+		uuid.NullUUID{UUID: invitation.JoinedUserId.UUID, Valid: invitation.JoinedUserId.Valid},
+		invitation.UsedAt,
+		invitation.Id,
+	)
+	return err
+}
+
+// DBから取得した行をドメインモデルに変換するための構造体
+type invitationRow struct {
+	Id           uuid.UUID     `db:"id"`
+	CalendarId   uuid.UUID     `db:"calendar_id"`
+	Email        string        `db:"email"`
+	JoinedUserId uuid.NullUUID `db:"joined_user_id"`
+	Token        uuid.UUID     `db:"token"`
+	ExpiresAt    sql.NullTime  `db:"expires_at"`
+	UsedAt       sql.NullTime  `db:"used_at"`
+	CreatedAt    sql.NullTime  `db:"created_at"`
+}
+
+func (row *invitationRow) toInvitation() *calendar.Invitation {
+	return &calendar.Invitation{
+		Id:           row.Id,
+		CalendarId:   row.CalendarId,
+		Email:        row.Email,
+		JoinedUserId: row.JoinedUserId,
+		Token:        row.Token,
+		ExpiresAt:    row.ExpiresAt.Time,
+		UsedAt:       row.UsedAt,
+		CreatedAt:    row.CreatedAt.Time,
+	}
 }
