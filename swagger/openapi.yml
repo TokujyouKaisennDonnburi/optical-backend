@@ -1711,21 +1711,23 @@ components:
           type: integer
           format: int8
     GetAttendanceResponse:
-      type: object
-      required:
-        - userId
-        - comment
-        - status
-      properties:
-        userId:
-          type: string
-          format: uuid
-        comment:
-          type: string
-        status:
-          type: array
-          items:
-            $ref: "#/components/schemas/GetAttendanceStatusResponse"
+      type: array
+      items:
+        type: object
+        required:
+          - userId
+          - comment
+          - status
+        properties:
+          userId:
+            type: string
+            format: uuid
+          comment:
+            type: string
+          status:
+            type: array
+            items:
+              $ref: "#/components/schemas/GetAttendanceStatusResponse"
     GetAttendanceStatusResponse:
       type: object
       required:

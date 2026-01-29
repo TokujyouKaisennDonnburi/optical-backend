@@ -13,7 +13,7 @@ type AttendanceQueryInput struct {
 	UserId      uuid.UUID
 }
 
-func (q *SchedulerQuery) AttendanceQuery(ctx context.Context, input AttendanceQueryInput) (*output.SchedulerAttendanceOutput, error) {
+func (q *SchedulerQuery) AttendanceQuery(ctx context.Context, input AttendanceQueryInput) ([]output.SchedulerAttendanceOutput, error) {
 	result, err := q.schedulerRepository.FindAttendanceById(ctx, input.CalendarId, input.SchedulerId, input.UserId)
 	if err != nil {
 		return nil, err

@@ -14,6 +14,6 @@ type SchedulerRepository interface {
 	FindSchedulerById(ctx context.Context, id uuid.UUID) (*output.SchedulerOutput, error)
 	AddAttendance(ctx context.Context, id, schedulerId, userId uuid.UUID, comment string, schedulerStatus []scheduler.SchedulerStatus) error
 	FindResultByIdAndUserId(ctx context.Context, schedulerId, userId uuid.UUID) (*output.SchedulerResultOutput, error)
-	FindAttendanceById(ctx context.Context, calendarId, schedulerId, userId uuid.UUID) (*output.SchedulerAttendanceOutput, error)
+	FindAttendanceById(ctx context.Context, calendarId, schedulerId, userId uuid.UUID) ([]output.SchedulerAttendanceOutput, error)
 	FindAllSchedulerById(ctx context.Context, calendarId, userId uuid.UUID) ([]scheduler.Scheduler, error)
 }
