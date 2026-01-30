@@ -1,16 +1,18 @@
 package handler
 
 import (
+	"github.com/TokujouKaisenDonburi/optical-backend/internal/calendar/notice"
 	"github.com/TokujouKaisenDonburi/optical-backend/internal/calendar/service/command"
 	"github.com/TokujouKaisenDonburi/optical-backend/internal/calendar/service/query"
 )
 
 type CalendarHttpHandler struct {
-	eventCommand    *command.EventCommand
-	eventQuery      *query.EventQuery
-	calendarCommand *command.CalendarCommand
-	calendarQuery   *query.CalendarQuery
-	memberQuery     *query.MemberQuery
+	eventCommand          *command.EventCommand
+	eventQuery            *query.EventQuery
+	calendarCommand       *command.CalendarCommand
+	calendarQuery         *query.CalendarQuery
+	memberQuery           *query.MemberQuery
+	calendarNoticeService *notice.CalendarNoticeService
 }
 
 func NewCalendarHttpHandler(
@@ -19,6 +21,7 @@ func NewCalendarHttpHandler(
 	calendarCommand *command.CalendarCommand,
 	calendarQuery *query.CalendarQuery,
 	memberQuery *query.MemberQuery,
+	calendarNoticeService *notice.CalendarNoticeService,
 ) *CalendarHttpHandler {
 	if eventCommand == nil {
 		panic("EventCommand is nil")
@@ -35,11 +38,15 @@ func NewCalendarHttpHandler(
 	if memberQuery == nil {
 		panic("MemberQuery is nil")
 	}
+	if calendarNoticeService == nil {
+		panic("CalendarNoticeService is nil")
+	}
 	return &CalendarHttpHandler{
-		eventCommand:    eventCommand,
-		eventQuery:      eventQuery,
-		calendarCommand: calendarCommand,
-		calendarQuery:   calendarQuery,
-		memberQuery:     memberQuery,
+		eventCommand:          eventCommand,
+		eventQuery:            eventQuery,
+		calendarCommand:       calendarCommand,
+		calendarQuery:         calendarQuery,
+		memberQuery:           memberQuery,
+		calendarNoticeService: calendarNoticeService,
 	}
 }
