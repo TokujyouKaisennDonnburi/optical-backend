@@ -792,7 +792,8 @@ paths:
         "500":
           description: Internal server error
     post:
-      summary: Add a member to a calendar
+      summary: Add a member to a calendar (Old flow)
+      description: 直接メンバーをカレンダーに追加します。登録済みユーザーのみが対象です。
       tags:
         - members
       security:
@@ -818,8 +819,8 @@ paths:
         "500":
           description: Internal server error
     patch:
-      summary: Join a calendar as an invited member
-      description: Allows an invited user to join a calendar. The user must have been previously invited.
+      summary: Join a calendar as an invited member (Old flow)
+      description: 従来の招待（メンバーテーブルへの直接追加）を受けたユーザーが参加を確定させます。トークンは不要です。
       tags:
         - members
       security:
@@ -855,6 +856,63 @@ paths:
           description: Successfully rejected the invitation
         "400":
           description: Invalid calendarId format
+        "500":
+          description: Internal server error
+  /calendars/{calendarId}/invitations:
+    post:
+      summary: Create invitations with tokens (New flow)
+      description: 未登録ユーザーも含め、メールアドレス指定で招待状を発行します。個別トークン付きのメールが送信されます。
+      tags:
+        - members
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: calendarId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MemberCreateRequest"
+      responses:
+        "204":
+          description: Invitations created successfully
+        "400":
+          description: Invalid request
+        "500":
+          description: Internal server error
+  /calendars/{calendarId}/join:
+    post:
+      summary: Join a calendar using an invitation token (New flow)
+      description: 招待メールに含まれるトークンを使用してカレンダーに参加します。
+      tags:
+        - members
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: calendarId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: token
+          in: query
+          required: true
+          description: 招待状のトークン (UUID)
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "204":
+          description: Successfully joined the calendar
+        "400":
+          description: Invalid token or already used
         "500":
           description: Internal server error
   /github/apps/state:
