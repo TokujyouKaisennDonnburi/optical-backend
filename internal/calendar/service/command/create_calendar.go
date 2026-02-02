@@ -2,11 +2,10 @@ package command
 
 import (
 	"context"
+
 	"github.com/TokujouKaisenDonburi/optical-backend/internal/calendar"
-	"github.com/TokujouKaisenDonburi/optical-backend/internal/user"
 	"github.com/TokujouKaisenDonburi/optical-backend/pkg/apperr"
 	"github.com/google/uuid"
-	"github.com/sirupsen/logrus"
 )
 
 type CalendarCreateInput struct {
@@ -14,7 +13,6 @@ type CalendarCreateInput struct {
 	UserName      string
 	CalendarName  string
 	CalendarColor string
-	MemberEmails  []string
 	ImageId       uuid.UUID
 	OptionIds     []int32
 }
@@ -69,28 +67,6 @@ func (c *CalendarCommand) CreateCalendar(ctx context.Context, input CalendarCrea
 	})
 	if err != nil {
 		return nil, err
-	}
-	if len(input.MemberEmails) > 0 {
-		go func() {
-			content := getEmailContent(getFontendUrl(), newCalendar.Id)
-			emails := make([]user.Email, len(input.MemberEmails))
-			for i, mail := range input.MemberEmails {
-				newEmail, err := user.NewEmail(mail)
-				if err != nil {
-					continue
-				}
-				emails[i] = newEmail
-			}
-			err := c.emailRepository.NotifyAll(
-				ctx,
-				"OptiCal: メンバーに招待されました",
-				content,
-				emails,
-			)
-			if err != nil {
-				logrus.WithError(err).Error("failed to send emails")
-			}
-		}()
 	}
 	return &CalendarCreateOutput{
 		Id:   newCalendar.Id,
