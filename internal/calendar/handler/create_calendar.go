@@ -13,11 +13,10 @@ import (
 )
 
 type CalendarCreateRequest struct {
-	Name      string   `json:"name"`
-	Color     string   `json:"color"`
-	ImageId   string   `json:"imageId"`
-	Members   []string `json:"members"`
-	OptionIds []int32  `json:"optionIds"`
+	Name      string  `json:"name"`
+	Color     string  `json:"color"`
+	ImageId   string  `json:"imageId"`
+	OptionIds []int32 `json:"optionIds"`
 }
 
 type CalendarCreateResponse struct {
@@ -58,7 +57,6 @@ func (h *CalendarHttpHandler) CreateCalendar(w http.ResponseWriter, r *http.Requ
 		ImageId:       imageId,
 		CalendarName:  request.Name,
 		CalendarColor: request.Color,
-		MemberEmails:  request.Members,
 		OptionIds:     request.OptionIds,
 	})
 	if err != nil {
