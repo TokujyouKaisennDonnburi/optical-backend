@@ -1,0 +1,108 @@
+openapi: 3.1.0
+servers:
+  - url: http://localhost:8000
+info:
+  title: Optical Backend API
+  version: 1.0.0
+  description: API for Optical Backend
+tags:
+  - name: users
+    description: Users and authorization
+  - name: calendars
+    description: Calendars
+  - name: members
+    description: Member management
+  - name: events
+    description: Events management
+  - name: schedulers
+    description: Scheduler management
+  - name: options
+    description: Options management
+  - name: agents
+    description: AI agent functionality
+  - name: github
+    description: GitHub integration
+  - name: google
+    description: Google OAuth integration
+  - name: notices
+    description: Notifications management
+  - name: todos
+    description: Todo management
+paths:
+  /register:
+    $ref: "./tags/users/register.yml"
+  /login:
+    $ref: "./tags/users/login.yml"
+  /refresh:
+    $ref: "./tags/users/refresh.yml"
+  /users/@me:
+    $ref: "./tags/users/me.yml"
+  /users/avatars:
+    $ref: "./tags/users/avatars.yml"
+  /calendars:
+    $ref: "./tags/calendars/calendars.yml"
+  /calendars/{calendarId}:
+    $ref: "./tags/calendars/calendar.yml"
+  /calendars/images:
+    $ref: "./tags/calendars/images.yml"
+  /calendars/{calendarId}/members:
+    $ref: "./tags/members/members.yml"
+  /calendars/{calendarId}/events:
+    $ref: "./tags/events/events.yml"
+  /calendars/{calendarId}/events/{eventId}:
+    $ref: "./tags/events/event.yml"
+  /calendars/{calendarId}/schedulers:
+    $ref: "./tags/schedulers/schedulers.yml"
+  /calendars/{calendarId}/schedulers/{schedulerId}/attendance:
+    $ref: "./tags/schedulers/attendance.yml"
+  /calendars/{calendarId}/schedulers/{schedulerId}:
+    $ref: "./tags/schedulers/scheduler.yml"
+  /schedulers/{schedulerId}/result:
+    $ref: "./tags/schedulers/result.yml"
+  /events/todays:
+    $ref: "./tags/events/todays.yml"
+  /events/months:
+    $ref: "./tags/events/months.yml"
+  /events/search:
+    $ref: "./tags/events/search.yml"
+  /options:
+    $ref: "./tags/options/options.yml"
+  /agents/chat:
+    $ref: "./tags/agents/chat.yml"
+  /agents/options:
+    $ref: "./tags/agents/options.yml"
+  /github/apps/state:
+    $ref: "./tags/github/apps-state.yml"
+  /github/oauth/state:
+    $ref: "./tags/github/oauth-state.yml"
+  /github/apps/install:
+    $ref: "./tags/github/apps-install.yml"
+  /github/oauth/link:
+    $ref: "./tags/github/oauth-link.yml"
+  /github/calendars/{calendarId}/review-requests:
+    $ref: "./tags/github/review-requests.yml"
+  /github/calendars/{calendarId}/review-load-status:
+    $ref: "./tags/github/review-load-status.yml"
+  /github/calendars/{calendarId}/milestones:
+    $ref: "./tags/github/milestones.yml"
+  /github/oauth/status:
+    $ref: "./tags/github/oauth-status.yml"
+  /github/calendars/{calendarId}/installation-status:
+    $ref: "./tags/github/installation-status.yml"
+  /calendars/{calendarId}/todos:
+    $ref: "./tags/todos/todos.yml"
+  /calendars/{calendarId}/todos/{todoListId}/items:
+    $ref: "./tags/todos/items.yml"
+  /calendars/{calendarId}/todos/{todoListId}/items/{todoItemId}:
+    $ref: "./tags/todos/item.yml"
+  /google/oauth/state:
+    $ref: "./tags/google/oauth-state.yml"
+  /google/oauth/user:
+    $ref: "./tags/google/oauth-user.yml"
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

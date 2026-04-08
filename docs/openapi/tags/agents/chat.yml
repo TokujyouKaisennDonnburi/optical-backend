@@ -1,0 +1,29 @@
+post:
+  summary: Chat with an AI Agent
+  tags:
+    - agents
+  security:
+    - bearerAuth: []
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: "#/components/schemas/AgentChatRequest"
+  responses:
+    '200':
+      description: messages from AI Agent
+      content:
+        text/event-stream:
+          schema:
+            type: string
+            example: "data: {\"content\":\"来週の\"}"
+
+components:
+  schemas:
+    AgentChatRequest:
+      type: object
+      properties:
+        message:
+          type: string
+          example: "来週の予定を教えて"

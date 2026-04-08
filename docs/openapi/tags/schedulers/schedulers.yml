@@ -1,0 +1,152 @@
+get:
+  summary: Get list of schedulers by calendar ID
+  description: 指定されたカレンダーのscheduler一覧を取得します。ユーザーはカレンダーのメンバーである必要があります。
+  tags:
+    - schedulers
+  security:
+    - bearerAuth: []
+  parameters:
+    - name: calendarId
+      in: path
+      required: true
+      description: カレンダーID (UUID形式)
+      schema:
+        type: string
+        format: uuid
+        example: "019b1ffe-efd5-7d9b-a13f-f636cfc89c4d"
+  responses:
+    "200":
+      description: Schedulers retrieved successfully
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: "#/components/schemas/AllSchedulerResponse"
+    "400":
+      description: Invalid request
+    "401":
+      description: Unauthorized
+    "403":
+      description: Forbidden - User is not a member of this calendar
+    "500":
+      description: Internal server error
+post:
+  summary: Create a new scheduler
+  tags:
+    - schedulers
+  security:
+    - bearerAuth: []
+  parameters:
+    - name: calendarId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: "#/components/schemas/SchedulerCreateRequest"
+  responses:
+    "200":
+      description: Scheduler created successfully
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/SchedulerCreateResponse"
+    "400":
+      description: Invalid request
+    "401":
+      description: Unauthorized
+    "403":
+      description: Forbidden - Scheduler option not enabled
+    "500":
+      description: Internal server error
+
+components:
+  schemas:
+    AllSchedulerResponse:
+      type: object
+      required:
+        - id
+        - title
+        - memo
+        - limitTime
+        - isAllDay
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Scheduler ID
+          example: "019b1ffe-efd5-7d9b-a13f-f636cfc89c4d"
+        title:
+          type: string
+          description: Scheduler title
+          example: "Meeting Scheduler"
+        memo:
+          type: string
+          description: Scheduler memo/description
+          example: "Weekly team meeting"
+        limitTime:
+          type: string
+          format: date-time
+          description: Deadline for responses
+          example: "2026-03-15T12:00:00Z"
+        isAllDay:
+          type: boolean
+          description: Whether this is an all-day scheduler
+          example: false
+    SchedulerCreateRequest:
+      type: object
+      required:
+        - title
+        - memo
+        - limitTime
+        - isAllDay
+        - dates
+      properties:
+        title:
+          type: string
+          example: "scheduler title"
+        memo:
+          type: string
+          example: "memo"
+        limitTime:
+          type: string
+          format: date-time
+          example: "2026-03-15T12:00:00Z"
+        isAllDay:
+          type: boolean
+          example: false
+        dates:
+          type: array
+          items:
+            $ref: "#/components/schemas/SchedulerCreateDateRequest"
+    SchedulerCreateDateRequest:
+      type: object
+      required:
+        - date
+        - startTime
+        - endTime
+      properties:
+        date:
+          type: string
+          format: date-time
+          example: "2026-03-20T00:00:00Z"
+        startTime:
+          type: string
+          format: date-time
+          example: "2026-03-20T09:00:00Z"
+        endTime:
+          type: string
+          format: date-time
+          example: "2026-03-20T10:00:00Z"
+    SchedulerCreateResponse:
+      type: object
+      properties:
+        schedulerId:
+          type: string
+          format: uuid
