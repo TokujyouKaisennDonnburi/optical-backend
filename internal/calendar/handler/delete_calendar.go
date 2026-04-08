@@ -12,24 +12,29 @@ import (
 )
 
 func (h *CalendarHttpHandler) DeleteCalendar(w http.ResponseWriter, r *http.Request) {
-	// calendarId
+	ctx := r.Context()
+
 	calendarId, err := uuid.Parse(chi.URLParam(r, "calendarId"))
 	if err != nil {
 		_ = render.Render(w, r, apperr.ErrInvalidRequest(err))
 		return
 	}
-	// userId
+
 	userId, err := auth.GetUserIdFromContext(r)
 	if err != nil {
 		_ = render.Render(w, r, apperr.ErrInternalServerError(err))
 		return
 	}
-	err = h.calendarCommand.DeleteCalendar(r.Context(), command.CalendarDeleteInput{
+
+	// カレンダー削除
+	err = h.calendarCommand.DeleteCalendar(ctx, command.CalendarDeleteInput{
 		CalendarId: calendarId,
 		UserId:     userId,
 	})
 	if err != nil {
 		apperr.HandleAppError(w, r, err)
+		return
 	}
+
 	render.NoContent(w, r)
 }

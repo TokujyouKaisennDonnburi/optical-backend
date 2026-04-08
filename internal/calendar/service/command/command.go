@@ -1,18 +1,20 @@
 package command
 
 import (
+	"github.com/TokujouKaisenDonburi/optical-backend/internal/calendar/notice"
 	calendarRepo "github.com/TokujouKaisenDonburi/optical-backend/internal/calendar/repository"
 	optionRepo "github.com/TokujouKaisenDonburi/optical-backend/internal/option/repository"
 	"github.com/TokujouKaisenDonburi/optical-backend/pkg/transact"
 )
 
 type CalendarCommand struct {
-	transactor         transact.TransactionProvider
-	calendarRepository calendarRepo.CalendarRepository
-	optionRepository   optionRepo.OptionRepository
-	imageRepository    calendarRepo.ImageRepository
-	memberRepository   calendarRepo.MemberRepository
-	emailRepository    calendarRepo.EmailRepository
+	transactor            transact.TransactionProvider
+	calendarRepository    calendarRepo.CalendarRepository
+	optionRepository      optionRepo.OptionRepository
+	imageRepository       calendarRepo.ImageRepository
+	memberRepository      calendarRepo.MemberRepository
+	emailRepository       calendarRepo.EmailRepository
+	calendarNoticeService *notice.CalendarNoticeService
 }
 
 type EventCommand struct {
@@ -28,6 +30,7 @@ func NewCalendarCommand(
 	imageRepository calendarRepo.ImageRepository,
 	memberRepository calendarRepo.MemberRepository,
 	emailRepository calendarRepo.EmailRepository,
+	calendarNoticeService *notice.CalendarNoticeService,
 ) *CalendarCommand {
 	if transactor == nil {
 		panic("transactor is nil")
@@ -47,13 +50,17 @@ func NewCalendarCommand(
 	if emailRepository == nil {
 		panic("emailRepository is nil")
 	}
+	if calendarNoticeService == nil {
+		panic("calendarNoticeService is nil")
+	}
 	return &CalendarCommand{
-		transactor:         transactor,
-		calendarRepository: calendarRepository,
-		optionRepository:   optionRepository,
-		imageRepository:    imageRepository,
-		memberRepository:   memberRepository,
-		emailRepository:    emailRepository,
+		transactor:            transactor,
+		calendarRepository:    calendarRepository,
+		optionRepository:      optionRepository,
+		imageRepository:       imageRepository,
+		memberRepository:      memberRepository,
+		emailRepository:       emailRepository,
+		calendarNoticeService: calendarNoticeService,
 	}
 }
 
