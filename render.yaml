@@ -1,0 +1,149 @@
+# Render Blueprint
+#
+# ダッシュボードでの手作業に頼らず、デプロイ構成をリポジトリで管理するための定義。
+# Render の Blueprint として読み込むと、Web Service と Key Value をまとめて作成できる。
+#
+# 前提:
+#   - PostgreSQL は Render ではなく Neon の外部インスタンスを使う（pg_search 拡張が必要なため）
+#   - 画像ストレージは Cloudflare R2 を S3 互換として利用する（環境変数名は MINIO_* を流用）
+#   - メール送信は Resend の HTTP API を使う（Render の無料プランは outbound SMTP を遮断する）
+#
+# Blueprint で宣言できないもの（ダッシュボードでの操作が必要）:
+#   - Secret File `optical-github.private-key.pem`
+#     Environment → Add Secret File から登録する。実行時に /etc/secrets/ 配下に配置される。
+
+services:
+  # ------------------------------------------------------------------
+  # APIサーバー
+  # ------------------------------------------------------------------
+  - name: optical-backend
+    type: web
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    plan: free
+    # Neon が ap-southeast-1 のため、レイテンシを抑える目的で singapore を選ぶ
+    region: singapore
+    branch: main
+    # ヘルスチェック用のエンドポイントが未実装のため healthCheckPath は指定しない
+    envVars:
+      # --- 動作設定 ---------------------------------------------------
+      # Neon 側は全マイグレーション適用済みのため、起動時の実行は実質no-opになる
+      - key: RUNTIME_MIGRATION
+        value: "1"
+      - key: PRODUCTION
+        value: "1"
+      - key: LOGGER_LEVEL
+        value: INFO
+      - key: LOGGER_JSON_FORMAT
+        value: "1"
+      - key: LOGGER_REPORT_CALLER
+        value: "0"
+
+      # --- PostgreSQL (Neon) ------------------------------------------
+      # 接続文字列ではなく個別の変数で受け取る実装のため、Neon の接続情報を分解して設定する
+      - key: POSTGRES_HOST
+        sync: false
+      - key: POSTGRES_PASSWORD
+        sync: false
+      - key: POSTGRES_PORT
+        value: "5432"
+      - key: POSTGRES_DB
+        value: neondb
+      - key: POSTGRES_USER
+        value: neondb_owner
+      - key: POSTGRES_SSLMODE
+        value: require
+
+      # --- Redis (Render Key Value) -----------------------------------
+      # 実装は host:port 形式とパスワードを個別に要求するため、接続文字列から分解して設定する
+      - key: REDIS_ADDRESS
+        sync: false
+      - key: REDIS_PASSWORD
+        sync: false
+      - key: REDIS_TLS
+        value: "1"
+      - key: REDIS_TLS_INSECURE_SKIP_VERIFY
+        value: "0"
+
+      # --- 画像ストレージ (Cloudflare R2) -------------------------------
+      # IMAGE_STORAGE_BASE_URL は既存の avatars.url が相対パスで依存しているため、
+      # 現行本番と同じ値を使うこと。変更すると既存画像の参照が壊れる。
+      - key: MINIO_ENDPOINT
+        sync: false
+      - key: MINIO_ACCESS_KEY_ID
+        sync: false
+      - key: MINIO_SECRET_ACCESS_KEY
+        sync: false
+      - key: MINIO_IMAGE_BUCKET_NAME
+        sync: false
+      - key: IMAGE_STORAGE_BASE_URL
+        sync: false
+      - key: MINIO_FROM_IAM
+        value: "0"
+      - key: MINIO_USE_SSL
+        value: "1"
+      - key: MINIO_TLS_INSECURE_SKIP_VERIFY
+        value: "0"
+      - key: MINIO_REGION
+        value: auto
+
+      # --- 暗号鍵 -------------------------------------------------------
+      # INSTALLATION_ID_ENCRYPTION_KEY は calendar_githubs.installation_id の
+      # 復号に使うため、DBを引き継ぐ場合は現行本番と同じ値でなければならない。
+      # JWT_SECRET_KEY と REDIS_ENCRYPTION_KEY は新規発行してよい
+      # （前者は全ユーザーの再ログイン、後者は影響なし）。
+      - key: INSTALLATION_ID_ENCRYPTION_KEY
+        sync: false
+      - key: JWT_SECRET_KEY
+        sync: false
+      - key: REDIS_ENCRYPTION_KEY
+        sync: false
+
+      # --- メール送信 (Resend) ------------------------------------------
+      - key: RESEND_API_KEY
+        sync: false
+      - key: SENDER_EMAIL_ADDRESS
+        value: info@opti-cal.org
+
+      # --- GitHub ------------------------------------------------------
+      - key: GITHUB_CLIENT_ID
+        sync: false
+      - key: GITHUB_CLIENT_SECRET
+        sync: false
+      - key: GITHUB_OAUTH_REDIRECT_URI
+        sync: false
+      # Secret File として登録したファイルの配置先
+      - key: GITHUB_PRIVATE_KEY_PEM_PATH
+        value: /etc/secrets/optical-github.private-key.pem
+
+      # --- Google ------------------------------------------------------
+      - key: GOOGLE_OAUTH_CLIENT_ID
+        sync: false
+      - key: GOOGLE_OAUTH_CLIENT_SECRET
+        sync: false
+      - key: GOOGLE_OAUTH_REDIRECT_URI
+        sync: false
+
+      # --- AIエージェント ------------------------------------------------
+      - key: AGENT_API_KEY
+        sync: false
+      - key: AGENT_MODEL
+        sync: false
+
+      # --- フロントエンド --------------------------------------------------
+      - key: FRONTEND_BASE_URL
+        value: https://opti-cal.org
+
+  # ------------------------------------------------------------------
+  # Redis
+  # 保持しているのは TTL 付きのキャッシュと OAuth の state のみ。
+  # 無料プランは再起動でデータが消えるが、キャッシュミス時は
+  # GitHub API から取り直すフォールバックがあるため実害はない。
+  # ------------------------------------------------------------------
+  - name: optical-redis
+    type: keyvalue
+    plan: free
+    region: singapore
+    # 外部からの接続を許可しない（同一リージョンの Render サービスからのみ接続する）
+    ipAllowList: []
