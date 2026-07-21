@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"net/http"
 	"os"
-	"strconv"
 	"strings"
 
 	migrate "github.com/rubenv/sql-migrate"
@@ -51,7 +50,6 @@ import (
 	"github.com/sirupsen/logrus"
 	prefixed "github.com/x-cray/logrus-prefixed-formatter"
 	"google.golang.org/genai"
-	"gopkg.in/mail.v2"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/cors"
@@ -93,7 +91,6 @@ func main() {
 	jwtMiddleware := userHandler.NewUserAuthMiddleware()
 
 	db := getPostgresDB()
-	dialer := GetDialer()
 	redisClient := GetRedisClient()
 	minioClient := GetMinIOClient()
 	// genaiClient := GetGenAIClient()
@@ -135,7 +132,7 @@ func main() {
 	stateRepository := githubGateway.NewStateRedisRepository(db, redisClient, redisEncryptionKey)
 	optionRepository := optionGateway.NewOptionPsqlRepository(db)
 	githubRepository := githubGateway.NewGithubApiRepository(db, installationIdEncryptionKey)
-	gmailRepository := calendarGateway.NewGmailRepository(dialer, getEmailAddress())
+	emailRepository := calendarGateway.NewResendRepository(getResendApiKey(), getEmailAddress())
 	eventRepository := calendarGateway.NewEventPsqlRepository(db)
 	optionAgentRepository := agentGateway.NewOptionAgentOpenRouterRepository(openRouter)
 	agentQueryRepository := agentGateway.NewAgentQueryPsqlRepository(db)
@@ -164,7 +161,7 @@ func main() {
 	optionHandler := optionHandler.NewOptionHttpHandler(optionQuery)
 	eventCommand := calendarCommand.NewEventCommand(transactionProvider, eventRepository, calendarRepository)
 	eventQuery := calendarQuery.NewEventQuery(eventRepository)
-	calendarCommand := calendarCommand.NewCalendarCommand(transactionProvider, calendarRepository, optionRepository, imageRepository, memberRepository, gmailRepository)
+	calendarCommand := calendarCommand.NewCalendarCommand(transactionProvider, calendarRepository, optionRepository, imageRepository, memberRepository, emailRepository)
 	memberQuery := calendarQuery.NewMemberQuery(memberRepository)
 	calendarQuery := calendarQuery.NewCalendarQuery(calendarRepository)
 	calendarHandler := calendarHandler.NewCalendarHttpHandler(eventCommand, eventQuery, calendarCommand, calendarQuery, memberQuery)
@@ -455,28 +452,12 @@ func getEmailAddress() string {
 	return email
 }
 
-func GetDialer() *mail.Dialer {
-	host, ok := os.LookupEnv("EMAIL_HOST")
+func getResendApiKey() string {
+	apiKey, ok := os.LookupEnv("RESEND_API_KEY")
 	if !ok {
-		panic("'EMAIL_HOST' is not set")
+		panic("'RESEND_API_KEY' is not set")
 	}
-	portStr, ok := os.LookupEnv("EMAIL_PORT")
-	if !ok {
-		panic("'EMAIL_PORT' is not set")
-	}
-	port, err := strconv.Atoi(portStr)
-	if err != nil {
-		panic("'EMAIL_PORT' is not int")
-	}
-	user, ok := os.LookupEnv("EMAIL_USER")
-	if !ok {
-		panic("'EMAIL_USER' is not set")
-	}
-	password, ok := os.LookupEnv("EMAIL_PASSWORD")
-	if !ok {
-		panic("'EMAIL_PASSWORD' is not set")
-	}
-	return mail.NewDialer(host, port, user, password)
+	return apiKey
 }
 
 func GetGenAIClient() *genai.Client {
