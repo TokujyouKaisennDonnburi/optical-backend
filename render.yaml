@@ -61,8 +61,11 @@ services:
         sync: false
       - key: REDIS_PASSWORD
         sync: false
+      # 接続文字列のスキームに合わせること。
+      # 内部接続 (redis://) なら 0、外部接続 (rediss://) なら 1。
+      # 不一致だと起動時の Ping に失敗して panic する。
       - key: REDIS_TLS
-        value: "1"
+        sync: false
       - key: REDIS_TLS_INSECURE_SKIP_VERIFY
         value: "0"
 
